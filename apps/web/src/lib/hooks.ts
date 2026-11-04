@@ -119,7 +119,10 @@ export function usePortfolio(address?: Address) {
     }, 0)
     const change = prev > 0 ? ((total - prev) / prev) * 100 : null
     const unpriced = rows.filter((r) => r.valueUsd === null && r.raw > 0n)
-    return { total: prices.isError ? null : total, change24hPct: change, unpriced }
+    const pricedHeld = priced.filter((r) => r.raw > 0n)
+    // Never show "$0" for a wallet whose assets simply have no market price.
+    const unknown = prices.isError || (pricedHeld.length === 0 && unpriced.length > 0)
+    return { total: unknown ? null : total, change24hPct: change, unpriced }
   }, [rows, prices.isError])
 
   return { balances, prices, rows, totals, network }

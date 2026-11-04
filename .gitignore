@@ -17,3 +17,4 @@ apps/desktop/src-tauri/target/
 # expo
 apps/mobile/.expo/
 .DS_Store
+apps/web/e2e/screens/

@@ -2,6 +2,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, Minimize2, X } from 'lucide-react'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { checkMnemonic } from '@inwif/core'
 import { useHardware } from '@/lib/hardware'
 import { cx } from './ui'
@@ -200,7 +201,9 @@ export function SimulatorScreen() {
 /** Floating panel so the device is visible wherever a prompt arrives. */
 export function DevicePanel() {
   const h = useHardware()
-  if (!h.simulator) return null
+  const path = usePathname()
+  // The hardware page renders the device inline.
+  if (!h.simulator || path.startsWith('/app/hardware')) return null
   return (
     <AnimatePresence>
       {h.panelOpen ? (

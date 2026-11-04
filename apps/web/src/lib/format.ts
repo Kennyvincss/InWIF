@@ -12,7 +12,7 @@ export function fmtToken(raw: bigint | string, decimals: number, maxFrac = 6): s
 export function fmtUsd(v: number | null | undefined, opts: { compact?: boolean } = {}): string {
   if (v === null || v === undefined || !Number.isFinite(v)) return '—'
   if (opts.compact && Math.abs(v) >= 10_000)
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 2 }).format(v)
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', notation: 'compact', maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(v)
   const digits = Math.abs(v) > 0 && Math.abs(v) < 0.01 ? 6 : 2
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: digits, minimumFractionDigits: Math.min(2, digits) }).format(v)
 }

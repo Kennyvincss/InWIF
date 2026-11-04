@@ -19,6 +19,8 @@ export function ActivityList({
   emptyText?: string
 }) {
   const { network } = useNetwork()
+  if (!network.explorer.apiV2)
+    return <Empty icon={<RefreshCw className="h-5 w-5" />} title="History unavailable">{network.name} has no explorer indexer configured, so InWIF cannot list past transactions here.</Empty>
   if (loading)
     return (
       <div className="space-y-2">

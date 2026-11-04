@@ -59,7 +59,11 @@ export default function Dashboard() {
             </div>
             <div className="mt-1 flex items-center gap-2 text-sm">
               {totals.change24hPct !== null && <span className={totals.change24hPct >= 0 ? 'text-ok' : 'text-bad'}>{fmtPct(totals.change24hPct)} 24h</span>}
-              {prices.isError && <span className="text-warn">Market data unavailable — showing token amounts only.</span>}
+              {prices.isError ? (
+                <span className="text-warn">Market data unavailable — showing token amounts only.</span>
+              ) : totals.total === null && totals.unpriced.length > 0 ? (
+                <span className="text-mute">No market price available for your assets on {network.name}.</span>
+              ) : null}
             </div>
           </div>
           <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900 px-3 py-2">
