@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
+    "build:desktop": "node scripts/build-desktop.mjs",
     "start": "next start -p 3000",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

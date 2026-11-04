@@ -23,13 +23,16 @@ const securityHeaders = [
   },
 ]
 
+const DESKTOP = process.env.NEXT_PUBLIC_DESKTOP === '1'
+
 const nextConfig = {
   reactStrictMode: true,
+  // Desktop (Tauri) build: static export (see scripts/build-desktop.mjs, which
+  // leaves the server-only relays in src/app/api out of the build).
+  ...(DESKTOP ? { output: 'export', images: { unoptimized: true }, trailingSlash: true } : {}),
   transpilePackages: ['@inwif/core'],
   poweredByHeader: false,
-  async headers() {
-    return [{ source: '/:path*', headers: securityHeaders }]
-  },
+  ...(DESKTOP ? {} : { async headers() { return [{ source: '/:path*', headers: securityHeaders }] } }),
   webpack: (config) => {
     // Optional peer deps pulled in by wallet connectors we do not use.
     config.externals.push('pino-pretty', 'lokijs', 'encoding')

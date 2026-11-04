@@ -1,0 +1,41 @@
+name: CI
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  ts:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_USER: inwif, POSTGRES_PASSWORD: inwif-dev, POSTGRES_DB: inwif_test }
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @inwif/core test
+      - run: pnpm --filter @inwif/core typecheck
+      - run: pnpm --filter @inwif/web test
+      - run: pnpm --filter @inwif/web build
+      - run: pnpm --filter @inwif/api test
+        env: { TEST_DATABASE_URL: 'postgres://inwif:inwif-dev@localhost:5432/inwif_test' }
+      - run: pnpm --filter @inwif/mobile typecheck
+  contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - uses: foundry-rs/foundry-toolchain@v1
+      - run: forge test --root contracts
+  firmware:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: thumbv7em-none-eabihf }
+      - run: cargo test --manifest-path firmware/Cargo.toml
+      - run: cargo build --manifest-path firmware/Cargo.toml --release --no-default-features --target thumbv7em-none-eabihf

@@ -1,6 +1,8 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
+import type { ChartRange } from '@inwif/core'
+import { market } from './market-client'
 import type { Address } from 'viem'
 import {
   DEFAULT_TOKENS,
@@ -61,11 +63,7 @@ export function usePrices(network: NetworkConfig, addresses: Address[]) {
   return useQuery({
     queryKey: ['prices', network.key, addresses.join(',')],
     enabled: !!network.geckoTerminalNetwork && addresses.length > 0,
-    queryFn: async (): Promise<PriceMap> => {
-      const r = await fetch(`/api/market/prices?network=${network.geckoTerminalNetwork}&tokens=${addresses.join(',')}`)
-      if (!r.ok) throw new Error('Market data unavailable')
-      return (await r.json()) as PriceMap
-    },
+    queryFn: (): Promise<PriceMap> => market.prices(network.geckoTerminalNetwork!, addresses),
     staleTime: 60_000,
     refetchInterval: 120_000,
     retry: 1,
@@ -162,25 +160,16 @@ export function useTokenMarket(network: NetworkConfig, token?: Address) {
   return useQuery({
     queryKey: ['market', network.key, token],
     enabled: !!token && !!network.geckoTerminalNetwork,
-    queryFn: async (): Promise<MarketInfo | null> => {
-      const r = await fetch(`/api/market/token?network=${network.geckoTerminalNetwork}&address=${token}`)
-      if (r.status === 404) return null
-      if (!r.ok) throw new Error('Market data unavailable')
-      return (await r.json()) as MarketInfo
-    },
+    queryFn: (): Promise<MarketInfo | null> => market.token(network.geckoTerminalNetwork!, token!),
     staleTime: 120_000,
     retry: 1,
   })
 }
 
 export async function fetchHistory(network: NetworkConfig, token: Address, range: string) {
-  const m = await fetch(`/api/market/token?network=${network.geckoTerminalNetwork}&address=${token}`)
-  if (!m.ok) return []
-  const info = (await m.json()) as MarketInfo
-  if (!info.topPool) return []
-  const r = await fetch(`/api/market/ohlcv?network=${network.geckoTerminalNetwork}&pool=${info.topPool}&token=${token}&range=${range}`)
-  if (!r.ok) return []
-  return (await r.json()) as { t: number; close: number }[]
+  const info = await market.token(network.geckoTerminalNetwork!, token).catch(() => null)
+  if (!info?.topPool) return []
+  return market.history(network.geckoTerminalNetwork!, info.topPool as Address, token, range as ChartRange).catch(() => [])
 }
 
 export function usePortfolioHistory(rows: PricedBalance[], range: string) {

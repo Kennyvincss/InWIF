@@ -1,6 +1,9 @@
 'use client'
 import { NETWORKS, type NetworkConfig, type NetworkKey } from '@inwif/core'
 
+/** Desktop (Tauri) build: static export with no InWIF server, so no relays. */
+export const DESKTOP = process.env.NEXT_PUBLIC_DESKTOP === '1'
+
 export const LOCAL_ENABLED = process.env.NEXT_PUBLIC_ENABLE_LOCAL_NETWORK === 'true'
 
 export const SELECTABLE_NETWORKS: NetworkKey[] = LOCAL_ENABLED
@@ -14,7 +17,7 @@ export const SELECTABLE_NETWORKS: NetworkKey[] = LOCAL_ENABLED
  */
 export function browserNetwork(key: NetworkKey): NetworkConfig {
   const base = NETWORKS[key]
-  if (typeof window === 'undefined' || key === 'local') return base
+  if (typeof window === 'undefined' || key === 'local' || DESKTOP) return base
   const origin = window.location.origin
   return {
     ...base,

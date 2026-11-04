@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "InWIF",
+  "version": "0.1.0",
+  "identifier": "com.inwif.desktop",
+  "build": {
+    "frontendDist": "../../web/out",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "pnpm --filter @inwif/web dev",
+    "beforeBuildCommand": "pnpm --filter @inwif/web build:desktop"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [{ "title": "InWIF", "width": 1280, "height": 860, "minWidth": 380, "minHeight": 600, "url": "app/" }],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https: wss:; frame-ancestors 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Finance",
+    "shortDescription": "Free self-custody wallet for Robinhood Chain",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
+  }
+}

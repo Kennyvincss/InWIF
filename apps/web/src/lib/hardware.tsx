@@ -9,6 +9,7 @@ import {
   type DeviceInfo,
   type DevicePrompt,
   type SimulatorState,
+  type Transport,
 } from '@inwif/core'
 
 export interface SigningStep {
@@ -36,6 +37,7 @@ interface HwCtx {
   setPanelOpen: (o: boolean) => void
   startSimulator: () => SimulatedDevice
   connectWebSerial: () => Promise<void>
+  connectTransport: (t: Transport) => Promise<void>
   refreshInfo: () => Promise<DeviceInfo | null>
   verify: () => Promise<AuthenticityResult>
   disconnect: () => Promise<void>
@@ -111,6 +113,19 @@ export function HardwareProvider({ children }: { children: React.ReactNode }) {
     await refreshInfo()
   }, [refreshInfo])
 
+  const connectTransport = useCallback(
+    async (t: Transport) => {
+      const h = new HardwareWallet(t)
+      hwRef.current = h
+      setHw(h)
+      setSimulator(null)
+      setSimState(null)
+      setAuthenticity(null)
+      await refreshInfo()
+    },
+    [refreshInfo],
+  )
+
   const verify = useCallback(async () => {
     if (!hwRef.current) throw new Error('No device connected')
     const r = await hwRef.current.verifyAuthenticity()
@@ -147,6 +162,7 @@ export function HardwareProvider({ children }: { children: React.ReactNode }) {
         setPanelOpen,
         startSimulator,
         connectWebSerial,
+        connectTransport,
         refreshInfo,
         verify,
         disconnect,

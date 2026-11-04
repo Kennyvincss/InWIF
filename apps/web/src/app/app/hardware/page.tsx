@@ -10,6 +10,7 @@ import { useNotify } from '@/lib/notifications'
 import { SimulatorScreen } from '@/components/DevicePanel'
 import { Badge, ErrorBox, Notice, PageHeader, Row, Spinner } from '@/components/ui'
 import { timeAgo } from '@/lib/format'
+import { TauriSerialTransport, isTauri, listSerialPorts } from '@/lib/tauri-transport'
 
 const FLOW = [
   'Companion app constructs the transaction',
@@ -65,6 +66,24 @@ export default function HardwarePage() {
             <p className="mt-3 font-display text-lg font-bold">Start device simulator</p>
             <p className="mt-1 text-sm text-mute">Runs the same IWDP protocol as the firmware, in this tab. Not secure hardware — for demonstration and development.</p>
           </button>
+          {isTauri() ? (
+          <button
+            className="card p-6 text-left transition hover:border-lime/30"
+            onClick={() =>
+              run('usb', async () => {
+                const ports = await listSerialPorts()
+                const port = ports.find((p) => p.likely_inwif) ?? ports[0]
+                if (!port) throw new Error('No USB serial device found. Connect your InWIF device or dev board.')
+                await h.connectTransport(await TauriSerialTransport.open(port.name))
+                notify.push({ type: 'hardware', title: `Hardware device connected on ${port.name}` })
+              })
+            }
+          >
+            <Usb className="h-8 w-8 text-lime" />
+            <p className="mt-3 font-display text-lg font-bold">Connect over USB-C (native)</p>
+            <p className="mt-1 text-sm text-mute">Desktop app: direct USB serial access to your InWIF device or development board.</p>
+          </button>
+          ) : (
           <button
             className="card p-6 text-left transition hover:border-lime/30 disabled:opacity-50"
             disabled={!webSerialSupported()}
@@ -81,6 +100,7 @@ export default function HardwarePage() {
               {webSerialSupported() ? 'WebSerial: pick your InWIF device or development board.' : 'Requires a Chromium-based desktop browser (WebSerial), or the InWIF desktop app.'}
             </p>
           </button>
+          )}
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[340px,1fr]">
