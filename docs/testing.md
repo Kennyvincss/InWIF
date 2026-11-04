@@ -8,6 +8,8 @@
 | API (vitest + PostgreSQL) | `pnpm --filter @inwif/api test` | wallet-signature auth, nonce replay, secret rejection, device registry, input validation, rate limiting, no payment endpoints, schema has no secret columns |
 | Contracts (Foundry) | `cd contracts && forge test` | unit, fuzz (512 runs) and invariant tests: solvency, conservation, claimed ≤ funded; TS-generated Merkle proofs verify on-chain; mainnet deploy refused |
 | Firmware (cargo) | `cd firmware && cargo test` | byte-identical signatures vs the TS implementation, RLP and tx parser hardening, PIN wipe, chain allow-list, attestation, firmware signature checks |
+| Live mainnet (read-only) | `NODE_USE_ENV_PROXY=1 pnpm --filter @inwif/core verify:live` | chain IDs, $WIF and token metadata, Uniswap deployments, a live quote, explorer and market reachability |
+| Live web (read-only) | `node apps/web/e2e/live-mainnet.mjs` (server on :3000) | watch-only wallet on mainnet: verification, live portfolio, charts, $WIF page, swap quote, activity (with RPC fallback) |
 | Mobile | `cd apps/mobile && npx tsc --noEmit && npx expo export --platform android` | type safety and bundling |
 | Desktop | `cd apps/desktop/src-tauri && cargo build` | native shell compiles |
 
@@ -28,6 +30,8 @@ node e2e/smoke.mjs
 ```
 
 The API tests need PostgreSQL. Set `TEST_DATABASE_URL`; the default is `postgres://inwif:inwif-dev@127.0.0.1:5432/inwif_test`.
+
+`NODE_USE_ENV_PROXY=1` is only needed where outbound traffic goes through an HTTPS proxy, as in the sandbox used to build this.
 
 ## Not yet done
 - No independent security audit has been performed.

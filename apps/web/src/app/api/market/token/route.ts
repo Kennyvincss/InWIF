@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { fetchTokenMarket } from '@inwif/core'
-import { ADDRESS_RE, cached, logError, rateLimit } from '@/server/guard'
+import { ADDRESS_RE, cached, geckoFetch, logError, rateLimit } from '@/server/guard'
 
 export async function GET(req: Request) {
   const limited = rateLimit(req)
@@ -10,8 +10,8 @@ export async function GET(req: Request) {
   const address = u.searchParams.get('address') ?? ''
   if (network !== 'robinhood' || !ADDRESS_RE.test(address)) return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 })
   try {
-    const r = await cached<unknown>(`token:${network}:${address.toLowerCase()}`, 120_000, async () => {
-      const m = await fetchTokenMarket(network, address as `0x${string}`)
+    const r = await cached<unknown>(`token:${network}:${address.toLowerCase()}`, 300_000, async () => {
+      const m = await fetchTokenMarket(network, address as `0x${string}`, geckoFetch)
       return m ? { status: 200, body: m } : { status: 404, body: { error: 'No market for this token' } }
     })
     return NextResponse.json(r.body, { status: r.status })

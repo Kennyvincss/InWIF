@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { fetchTokenPrices } from '@inwif/core'
-import { ADDRESS_RE, cached, logError, rateLimit } from '@/server/guard'
+import { ADDRESS_RE, cached, geckoFetch, logError, rateLimit } from '@/server/guard'
 
 const NETWORKS = new Set(['robinhood'])
 
@@ -14,7 +14,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 })
   try {
     const key = `prices:${network}:${tokens.map((t) => t.toLowerCase()).sort().join(',')}`
-    const r = await cached(key, 60_000, async () => ({ status: 200, body: await fetchTokenPrices(network, tokens as `0x${string}`[]) }))
+    const r = await cached(key, 90_000, async () => ({ status: 200, body: await fetchTokenPrices(network, tokens as `0x${string}`[], geckoFetch) }))
     return NextResponse.json(r.body, { status: r.status, headers: { 'cache-control': 'public, max-age=30' } })
   } catch (e) {
     logError('market/prices', e)

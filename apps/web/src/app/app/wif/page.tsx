@@ -21,6 +21,7 @@ import { useWallet } from '@/lib/wallet-store'
 import { fetchHistory, useActivity, useNetwork, usePortfolio, useTokenMarket } from '@/lib/hooks'
 import { fmtPct, fmtToken, fmtUsd } from '@/lib/format'
 import { ECOSYSTEM_APPS, LISTING_CRITERIA } from '@/lib/ecosystem'
+import { withExplorer } from '@/lib/net'
 import { AreaChart } from '@/components/Charts'
 import { ActivityList } from '@/components/ActivityList'
 import { TxFlow, type TxRequest } from '@/components/TxFlow'
@@ -46,9 +47,9 @@ export default function WifPage() {
     },
     staleTime: 3_600_000,
   })
-  const explorer = useQuery({ queryKey: ['wif-explorer'], enabled: onMainnet, queryFn: () => fetchExplorerToken(network, WIF_ADDRESS), retry: 1 })
+  const explorer = useQuery({ queryKey: ['wif-explorer'], enabled: onMainnet, queryFn: () => withExplorer(network.key, (n) => fetchExplorerToken(n, WIF_ADDRESS)), retry: 1 })
   const market = useTokenMarket(network, onMainnet ? WIF_ADDRESS : undefined)
-  const history = useQuery({ queryKey: ['wif-history', range], enabled: onMainnet, queryFn: () => fetchHistory(network, WIF_ADDRESS, range), staleTime: 300_000 })
+  const history = useQuery({ queryKey: ['wif-history', range], enabled: onMainnet, queryFn: () => fetchHistory(network, WIF_ADDRESS, range), staleTime: 300_000, retry: 2, retryDelay: (n) => 3_000 * 2 ** n })
   const transfers = useActivity(onMainnet ? address : undefined, WIF_ADDRESS)
 
   const participation = transfers.data
@@ -97,7 +98,7 @@ export default function WifPage() {
             ))}
           </div>
           <div className="mt-3">
-            {history.isLoading ? <Skeleton className="h-48" /> : history.data && history.data.length > 1 ? <AreaChart data={history.data} label="$WIF price (USD)" /> : <Notice>No price history available from GeckoTerminal.</Notice>}
+            {history.isLoading ? <Skeleton className="h-48" /> : history.data && history.data.length > 1 ? <AreaChart data={history.data} label="$WIF price (USD)" /> : <Notice>{history.isError ? 'GeckoTerminal is busy or rate-limiting; price history will load when it responds.' : 'No price history available from GeckoTerminal.'}</Notice>}
           </div>
           <p className="mt-2 text-xs text-mute">Market data: GeckoTerminal (on-chain DEX pools). Prices of low-liquidity tokens can move sharply.</p>
         </section>

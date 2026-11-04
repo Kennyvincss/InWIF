@@ -27,6 +27,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ network: string
   try {
     const r = await cached(url, 15_000, async () => {
       const res = await fetch(url, { headers: { accept: 'application/json' }, signal: AbortSignal.timeout(15_000) })
+      if (res.headers.get('cf-mitigated') === 'challenge')
+        return { status: 503, body: { error: 'Explorer bot protection blocked the server relay; your browser connects to it directly instead.' } }
       return { status: res.status, body: await res.json().catch(() => ({ error: 'Bad explorer response' })) }
     })
     return NextResponse.json(r.body, { status: r.status })

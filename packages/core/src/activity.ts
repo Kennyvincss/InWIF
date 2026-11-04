@@ -3,7 +3,7 @@
  * Handles both older (`tx_hash`, `block`) and newer (`transaction_hash`,
  * `block_number`) Blockscout field names.
  */
-import { getAddress, type Address } from 'viem'
+import { getAddress, parseAbiItem, type Address, type PublicClient } from 'viem'
 import type { NetworkConfig } from './networks'
 
 type Fetch = typeof fetch
@@ -26,6 +26,8 @@ export interface ActivityItem {
   method?: string
   status: ActivityStatus
   feeWei?: string
+  /** Set when the item was read directly from RPC logs because the explorer was unavailable. */
+  via?: 'rpc'
 }
 
 interface BsAddr {
@@ -77,6 +79,7 @@ function qs(params?: Record<string, string | number>): string {
 
 async function getJson<T>(f: Fetch, url: string): Promise<T> {
   const r = await f(url, { headers: { accept: 'application/json' } })
+  if (r.headers.get('cf-mitigated') === 'challenge') throw new Error('Explorer bot protection (Cloudflare) blocked this request')
   if (!r.ok) throw new Error(`Explorer API ${r.status} for ${new URL(url).pathname}`)
   return (await r.json()) as T
 }
@@ -182,4 +185,59 @@ export function mergeActivity(...lists: ActivityItem[][]): ActivityItem[] {
     return true
   })
   return all.sort((a, b) => (b.timestamp ?? '').localeCompare(a.timestamp ?? ''))
+}
+
+const transferEvent = parseAbiItem('event Transfer(address indexed from, address indexed to, uint256 value)')
+
+/**
+ * Fallback when the explorer is unreachable: recent ERC-20 transfers of the
+ * given tokens, read straight from chain logs. Covers `maxBlocks` back from the
+ * head in RPC-sized chunks. Native ETH transfers are not visible this way.
+ */
+export async function fetchTokenTransfersViaRpc(
+  client: PublicClient,
+  owner: Address,
+  tokens: { address: Address; symbol: string; decimals: number }[],
+  opts: { maxBlocks?: bigint; chunk?: bigint; limit?: number } = {},
+): Promise<ActivityItem[]> {
+  const chunk = opts.chunk ?? 10_000_000n
+  const latest = await client.getBlockNumber()
+  const floor = latest > (opts.maxBlocks ?? 30_000_000n) ? latest - (opts.maxBlocks ?? 30_000_000n) : 0n
+  const items: ActivityItem[] = []
+  const byToken = new Map(tokens.map((t) => [t.address.toLowerCase(), t]))
+  for (let to = latest; to > floor; to -= chunk) {
+    const from = to - chunk + 1n > floor ? to - chunk + 1n : floor
+    const queries = tokens.flatMap((t) => [
+      client.getLogs({ address: t.address, event: transferEvent, args: { from: owner }, fromBlock: from, toBlock: to }),
+      client.getLogs({ address: t.address, event: transferEvent, args: { to: owner }, fromBlock: from, toBlock: to }),
+    ])
+    for (const logs of await Promise.all(queries)) {
+      for (const l of logs) {
+        const t = byToken.get(l.address.toLowerCase())!
+        items.push({
+          hash: l.transactionHash!,
+          blockNumber: Number(l.blockNumber),
+          kind: 'token',
+          direction: direction(owner, l.args.from!, l.args.to!),
+          from: getAddress(l.args.from!),
+          to: getAddress(l.args.to!),
+          value: l.args.value!.toString(),
+          decimals: t.decimals,
+          symbol: t.symbol,
+          tokenAddress: getAddress(l.address),
+          status: 'success',
+          via: 'rpc',
+        })
+      }
+    }
+    if (items.length >= (opts.limit ?? 25)) break
+  }
+  items.sort((a, b) => (b.blockNumber ?? 0) - (a.blockNumber ?? 0))
+  const top = items.slice(0, opts.limit ?? 25)
+  // Real timestamps from block headers (one call per distinct block).
+  const blocks = [...new Set(top.map((i) => i.blockNumber!))]
+  const stamps = new Map(
+    await Promise.all(blocks.map(async (b) => [b, new Date(Number((await client.getBlock({ blockNumber: BigInt(b) })).timestamp) * 1000).toISOString()] as const)),
+  )
+  return top.map((i) => ({ ...i, timestamp: stamps.get(i.blockNumber!) }))
 }

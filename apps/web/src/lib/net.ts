@@ -25,3 +25,19 @@ export function browserNetwork(key: NetworkKey): NetworkConfig {
     explorer: base.explorer.apiV2 ? { ...base.explorer, apiV2: `${origin}/api/explorer/${key}` } : base.explorer,
   }
 }
+
+/**
+ * Explorer access order: the user's browser calls Blockscout directly first
+ * (server IPs are often blocked by the explorer's bot protection), then falls
+ * back to the InWIF relay. Desktop builds have no relay.
+ */
+export async function withExplorer<T>(key: NetworkKey, fn: (n: NetworkConfig) => Promise<T>): Promise<T> {
+  const direct = NETWORKS[key]
+  try {
+    return await fn(direct)
+  } catch (e) {
+    const relay = browserNetwork(key)
+    if (DESKTOP || relay.explorer.apiV2 === direct.explorer.apiV2) throw e
+    return fn(relay)
+  }
+}

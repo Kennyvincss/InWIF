@@ -76,3 +76,24 @@ describe('holdings value series', () => {
     expect(s).toEqual([{ t: 1, close: 20 }, { t: 2, close: 25 }, { t: 3, close: 45 }])
   })
 })
+
+describe('RPC transfer fallback', () => {
+  it('reads transfers from logs in chunks, newest first, with real block timestamps', async () => {
+    const { fetchTokenTransfersViaRpc } = await import('../src')
+    const calls: { fromBlock: bigint; toBlock: bigint }[] = []
+    const client = {
+      getBlockNumber: async () => 25_000_000n,
+      getLogs: async (q: { fromBlock: bigint; toBlock: bigint; args: { from?: string; to?: string } }) => {
+        calls.push({ fromBlock: q.fromBlock, toBlock: q.toBlock })
+        if (q.args.to && q.toBlock === 25_000_000n)
+          return [{ address: '0x5173b8eA6923c2d40267890D45C46a3480954773', transactionHash: '0xaa', blockNumber: 24_000_000n, args: { from: '0x70997970C51812dc3A010C7d01b50e0d17dc79C8', to: ME, value: 5n } }]
+        return []
+      },
+      getBlock: async () => ({ timestamp: 1_790_000_000n }),
+    } as never
+    const items = await fetchTokenTransfersViaRpc(client, ME, [{ address: '0x5173b8eA6923c2d40267890D45C46a3480954773', symbol: 'WIF', decimals: 18 }], { limit: 1 })
+    expect(items).toHaveLength(1)
+    expect(items[0]).toMatchObject({ direction: 'in', symbol: 'WIF', via: 'rpc', timestamp: new Date(1_790_000_000_000).toISOString() })
+    expect(calls.every((c) => c.toBlock - c.fromBlock < 10_000_000n)).toBe(true)
+  })
+})

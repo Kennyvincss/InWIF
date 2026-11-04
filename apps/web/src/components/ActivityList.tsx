@@ -30,8 +30,15 @@ export function ActivityList({
       </div>
     )
   if (error) return <ErrorBox>Could not load activity from {network.explorer.name}: {error.message}. Balances above are read directly from the chain and are unaffected.</ErrorBox>
+  const viaRpc = items?.[0]?.via === 'rpc'
   if (!items?.length) return <Empty icon={<RefreshCw className="h-5 w-5" />} title="No activity yet">{emptyText}</Empty>
   return (
+    <>
+    {viaRpc && (
+      <p className="mb-2 rounded-lg border border-warn/30 bg-warn/10 px-3 py-2 text-xs text-[#ffe7a8]">
+        {network.explorer.name} is unreachable right now. Showing recent token transfers read directly from the chain; ETH transfers and contract calls appear once the explorer responds.
+      </p>
+    )}
     <ul className="divide-y divide-white/[0.05]">
       {items.slice(0, limit).map((i) => {
         const Icon = i.status === 'failed' ? XCircle : i.kind === 'contract' ? FileCode2 : i.direction === 'in' ? ArrowDownLeft : ArrowUpRight
@@ -69,5 +76,6 @@ export function ActivityList({
         )
       })}
     </ul>
+    </>
   )
 }

@@ -7,6 +7,7 @@ import type { Address } from 'viem'
 
 type Fetch = typeof fetch
 export const GECKOTERMINAL_API = 'https://api.geckoterminal.com/api/v2'
+export const POOL_ID_RE = /^0x[0-9a-fA-F]{40}([0-9a-fA-F]{24})?$/
 
 export interface TokenMarket {
   source: 'geckoterminal'
@@ -106,7 +107,8 @@ export interface PricePoint {
 /** Historical USD close prices for `token` from one of its pools. */
 export async function fetchPriceHistory(
   network: string,
-  pool: Address,
+  /** Pool address (20 bytes) or pool id (32 bytes, e.g. Uniswap v4). */
+  pool: string,
   token: Address,
   range: ChartRange,
   f: Fetch = fetch,

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { RANGE_QUERY, fetchPriceHistory, type ChartRange } from '@inwif/core'
-import { ADDRESS_RE, cached, logError, rateLimit } from '@/server/guard'
+import { POOL_ID_RE, RANGE_QUERY, fetchPriceHistory, type ChartRange } from '@inwif/core'
+import { ADDRESS_RE, cached, geckoFetch, logError, rateLimit } from '@/server/guard'
 
 export async function GET(req: Request) {
   const limited = rateLimit(req)
@@ -10,12 +10,12 @@ export async function GET(req: Request) {
   const pool = u.searchParams.get('pool') ?? ''
   const token = u.searchParams.get('token') ?? ''
   const range = (u.searchParams.get('range') ?? '7d') as ChartRange
-  if (network !== 'robinhood' || !ADDRESS_RE.test(pool) || !ADDRESS_RE.test(token) || !(range in RANGE_QUERY))
+  if (network !== 'robinhood' || !POOL_ID_RE.test(pool) || !ADDRESS_RE.test(token) || !(range in RANGE_QUERY))
     return NextResponse.json({ error: 'Invalid parameters' }, { status: 400 })
   try {
-    const r = await cached(`ohlcv:${pool}:${token}:${range}`.toLowerCase(), 300_000, async () => ({
+    const r = await cached(`ohlcv:${pool}:${token}:${range}`.toLowerCase(), 600_000, async () => ({
       status: 200,
-      body: await fetchPriceHistory(network, pool as `0x${string}`, token as `0x${string}`, range),
+      body: await fetchPriceHistory(network, pool, token as `0x${string}`, range, geckoFetch),
     }))
     return NextResponse.json(r.body)
   } catch (e) {

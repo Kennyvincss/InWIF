@@ -19,7 +19,7 @@ export const market = {
     DESKTOP ? fetchTokenPrices(network, tokens) : relay<Awaited<ReturnType<typeof fetchTokenPrices>>>(`/api/market/prices?network=${network}&tokens=${tokens.join(',')}`).then((r) => r ?? {}),
   token: (network: string, token: Address) =>
     DESKTOP ? fetchTokenMarket(network, token) : relay<Awaited<ReturnType<typeof fetchTokenMarket>>>(`/api/market/token?network=${network}&address=${token}`),
-  history: (network: string, pool: Address, token: Address, range: ChartRange) =>
+  history: (network: string, pool: string, token: Address, range: ChartRange) =>
     DESKTOP
       ? fetchPriceHistory(network, pool, token, range)
       : relay<Awaited<ReturnType<typeof fetchPriceHistory>>>(`/api/market/ohlcv?network=${network}&pool=${pool}&token=${token}&range=${range}`).then((r) => r ?? []),

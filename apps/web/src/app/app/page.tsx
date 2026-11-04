@@ -105,6 +105,8 @@ export default function Dashboard() {
             <Notice>
               {hide
                 ? 'Balances hidden.'
+                : history.isError
+                  ? 'The market data provider (GeckoTerminal) is busy or rate-limiting. Price history will load when it responds; balances above are unaffected.'
                 : network.geckoTerminalNetwork
                   ? 'No price history available for the assets you hold. InWIF only charts real market data.'
                   : `${network.name} has no market data source.`}

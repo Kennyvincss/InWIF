@@ -22,15 +22,53 @@ export function rateLimit(req: Request, perMinute = 120): NextResponse | null {
 }
 
 const cache = new Map<string, { at: number; body: unknown; status: number }>()
+const STALE_MAX_MS = 60 * 60_000
 
+/**
+ * Response cache. Fresh entries are served for `ttlMs`; if the upstream then
+ * fails or rate-limits us, the last good response (up to 1h old) is served
+ * instead of an error. Clients see real, slightly older data — never invented data.
+ */
 export async function cached<T>(key: string, ttlMs: number, fn: () => Promise<{ status: number; body: T }>) {
   const hit = cache.get(key)
   if (hit && Date.now() - hit.at < ttlMs) return { status: hit.status, body: hit.body as T }
-  const res = await fn()
-  if (res.status < 500) cache.set(key, { at: Date.now(), ...res })
-  if (cache.size > 2_000) cache.clear()
-  return res
+  try {
+    const res = await fn()
+    if (res.status < 400 || res.status === 404) {
+      cache.set(key, { at: Date.now(), ...res })
+      if (cache.size > 2_000) cache.delete(cache.keys().next().value!)
+      return res
+    }
+    if (hit && Date.now() - hit.at < STALE_MAX_MS) return { status: hit.status, body: hit.body as T }
+    return res
+  } catch (e) {
+    if (hit && Date.now() - hit.at < STALE_MAX_MS) return { status: hit.status, body: hit.body as T }
+    throw e
+  }
 }
+
+/**
+ * Paced fetch for rate-limited public APIs (GeckoTerminal allows ~30 req/min).
+ * Requests are queued at least `intervalMs` apart; a 429 is retried once after a pause.
+ */
+export function pacedFetch(intervalMs: number): typeof fetch {
+  let next = 0
+  const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+  const paced: typeof fetch = async (input, init) => {
+    const now = Date.now()
+    const slot = Math.max(now, next)
+    next = slot + intervalMs
+    if (slot > now) await wait(slot - now)
+    const res = await fetch(input, { ...init, signal: init?.signal ?? AbortSignal.timeout(15_000) })
+    if (res.status !== 429) return res
+    await wait(Math.max(intervalMs, Number(res.headers.get('retry-after') ?? 0) * 1000 || 3_000))
+    return fetch(input, { ...init, signal: AbortSignal.timeout(15_000) })
+  }
+  return paced
+}
+
+/** Shared pacing for all GeckoTerminal calls made by this server. */
+export const geckoFetch = pacedFetch(2_100)
 
 export function logError(scope: string, err: unknown) {
   // Never log request bodies; redact anything secret-shaped from messages.

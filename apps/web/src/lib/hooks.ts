@@ -8,6 +8,7 @@ import {
   DEFAULT_TOKENS,
   fetchTokenTransfers,
   fetchTransactions,
+  fetchTokenTransfersViaRpc,
   getPublicClient,
   mergeActivity,
   readBalances,
@@ -15,7 +16,7 @@ import {
   type NetworkConfig,
   type TokenInfo,
 } from '@inwif/core'
-import { browserNetwork } from './net'
+import { browserNetwork, withExplorer } from './net'
 import { useWallet } from './wallet-store'
 import { toNumber } from './format'
 
@@ -66,7 +67,8 @@ export function usePrices(network: NetworkConfig, addresses: Address[]) {
     queryFn: (): Promise<PriceMap> => market.prices(network.geckoTerminalNetwork!, addresses),
     staleTime: 60_000,
     refetchInterval: 120_000,
-    retry: 1,
+    retry: 2,
+    retryDelay: (n) => 3_000 * 2 ** n,
   })
 }
 
@@ -127,16 +129,23 @@ export function usePortfolio(address?: Address) {
 }
 
 export function useActivity(address?: Address, token?: Address) {
-  const { network } = useNetwork()
+  const { network, client } = useNetwork()
+  const tokens = useTokens()
   return useQuery({
     queryKey: ['activity', network.key, address, token],
     enabled: !!address && !!network.explorer.apiV2,
     queryFn: async () => {
-      const [txs, transfers] = await Promise.all([
-        token ? Promise.resolve({ items: [] }) : fetchTransactions(network, address!),
-        fetchTokenTransfers(network, address!, { token }),
-      ])
-      return mergeActivity(txs.items, transfers.items)
+      try {
+        const [txs, transfers] = await withExplorer(network.key, (n) =>
+          Promise.all([token ? Promise.resolve({ items: [] }) : fetchTransactions(n, address!), fetchTokenTransfers(n, address!, { token })]),
+        )
+        return mergeActivity(txs.items, transfers.items)
+      } catch (explorerError) {
+        // Explorer unreachable: fall back to recent token transfers read straight from chain logs.
+        const list = token ? tokens.filter((t) => t.address === token) : tokens
+        if (!list.length) throw explorerError
+        return fetchTokenTransfersViaRpc(client, address!, list)
+      }
     },
     refetchInterval: 30_000,
     retry: 1,
@@ -162,14 +171,16 @@ export function useTokenMarket(network: NetworkConfig, token?: Address) {
     enabled: !!token && !!network.geckoTerminalNetwork,
     queryFn: (): Promise<MarketInfo | null> => market.token(network.geckoTerminalNetwork!, token!),
     staleTime: 120_000,
-    retry: 1,
+    retry: 2,
+    retryDelay: (n) => 3_000 * 2 ** n,
   })
 }
 
 export async function fetchHistory(network: NetworkConfig, token: Address, range: string) {
-  const info = await market.token(network.geckoTerminalNetwork!, token).catch(() => null)
+  // Errors propagate so React Query retries with backoff; "no market" (null) is a real empty result.
+  const info = await market.token(network.geckoTerminalNetwork!, token)
   if (!info?.topPool) return []
-  return market.history(network.geckoTerminalNetwork!, info.topPool as Address, token, range as ChartRange).catch(() => [])
+  return market.history(network.geckoTerminalNetwork!, info.topPool, token, range as ChartRange)
 }
 
 export function usePortfolioHistory(rows: PricedBalance[], range: string) {
@@ -187,6 +198,7 @@ export function usePortfolioHistory(rows: PricedBalance[], range: string) {
       return holdingsValueSeries(series.filter((s) => s.prices.length > 0))
     },
     staleTime: 300_000,
-    retry: 1,
+    retry: 2,
+    retryDelay: (n) => 3_000 * 2 ** n,
   })
 }

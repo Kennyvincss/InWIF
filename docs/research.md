@@ -1,8 +1,39 @@
 # Research & verification notes (2026-11-04)
 
+## 0. Live verification results (mainnet, 2026-11-04)
+Run `pnpm --filter @inwif/core verify:live` to repeat these checks. They are read-only and need no keys.
+
+| Check | Result |
+|---|---|
+| `eth_chainId` mainnet / testnet | **4663** / **46630**, matching config |
+| $WIF `0x5173…4773` | name **"World is Flat"**, symbol **WIF**, **18** decimals, total supply **999,997,640.6** (on-chain) |
+| WETH / USDG / cbBTC | on-chain symbol and decimals match the listings (18 / 6 / 8) |
+| Uniswap V3 factory, QuoterV2, SwapRouter02, WETH9, NonfungiblePositionManager | deployed code present at every address |
+| Live quote | 0.01 ETH → ~12,773 WIF via the 1% pool (~2.9% price impact at that size) |
+| GeckoTerminal | WIF ≈ $0.00164, liquidity ≈ $64k; top pool id is a 32-byte (v4-style) id, which is supported |
+| Blockscout mainnet API | reachable, but sits behind a Cloudflare bot challenge for server and data-centre IPs (see below) |
+
+The web wallet was also exercised live (`apps/web/e2e/live-mainnet.mjs`) with a watch-only wallet for the public
+Uniswap V3 WIF/WETH pool. It showed:
+- verified chain 4663
+- 9,363,133 WIF ≈ $15.4k from live balances and prices
+- real price charts
+- verified $WIF metadata
+- a live swap quote
+- 25 real transfers in the activity view
+
+**Explorer resilience.** Because the Blockscout API may challenge some clients, the wallet:
+1. calls Blockscout directly from the user's browser
+2. falls back to the InWIF relay
+3. finally falls back to recent ERC-20 transfers read straight from chain logs (`fetchTokenTransfersViaRpc`), labelled as such in the UI
+
+**Market data limits.** GeckoTerminal's free API allows about 30 requests a minute. The relay paces calls, retries one 429,
+and serves the last good response for up to an hour. When the provider is limiting, the UI says so; it never
+shows fabricated values.
+
+
 ## 1. Reference product (Unruggable)
-The development environment's network policy blocked `unruggable.io`, so its site could not be studied directly
-during this build. InWIF's feature set was derived from the brief's description of that product category:
+`unruggable.io` was blocked by the environment's network policy during the initial build and was allowed later. InWIF's feature set was derived from the brief's description of that product category:
 - a hardware wallet with a secure display and physical confirmation
 - a companion app covering portfolio, swaps and transaction security
 
@@ -21,9 +52,8 @@ All code, branding, protocol (IWDP) and design are original to InWIF. Nothing wa
 | Stack | Arbitrum Orbit L2 settling to Ethereum | registry `parent` + Arbitrum bridge |
 | Official docs | `https://docs.robinhood.com/chain` | registry `infoURL` (not reachable from the build sandbox) |
 
-**Runtime check.** The chain RPC itself was not reachable from the build sandbox. To compensate, the wallet checks
-`eth_chainId` against the RPC at runtime and **refuses to sign on mismatch**. This was exercised end-to-end against
-a local chain.
+**Runtime check.** The wallet also checks `eth_chainId` against the RPC at runtime and **refuses to sign on mismatch**
+(verified live, see section 0).
 
 ## 3. Uniswap on Robinhood Chain (from Uniswap's own SDK source)
 
@@ -42,7 +72,7 @@ The swap screen verifies that each address has deployed code before quoting.
 - **Contract:** `0x5173b8eA6923c2d40267890D45C46a3480954773`, as given in the brief. Public explorer and GeckoTerminal listings index
   it as "World is Flat (WIF)" on Robinhood Chain, with WIF/WETH pools on Uniswap V3.
 - **Metadata is read live.** Name, symbol, decimals and total supply are read from the contract at runtime and compared with the listing
-  (`compareMetadata`); any mismatch is shown to the user. They could not be read from the sandbox because the RPC was blocked.
+  (`compareMetadata`); any mismatch is shown to the user. Verified values are in section 0.
 - **No invented governance.** No on-chain $WIF governance contract was found, so InWIF invents no governance rights.
 
 ## 5. Other tokens listed by default
