@@ -26,3 +26,4 @@ export const INWIF_POLICY = {
   serviceFeeBps: 0,
   wifRequiredForFeatures: false,
 } as const
+export * from './defi'

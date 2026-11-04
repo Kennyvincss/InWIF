@@ -27,6 +27,7 @@ export interface UniswapV3Config {
   factory: Address
   quoterV2: Address
   swapRouter02: Address
+  nonfungiblePositionManager: Address
   /** Wrapped native token used for ETH routes. */
   weth9: Address
   feeTiers: readonly number[]
@@ -83,6 +84,7 @@ export const ROBINHOOD_MAINNET: NetworkConfig = {
     factory: '0x1f7d7550b1b028f7571e69a784071f0205fd2efa',
     quoterV2: '0x33e885ed0ec9bf04ecfb19341582aadcb4c8a9e7',
     swapRouter02: '0xcaf681a66d020601342297493863e78c959e5cb2',
+    nonfungiblePositionManager: '0x73991a25c818bf1f1128deaab1492d45638de0d3',
     weth9: '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73',
     feeTiers: [100, 500, 3000, 10000],
   },
