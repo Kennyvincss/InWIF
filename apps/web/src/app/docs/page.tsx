@@ -18,7 +18,7 @@ export default function DocsPage() {
               <a key={s} href={`#${s}`} className="block capitalize hover:text-white">{s}</a>
             ))}
           </nav>
-          <div className="prose-invert max-w-3xl space-y-4 text-[15px] leading-relaxed text-mute [&_b]:text-white [&_code]:text-lime-soft">
+          <div className="prose-invert min-w-0 max-w-3xl space-y-4 break-words text-[15px] leading-relaxed text-mute [&_b]:text-white [&_code]:break-all [&_code]:text-lime-soft">
             <H id="architecture">Architecture</H>
             <p>InWIF is a monorepo. <b>packages/core</b> is the wallet engine shared by every client: network config, keystore, BIP-39 wallets, validation, transaction review and simulation, approvals, activity, market data, swaps, rewards helpers and the hardware protocol. <b>apps/web</b> is this site and the web wallet (Next.js). <b>apps/api</b> is an optional backend for public, non-sensitive data (PostgreSQL). <b>apps/mobile</b> (Expo) and <b>apps/desktop</b> (Tauri) reuse the core. <b>contracts</b> holds the Foundry rewards contract, and <b>firmware</b> the Rust signing core for the device.</p>
             <p>Signing is always local: in the browser for software wallets, on the device for hardware wallets. The backend never signs and never receives keys.</p>
