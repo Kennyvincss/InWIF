@@ -1,0 +1,15 @@
+node_modules
+**/node_modules
+**/.next
+apps/web/out
+apps/web/e2e/screens
+contracts/lib
+contracts/out
+contracts/cache
+firmware/target
+apps/desktop/src-tauri/target
+apps/desktop/src-tauri/gen
+apps/mobile/.expo
+.git
+.env.local
+.vercel

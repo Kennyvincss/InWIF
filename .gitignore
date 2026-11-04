@@ -20,3 +20,4 @@ apps/mobile/.expo/
 apps/web/e2e/screens/
 apps/web/.api-parked/
 apps/desktop/src-tauri/gen/
+.vercel
