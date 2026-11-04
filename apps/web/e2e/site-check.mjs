@@ -1,7 +1,8 @@
 /** Public-site check: pages load, no console errors, no horizontal overflow on phones, internal links resolve. */
 import { chromium } from 'playwright'
 const BASE = process.env.BASE_URL ?? 'http://127.0.0.1:3000'
-const b = await chromium.launch()
+const proxy = process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY, bypass: '127.0.0.1,localhost' } : undefined
+const b = await chromium.launch({ proxy })
 const pages = ['/', '/hardware', '/ecosystem', '/security', '/docs']
 const links = new Set()
 const problems = []

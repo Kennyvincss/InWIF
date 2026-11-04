@@ -10,6 +10,5 @@ firmware/target
 apps/desktop/src-tauri/target
 apps/desktop/src-tauri/gen
 apps/mobile/.expo
-.git
 .env.local
 .vercel

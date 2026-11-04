@@ -4,8 +4,7 @@
 
 1. On vercel.com choose **Add New… → Project**, then **Import** the `Kennyvincss/InWIF` GitHub repository.
 2. Set **Root Directory** to `apps/web`. Leave "Include files outside the root directory" enabled, because the app imports
-   `packages/core`. Vercel detects Next.js and pnpm. `apps/web/vercel.json` sets the install and build commands and skips
-   rebuilds when only contracts or firmware change.
+   `packages/core`. Vercel detects Next.js and pnpm. `apps/web/vercel.json` sets the install and build commands.
 3. **Environment variables:** none are required. Optionally set `NEXT_PUBLIC_ROBINHOOD_RPC_URL` to a dedicated RPC provider
    for higher rate limits.
 4. Deploy.
