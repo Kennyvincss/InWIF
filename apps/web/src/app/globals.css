@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #090b10;
+  --bg-2: #11151d;
+  --card: #171d27;
+  --accent: #a6f36a;
+  --accent-2: #d5ffb8;
+  --text: #ffffff;
+  --text-2: #8993a4;
+  --ok: #62d99a;
+  --bad: #ff5c68;
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(166, 243, 106, 0.3);
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-white/[0.06] bg-ink-800 shadow-card;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
+      disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime/60;
+  }
+  .btn-primary {
+    @apply btn bg-lime text-ink-950 hover:bg-lime-soft;
+  }
+  .btn-ghost {
+    @apply btn border border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.07];
+  }
+  .btn-danger {
+    @apply btn bg-bad/90 text-white hover:bg-bad;
+  }
+  .input {
+    @apply w-full rounded-xl border border-white/10 bg-ink-900 px-3.5 py-2.5 text-sm text-white placeholder:text-mute/70
+      outline-none transition focus:border-lime/50 focus:ring-2 focus:ring-lime/20;
+  }
+  .label {
+    @apply mb-1.5 block text-xs font-medium uppercase tracking-wider text-mute;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-mute;
+  }
+  .mono {
+    @apply font-mono;
+  }
+}
+
+.bg-grid {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.text-gradient {
+  background: linear-gradient(120deg, #ffffff 0%, #d5ffb8 45%, #a6f36a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

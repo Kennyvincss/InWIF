@@ -1,0 +1,32 @@
+{
+  "name": "@inwif/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "migrate": "tsx src/db/migrate.ts",
+    "build": "tsc --noEmit",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.4.0",
+    "@fastify/helmet": "^13.2.0",
+    "@fastify/rate-limit": "^10.3.0",
+    "@inwif/core": "workspace:*",
+    "fastify": "^5.12.8",
+    "ioredis": "^5.11.1",
+    "pg": "^8.23.1",
+    "viem": "^2.57.16",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
+  }
+}

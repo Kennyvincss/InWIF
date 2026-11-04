@@ -1,0 +1,22 @@
+[package]
+name = "inwif-desktop"
+version = "0.1.0"
+edition = "2021"
+description = "InWIF desktop companion (Tauri): the InWIF wallet with native USB access to InWIF hardware."
+license = "MIT"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serialport = { version = "4", default-features = false }
+# Reuse the firmware crate's IWDP frame validation so the desktop never forwards malformed frames.
+inwif-firmware-core = { path = "../../../firmware" }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

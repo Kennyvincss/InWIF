@@ -1,0 +1,17 @@
+{
+  "name": "inwif",
+  "private": true,
+  "version": "0.1.0",
+  "description": "InWIF — free, self-custody wallet ecosystem for Robinhood Chain and the World Is Flat ($WIF) community.",
+  "license": "MIT",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm --filter @inwif/web dev",
+    "build": "pnpm -r --filter ./packages/** --filter @inwif/web --filter @inwif/api build",
+    "test": "pnpm -r --filter ./packages/** --filter @inwif/web --filter @inwif/api test",
+    "typecheck": "pnpm -r typecheck",
+    "test:contracts": "cd contracts && forge test",
+    "test:firmware": "cd firmware && cargo test"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -1,0 +1,23 @@
+node_modules/
+.next/
+out/
+dist/
+coverage/
+*.tsbuildinfo
+.env
+.env.local
+.env.*.local
+# foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/*/31337/
+# rust
+firmware/target/
+apps/desktop/src-tauri/target/
+# expo
+apps/mobile/.expo/
+.DS_Store
+apps/web/e2e/screens/
+apps/web/.api-parked/
+apps/desktop/src-tauri/gen/
+.vercel
