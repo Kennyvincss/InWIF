@@ -1,54 +1,28 @@
 'use client'
 import Link from 'next/link'
-import { useAccount, useConnect, useDisconnect, useReadContract } from 'wagmi'
-import { erc20Abi, formatUnits } from 'viem'
 import { ShieldCheck, Sparkles, Wallet } from 'lucide-react'
 import { WIF_ADDRESS, explorerTokenUrl, ROBINHOOD_MAINNET } from '@inwif/core'
 import { SitePage, Section } from '@/components/site/Site'
 import { ECOSYSTEM_APPS, LISTING_CRITERIA } from '@/lib/ecosystem'
-import { useWallet } from '@/lib/wallet-store'
 
-function ConnectPanel() {
-  const { address, isConnected, chainId } = useAccount()
-  const { connect, connectors, isPending, error } = useConnect()
-  const { disconnect } = useDisconnect()
-  const wallet = useWallet()
-  const bal = useReadContract({ address: WIF_ADDRESS, abi: erc20Abi, functionName: 'balanceOf', args: address ? [address] : undefined, chainId: 4663, query: { enabled: !!address } })
-  const injected = connectors[0]
+function GetWalletPanel() {
   return (
-    <div id="connect" className="card scroll-mt-24 p-6">
-      <h3 className="flex items-center gap-2 font-display text-lg font-bold"><Wallet className="h-5 w-5 text-lime" /> Connect a wallet to view your $WIF profile</h3>
-      <p className="mt-1 text-sm text-mute">Read-only. InWIF only reads your public address and $WIF balance; it never asks this wallet to sign.</p>
-      {!isConnected ? (
-        <div className="mt-4">
-          <button className="btn-primary" disabled={!injected || isPending} onClick={() => injected && connect({ connector: injected })}>
-            {isPending ? 'Connecting…' : 'Connect browser wallet'}
-          </button>
-          {error && <p className="mt-2 text-sm text-bad">{error.message.split('\n')[0]}</p>}
-          <p className="mt-3 text-xs text-mute">No browser wallet? <Link href="/app" className="text-lime">Create a free InWIF wallet</Link> instead.</p>
-        </div>
-      ) : (
-        <div className="mt-4 space-y-2 text-sm">
-          <p className="break-all font-mono">{address}</p>
-          <p>
-            $WIF balance:{' '}
-            <b>{bal.data !== undefined ? Number(formatUnits(bal.data, 18)).toLocaleString() : bal.isError ? 'unavailable' : '…'}</b>
-            {chainId !== 4663 && <span className="ml-2 text-xs text-warn">(read from Robinhood Chain regardless of your wallet&apos;s current network)</span>}
-          </p>
-          <div className="flex flex-wrap gap-2 pt-2">
-            <button
-              className="btn-ghost"
-              onClick={() => {
-                if (!wallet.state.wallets.some((w) => w.accounts.some((a) => a.address === address))) wallet.addWatchWallet({ name: 'Connected wallet (watch)', address: address! })
-                window.location.href = '/app/wif'
-              }}
-            >
-              Track in InWIF (watch-only)
-            </button>
-            <button className="btn-ghost" onClick={() => disconnect()}>Disconnect</button>
-          </div>
-        </div>
-      )}
+    <div className="card p-6">
+      <h3 className="flex items-center gap-2 font-display text-lg font-bold">
+        <Wallet className="h-5 w-5 text-lime" /> Get your free InWIF wallet
+      </h3>
+      <p className="mt-2 text-sm text-mute">
+        Create a wallet in seconds: InWIF generates it on your device, and only you hold the keys. Already have a wallet? Import it with your recovery phrase, or watch any address
+        to follow its $WIF.
+      </p>
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link href="/app" className="btn-primary">
+          Create my wallet
+        </Link>
+        <Link href="/app" className="btn-ghost">
+          Import or watch an address
+        </Link>
+      </div>
     </div>
   )
 }
@@ -69,7 +43,7 @@ export default function EcosystemPage() {
               <a className="mt-2 inline-block text-xs text-lime" href={explorerTokenUrl(ROBINHOOD_MAINNET, WIF_ADDRESS)} target="_blank" rel="noreferrer">View on explorer ↗</a>
             </div>
           </div>
-          <ConnectPanel />
+          <GetWalletPanel />
         </div>
       </Section>
       <Section eyebrow="What you can do with $WIF in InWIF" title="Real, on-chain utility.">

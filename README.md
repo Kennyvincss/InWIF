@@ -20,15 +20,14 @@ InWIF is a free, self-custody wallet ecosystem for **Robinhood Chain**, built fo
 
 | Area | Status |
 |---|---|
-| Web wallet: create (12/24 words + backup quiz), import (phrase / key), watch-only, unlimited wallets & accounts | ✅ |
+| Web wallet: one-step create (12/24 words, password only; backup later with a reveal + word quiz), import (phrase / key), watch-only, unlimited wallets & accounts | ✅ |
 | Live chain-ID verification before every signature | ✅ |
 | Portfolio: on-chain balances, GeckoTerminal prices, 24h/7d/30d/90d/all charts, allocation | ✅ |
 | Send / receive: EIP-681 QR, address checks, simulation, decoded review, fee disclosure, receipt | ✅ |
 | Swaps: Uniswap V3 (QuoterV2 + SwapRouter02), slippage, price impact, exact approvals, **0% InWIF fee** | ✅ |
 | $WIF dashboard: verified on-chain metadata, market, holders, history, profile, quests, app registry | ✅ |
 | DeFi: Uniswap V3 LP position tracking (staking/lending: none verified yet, so none shown) | ✅ |
-| Security Centre: approval discovery + revoke, flagged addresses, checklist, devices, connected apps | ✅ |
-| WalletConnect (Reown WalletKit): connect to dApps; transactions, messages and typed data reviewed in InWIF; permit detection | ✅ |
+| Security Centre: approval discovery + revoke, flagged addresses, checklist, devices | ✅ |
 | Hardware: IWDP v1 protocol, browser simulator, WebSerial, attestation, signed firmware, offline signing | ✅ prototype |
 | Firmware core (Rust, `no_std`): byte-identical signatures with the TS companion; builds for Cortex-M4F | ✅ prototype |
 | Backend API (Fastify + PostgreSQL): public data, wallet-signature login, no secrets | ✅ |
@@ -39,7 +38,7 @@ InWIF is a free, self-custody wallet ecosystem for **Robinhood Chain**, built fo
 
 ```
 packages/core     Wallet engine shared by every client (TypeScript, viem, @scure)
-apps/web          Landing site + web wallet (Next.js, Tailwind, Framer Motion, wagmi)
+apps/web          Landing site + web wallet (Next.js, Tailwind, Framer Motion)
 apps/api          Public-data backend (Fastify, PostgreSQL, optional Redis)
 apps/mobile       iOS / Android app (Expo, React Native)
 apps/desktop      Desktop app (Tauri 2) with native USB transport

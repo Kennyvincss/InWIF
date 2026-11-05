@@ -15,15 +15,14 @@ Recommended order:
 | # | Step | Time | Cost |
 |---|---|---|---|
 | 1 | Dedicated RPC endpoint (Dwellir, integrated) | 5 min | free tier |
-| 2 | WalletConnect (connect InWIF to dApps, integrated) | done | free |
-| 3 | Custom domain | 30 min | domain price |
-| 4 | Shared rate limiting (Upstash Redis) | 10 min | free tier |
-| 5 | Backend API hosting | 30 min | free tiers |
-| 6 | Mobile apps (iOS / Android) | days, mostly store review | $99/yr Apple, $25 Google |
-| 7 | Desktop installers (Windows / macOS) | 1–2 h | signing certificates |
-| 8 | Hardware wallet on a dev board | 1 day | about $15 of parts |
-| 9 | Security audit | weeks | quote-based |
-| 10 | Legal: privacy policy and terms | weeks | lawyer |
+| 2 | Custom domain | 30 min | domain price |
+| 3 | Shared rate limiting (Upstash Redis) | 10 min | free tier |
+| 4 | Backend API hosting | 30 min | free tiers |
+| 5 | Mobile apps (iOS / Android) | days, mostly store review | $99/yr Apple, $25 Google |
+| 6 | Desktop installers (Windows / macOS) | 1–2 h | signing certificates |
+| 7 | Hardware wallet on a dev board | 1 day | about $15 of parts |
+| 8 | Security audit | weeks | quote-based |
+| 9 | Legal: privacy policy and terms | weeks | lawyer |
 | — | Housekeeping | 5 min | — |
 
 ---
@@ -49,7 +48,7 @@ Recommended order:
    **Production** (and Preview if you want previews to use it). Do **not** add a `NEXT_PUBLIC_` prefix.
 3. **Redeploy.** The build reads whether the key exists in order to send browser RPC through the relay. Only that
    yes/no flag reaches the browser, never the key.
-4. If you host the backend API (step 5), set `DWELLIR_API_KEY` there too.
+4. If you host the backend API (step 4), set `DWELLIR_API_KEY` there too.
 
 **Check:**
 - `pnpm --filter @inwif/core verify:live` with the key set prints a "Managed RPC (Dwellir)" section.
@@ -59,41 +58,7 @@ Recommended order:
 session makes roughly 10–15 reads a minute (polling balances and network checks). If you exceed the quota, the relay
 falls back to the public RPCs, so the site keeps working.
 
-## 2. WalletConnect (connect InWIF to other apps) — integrated
-
-InWIF is a WalletConnect wallet (Reown WalletKit), using the project ID from the Reown dashboard
-(`8b2edb1e560d95b69a5eac692b07b323`, built in; override with `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`).
-
-**How users connect:**
-1. On the dApp's site, choose **WalletConnect**.
-2. In InWIF, click the **plug icon** in the top bar (or **Security → Connect an app**), then either:
-   - **Scan QR code** with the camera (phones and laptops), or
-   - **Scan from image**: upload a screenshot of the QR code (handy when it's on the same screen), or
-   - paste the `wc:…` link.
-
-   QR decoding happens on the device; camera frames and images are never uploaded.
-3. Review the connection request: who is asking, whether WalletConnect verified the domain, and which networks.
-4. dApps can also link directly to `https://inwif.vercel.app/app/connect?uri=wc:…`. InWIF still asks before
-   connecting.
-
-**What dApps can ask for (each opens an InWIF review screen; nothing is signed automatically):**
-- `eth_sendTransaction`: the normal review, simulation and fee screen, labelled with the dApp's name.
-- `personal_sign`: the decoded message. Unreadable or hash-like payloads are flagged, and so are sign-in messages
-  for a different domain.
-- `eth_signTypedData_v4`: decoded fields. EIP-2612 permits and Permit2 are flagged **high risk**, with UNLIMITED
-  amounts highlighted, and need an extra confirmation.
-- `wallet_switchEthereumChain`: allowed between Robinhood Chain mainnet and testnet only.
-
-**Limits and safety:**
-- Only the active account is shared. Watch-only wallets can't connect, and sites WalletConnect flags as scams are
-  blocked.
-- Connected apps are listed in the **Security Centre**, where they can be disconnected.
-- Typed-data signing on InWIF hardware isn't supported yet; message signing and transactions are.
-
-**You (optional):** in the Reown dashboard, keep the domain allowlist up to date: `inwif.vercel.app`, `localhost`
-for testing, and your custom domain once you have one (step 3).
-
-## 3. Custom domain
+## 2. Custom domain
 
 **You:**
 1. Buy a domain from a registrar such as Cloudflare, Namecheap or Porkbun.
@@ -102,9 +67,9 @@ for testing, and your custom domain once you have one (step 3).
    **Valid Configuration**.
 4. Change the Production variable `NEXT_PUBLIC_SITE_URL` to your domain (with or without `https://`), then redeploy.
    Share cards and the sitemap use it.
-5. If you restricted your RPC key (step 1) or WalletConnect project (step 2) by domain, add the new domain there too.
+5. If you restricted your RPC key (step 1) by domain, add the new domain there too.
 
-## 4. Shared rate limiting (Upstash Redis)
+## 3. Shared rate limiting (Upstash Redis)
 
 **Why.** The `/api` relays limit request rates per server instance. Under heavy traffic Vercel runs many instances, so
 the limit needs one shared store.
@@ -116,7 +81,7 @@ the limit needs one shared store.
 **Claude:** switch the rate limiter and response cache to Redis when those variables exist, keeping memory as the
 fallback.
 
-## 5. Backend API hosting (`apps/api`)
+## 4. Backend API hosting (`apps/api`)
 
 **Why.** The website works without it. The backend adds:
 - sign-in with a wallet signature
@@ -136,7 +101,7 @@ fallback.
 
 **Claude:** connect the website to it: wallet sign-in and device sync.
 
-## 6. Mobile apps (iOS and Android)
+## 5. Mobile apps (iOS and Android)
 
 **You: accounts**
 1. **Apple Developer Program** ($99/year). Apple's App Store rules only allow cryptocurrency wallet apps from
@@ -144,7 +109,7 @@ fallback.
    entity and a D-U-N-S number, which is free from Dun & Bradstreet but can take days.
 2. **Google Play Console** ($25 one-time). Complete Google's financial-services and crypto declarations. Requirements
    differ by country.
-3. Both stores require a **privacy policy URL** (step 10), screenshots and a description.
+3. Both stores require a **privacy policy URL** (step 9), screenshots and a description.
 
 **You and Claude: build and submit with Expo EAS**
 
@@ -160,10 +125,10 @@ eas build -p ios         # then: eas submit -p ios
 **Claude:** add `eas.json`, app icons, a splash screen and store screenshots, and extend the mobile app with swaps,
 activity and the Security Centre so it matches the web wallet.
 
-## 7. Desktop installers (Windows and macOS)
+## 6. Desktop installers (Windows and macOS)
 
 **You:**
-1. **macOS:** a "Developer ID Application" certificate, included with the Apple Developer account from step 6. Also
+1. **macOS:** a "Developer ID Application" certificate, included with the Apple Developer account from step 5. Also
    create an app-specific password for notarisation.
 2. **Windows:** a code-signing certificate. Azure Trusted Signing is the cheapest; an OV or EV certificate from a
    certificate authority also works. Without one, Windows shows "unknown publisher" warnings.
@@ -173,7 +138,7 @@ activity and the Security Centre so it matches the web wallet.
 **Claude:** add a GitHub Actions release workflow (`tauri-action`) that builds signed `.msi`/`.exe` and notarised `.dmg`
 files on GitHub's Windows and macOS machines and attaches them to a GitHub Release.
 
-## 8. Hardware wallet on a development board
+## 7. Hardware wallet on a development board
 
 **You: buy parts (about $15)**
 - Raspberry Pi Pico (RP2040) with pre-soldered headers
@@ -200,7 +165,7 @@ files on GitHub's Windows and macOS machines and attaches them to a GitHub Relea
 | Independent hardware security testing (fault injection, side channels) | a specialist lab |
 | Manufacturing and factory attestation provisioning | a manufacturing partner |
 
-## 9. Security audit
+## 8. Security audit
 
 **You:**
 1. **Wallet application** (key handling, signing flow, hardware protocol, web security). Get quotes from an application
@@ -211,17 +176,16 @@ files on GitHub's Windows and macOS machines and attaches them to a GitHub Relea
 **Claude:** prepare the audit package (scope, threat model, architecture, test instructions, known limitations) and fix
 the findings.
 
-## 10. Legal: privacy policy and terms
+## 9. Legal: privacy policy and terms
 
 **You:**
 1. Talk to a lawyer experienced in crypto and consumer software where you operate. Non-custodial wallets are treated
    differently from exchanges in most places, but the rules vary, and app stores require proper policies.
-2. Consider forming a legal entity. Apple requires one for wallet apps (step 6).
+2. Consider forming a legal entity. Apple requires one for wallet apps (step 5).
 3. Give me the approved texts.
 
 **Claude:** publish them on the site, link them from the footer and the stores, and keep the privacy policy in line
-with what the app actually sends to third parties: the RPC provider, Blockscout, GeckoTerminal, Vercel and
-WalletConnect.
+with what the app actually sends to third parties: the RPC provider, Blockscout, GeckoTerminal and Vercel.
 
 ## Housekeeping
 

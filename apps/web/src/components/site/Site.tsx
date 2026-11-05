@@ -30,9 +30,6 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/ecosystem#connect" className="btn-ghost hidden sm:inline-flex">
-            Connect Wallet
-          </Link>
           <Link href="/app" className="btn-primary">
             Get Started
           </Link>
@@ -48,9 +45,6 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
-          <Link href="/ecosystem#connect" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-2 text-sm text-lime">
-            Connect Wallet
-          </Link>
         </nav>
       )}
     </header>

@@ -1,13 +1,14 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
-import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Cpu, Eye, EyeOff, Landmark, ShieldAlert } from 'lucide-react'
+import { ArrowDownLeft, ArrowLeftRight, ArrowUpRight, Cpu, Eye, EyeOff, KeyRound, Landmark, ShieldAlert } from 'lucide-react'
 import { RANGE_QUERY, explorerAddressUrl, type ChartRange } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useActivity, usePortfolio, usePortfolioHistory } from '@/lib/hooks'
 import { fmtPct, fmtToken, fmtUsd } from '@/lib/format'
 import { AllocationBar, AreaChart } from '@/components/Charts'
 import { ActivityList } from '@/components/ActivityList'
+import { BackupModal } from '@/components/BackupModal'
 import { Badge, CopyButton, ErrorBox, Notice, Skeleton, TokenIcon, cx } from '@/components/ui'
 
 const RANGES = Object.keys(RANGE_QUERY) as ChartRange[]
@@ -18,6 +19,7 @@ export default function Dashboard() {
   const { balances, rows, totals, network, prices } = usePortfolio(address)
   const activity = useActivity(address)
   const [range, setRange] = useState<ChartRange>('7d')
+  const [backupOpen, setBackupOpen] = useState(false)
   const history = usePortfolioHistory(rows, range)
   const hide = state.settings.hideBalances
   const mask = (s: string) => (hide ? '••••' : s)
@@ -32,10 +34,17 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {activeWallet && !activeWallet.backedUp && (
-        <ErrorBox>
-          This wallet&apos;s recovery phrase has not been verified. <Link href="/app/wallets" className="underline">Back it up now</Link>.
-        </ErrorBox>
+      {activeWallet && !activeWallet.backedUp && activeWallet.kind === 'mnemonic' && (
+        <div className="flex flex-col gap-3 rounded-2xl border border-warn/30 bg-warn/10 p-4 sm:flex-row sm:items-center">
+          <KeyRound className="h-5 w-5 shrink-0 text-warn" />
+          <p className="flex-1 text-sm text-[#ffe7a8]">
+            <b>Back up your recovery phrase.</b> It is the only way to restore this wallet if you lose this device or clear your browser. Do it before adding funds.
+          </p>
+          <button className="btn-primary shrink-0" onClick={() => setBackupOpen(true)}>
+            Back up now
+          </button>
+          <BackupModal walletId={activeWallet.id} open={backupOpen} onClose={() => setBackupOpen(false)} />
+        </div>
       )}
 
       <section className="card relative overflow-hidden p-6">
