@@ -1,7 +1,8 @@
 'use client'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertTriangle, Check, Copy, Info, Loader2, ShieldAlert, X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 import type { Finding } from '@inwif/core'
 
@@ -24,7 +25,12 @@ export function Modal({
   children: React.ReactNode
   wide?: boolean
 }) {
-  return (
+  // Render at <body> level: a parent with backdrop-filter/transform (e.g. the blurred header)
+  // would otherwise become the containing block and clip this "fixed" overlay.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  if (!mounted) return null
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -38,7 +44,7 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={cx('card max-h-[92vh] w-full overflow-y-auto rounded-b-none p-5 sm:rounded-2xl', wide ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
+            className={cx('card max-h-[92vh] w-full min-w-0 overflow-y-auto overflow-x-hidden rounded-b-none p-5 sm:rounded-2xl', wide ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 30, opacity: 0 }}
@@ -53,7 +59,8 @@ export function Modal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
 

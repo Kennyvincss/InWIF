@@ -1,13 +1,15 @@
 'use client'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getAddress, isAddress, isHex, type Address, type Hex } from 'viem'
-import { Cable, Lock, ShieldAlert, ShieldCheck } from 'lucide-react'
+import { Cable, Camera, ImageUp, Lock, ShieldAlert, ShieldCheck } from 'lucide-react'
 import { NETWORKS, parseTypedData, reviewPersonalSign, reviewTypedData, type SignReview } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useHardware } from '@/lib/hardware'
 import { useTokens } from '@/lib/hooks'
 import { METHOD_LABELS, RPC_ERRORS, useWalletConnect, type DappMeta, type PendingRequest, type VerifyInfo } from '@/lib/walletconnect'
 import { TxFlow, type TxRequest } from './TxFlow'
+import { QrScanner } from './QrScanner'
+import { decodeQrFile, extractWcUri } from '@/lib/qr'
 import { Badge, ErrorBox, Findings, Modal, Notice, Row, Spinner, cx } from './ui'
 
 function DappHeader({ dapp, verify }: { dapp: DappMeta; verify: VerifyInfo }) {
@@ -64,39 +66,105 @@ export function WcConnectModal({ open, onClose, initialUri = '' }: { open: boole
   const [uri, setUri] = useState(initialUri)
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [scanning, setScanning] = useState(false)
+  const fileInput = useRef<HTMLInputElement>(null)
   useEffect(() => setUri(initialUri), [initialUri])
   useEffect(() => {
     if (wc.proposal) {
       setBusy(false)
+      setScanning(false)
       onClose()
     }
   }, [wc.proposal, onClose])
+  useEffect(() => {
+    if (!open) setScanning(false)
+  }, [open])
+
+  const blocked = wc.status !== 'ready' || activeWallet?.kind === 'watch'
+
+  // Pairing only asks the app for its connection request; the user still approves it on the next screen.
+  const connect = useCallback(
+    async (value: string) => {
+      setErr(null)
+      setBusy(true)
+      try {
+        await wc.pair(value)
+      } catch (e) {
+        setErr((e as Error).message)
+        setBusy(false)
+      }
+    },
+    [wc],
+  )
+  const onScan = useCallback(
+    (scanned: string) => {
+      setScanning(false)
+      setUri(scanned)
+      void connect(scanned)
+    },
+    [connect],
+  )
 
   return (
     <Modal open={open} onClose={onClose} title="Connect an app">
       <form
         className="space-y-4"
-        onSubmit={async (e) => {
+        onSubmit={(e) => {
           e.preventDefault()
-          setErr(null)
-          setBusy(true)
-          try {
-            await wc.pair(uri)
-          } catch (e2) {
-            setErr((e2 as Error).message)
-            setBusy(false)
-          }
+          void connect(uri)
         }}
       >
         <p className="text-sm text-mute">
-          On the app&apos;s website, choose <b className="text-white">WalletConnect</b>, then copy the connection link (usually a &ldquo;Copy&rdquo; button under the QR code) and paste it here.
+          On the app&apos;s website, choose <b className="text-white">WalletConnect</b>. Then scan its QR code, or copy the connection link (usually a &ldquo;Copy&rdquo; button under the QR
+          code) and paste it here.
         </p>
-        <textarea className="input h-24 font-mono text-xs" placeholder="wc:…" value={uri} onChange={(e) => setUri(e.target.value)} aria-label="WalletConnect link" spellCheck={false} />
+
+        {scanning ? (
+          <>
+            <QrScanner onScan={onScan} />
+            <button type="button" className="btn-ghost w-full" onClick={() => setScanning(false)}>
+              Stop scanning
+            </button>
+          </>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            <button type="button" className="btn-ghost" disabled={blocked || busy} onClick={() => setScanning(true)}>
+              <Camera className="h-4 w-4" /> Scan QR code
+            </button>
+            <button type="button" className="btn-ghost" disabled={blocked || busy} onClick={() => fileInput.current?.click()}>
+              <ImageUp className="h-4 w-4" /> Scan from image
+            </button>
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              aria-label="QR code image"
+              onChange={async (e) => {
+                const file = e.target.files?.[0]
+                e.target.value = ''
+                if (!file) return
+                setErr(null)
+                try {
+                  const text = await decodeQrFile(file)
+                  const found = text ? extractWcUri(text) : null
+                  if (!text) setErr('No QR code found in that image. Try a sharper screenshot of just the QR code.')
+                  else if (!found) setErr('That QR code is not a WalletConnect link.')
+                  else onScan(found)
+                } catch {
+                  setErr('Could not read that image.')
+                }
+              }}
+            />
+          </div>
+        )}
+
+        <textarea className="input h-20 font-mono text-xs" placeholder="…or paste the wc: link" value={uri} onChange={(e) => setUri(e.target.value)} aria-label="WalletConnect link" spellCheck={false} />
         {activeWallet?.kind === 'watch' && <ErrorBox>Watch-only wallets cannot connect to apps. Switch to a wallet you can sign with.</ErrorBox>}
         {wc.status === 'error' && <ErrorBox>WalletConnect could not start: {wc.error}</ErrorBox>}
         {err && <ErrorBox>{err}</ErrorBox>}
-        <Notice>Connecting only shares your public address. Every transaction or signature the app asks for will open a review screen first.</Notice>
-        <button className="btn-primary w-full" disabled={!uri.trim() || busy || wc.status !== 'ready' || activeWallet?.kind === 'watch'}>
+        <Notice>Connecting only shares your public address. Every transaction or signature the app asks for will open a review screen first. QR images and camera frames never leave your device.</Notice>
+        <button className="btn-primary w-full" disabled={!uri.trim() || busy || blocked}>
           {busy ? (
             <>
               <Spinner /> Waiting for the app…

@@ -65,10 +65,15 @@ InWIF is a WalletConnect wallet (Reown WalletKit), using the project ID from the
 (`8b2edb1e560d95b69a5eac692b07b323`, built in; override with `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`).
 
 **How users connect:**
-1. On the dApp's site, choose **WalletConnect** and copy the connection link (`wc:…`).
-2. In InWIF, click the **plug icon** in the top bar (or **Security → Connect an app**), paste the link and review the
-   connection request: who is asking, whether WalletConnect verified the domain, and which networks.
-3. dApps can also link directly to `https://inwif.vercel.app/app/connect?uri=wc:…`. InWIF still asks before
+1. On the dApp's site, choose **WalletConnect**.
+2. In InWIF, click the **plug icon** in the top bar (or **Security → Connect an app**), then either:
+   - **Scan QR code** with the camera (phones and laptops), or
+   - **Scan from image**: upload a screenshot of the QR code (handy when it's on the same screen), or
+   - paste the `wc:…` link.
+
+   QR decoding happens on the device; camera frames and images are never uploaded.
+3. Review the connection request: who is asking, whether WalletConnect verified the domain, and which networks.
+4. dApps can also link directly to `https://inwif.vercel.app/app/connect?uri=wc:…`. InWIF still asks before
    connecting.
 
 **What dApps can ask for (each opens an InWIF review screen; nothing is signed automatically):**

@@ -16,6 +16,7 @@ import { NETWORKS } from '@inwif/core'
 import type { IWalletKit } from '@reown/walletkit'
 import type { ProposalTypes, SessionTypes, Verify } from '@walletconnect/types'
 import { SELECTABLE_NETWORKS } from './net'
+import { extractWcUri } from './qr'
 import { useWallet } from './wallet-store'
 import { useNotify } from './notifications'
 
@@ -246,8 +247,9 @@ export function WalletConnectProvider({ children }: { children: React.ReactNode 
       pair: async (uri: string) => {
         const kit = kitRef.current
         if (!kit) throw new Error('WalletConnect is still starting. Try again in a moment.')
-        const u = uri.trim()
-        if (!/^wc:[0-9a-f]{64}@2\?/i.test(u)) throw new Error('That is not a WalletConnect link. Copy the "wc:…" link from the app’s QR code dialog.')
+        // Accept a bare wc: link or a deep link that carries one (?uri=wc:…).
+        const u = extractWcUri(uri)
+        if (!u) throw new Error('That is not a WalletConnect link. Copy the "wc:…" link from the app’s QR code dialog.')
         await kit.pair({ uri: u })
       },
       approve: async () => {

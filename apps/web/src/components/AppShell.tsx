@@ -52,7 +52,7 @@ function NetworkStatus() {
     <div className="flex items-center gap-2">
       <select
         aria-label="Network"
-        className="rounded-lg border border-white/10 bg-ink-900 px-2 py-1.5 text-xs font-semibold outline-none"
+        className="max-w-[7rem] truncate rounded-lg min-[381px]:max-w-[8.5rem] border border-white/10 bg-ink-900 px-2 py-1.5 text-xs font-semibold outline-none sm:max-w-none"
         value={state.network}
         onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))}
       >
@@ -66,7 +66,9 @@ function NetworkStatus() {
         <Badge>checking…</Badge>
       ) : v.data?.ok ? (
         <Badge tone="ok" >
-          <span className="h-1.5 w-1.5 rounded-full bg-ok" /> chain {v.data.chainId} · #{v.data.blockNumber.toString()}
+          <span className="h-1.5 w-1.5 rounded-full bg-ok" />
+          <span className="max-[380px]:sr-only">chain {v.data.chainId}</span>
+          <span className="hidden sm:inline"> · #{v.data.blockNumber.toString()}</span>
         </Badge>
       ) : (
         <Badge tone="bad">unverified</Badge>
@@ -203,12 +205,12 @@ function Shell({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-white/[0.06] bg-ink-950/80 px-4 py-3 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-30 flex items-center gap-1.5 border-b border-white/[0.06] bg-ink-950/80 px-3 py-3 backdrop-blur sm:px-6">
           <button className="rounded-lg p-2 lg:hidden" onClick={() => setMobileNav(true)} aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </button>
           <NetworkStatus />
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             <div className="hidden sm:block">
               <WalletSwitcher />
             </div>

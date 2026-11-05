@@ -8,6 +8,7 @@
 | API (vitest + PostgreSQL) | `pnpm --filter @inwif/api test` | wallet-signature auth, nonce replay, secret rejection, device registry, input validation, rate limiting, no payment endpoints, schema has no secret columns |
 | Firmware (cargo) | `cd firmware && cargo test` | byte-identical signatures vs the TS implementation, RLP and tx parser hardening, PIN wipe, chain allow-list, attestation, firmware signature checks |
 | WalletConnect E2E | `NODE_USE_ENV_PROXY=1 node apps/web/e2e/walletconnect.mjs` (server on :3000, Anvil running) | over the live WalletConnect relay: connect, `personal_sign` verified, unlimited permit flagged and rejected (4001), `eth_sendTransaction` confirmed on-chain, disconnect from the Security Centre |
+| QR scanning E2E | `NODE_USE_ENV_PROXY=1 node apps/web/e2e/walletconnect-qr.mjs` (server on :3000) | Chromium's fake camera plays the dApp's real WalletConnect QR code, which is scanned and connected; a QR from an uploaded image is decoded (connection rejected); a non-WalletConnect QR is refused |
 | Live mainnet (read-only) | `NODE_USE_ENV_PROXY=1 pnpm --filter @inwif/core verify:live` | chain IDs, $WIF and token metadata, Uniswap deployments, a live quote, explorer and market reachability |
 | Live web (read-only) | `node apps/web/e2e/live-mainnet.mjs` (server on :3000) | watch-only wallet on mainnet: verification, live portfolio, charts, $WIF page, swap quote, activity (with RPC fallback) |
 | Mobile | `cd apps/mobile && npx tsc --noEmit && npx expo export --platform android` | type safety and bundling |
