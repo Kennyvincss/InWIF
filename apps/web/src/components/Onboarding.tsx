@@ -1,8 +1,8 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Cpu, Eye, EyeOff, Fingerprint, KeyRound, Plus, ScanEye, ShieldCheck } from 'lucide-react'
+import { Cpu, KeyRound, Plus, ScanEye, ShieldCheck } from 'lucide-react'
 import {
   accountFromMnemonic,
   checkMnemonic,
@@ -11,23 +11,21 @@ import {
   createMnemonic,
   normaliseMnemonic,
   normalisePrivateKey,
-  pickVerificationIndices,
-  verifyBackupWords,
 } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { LogoMark } from './Logo'
+import { BackupModal } from './BackupModal'
 import { ErrorBox, Notice, Spinner, cx } from './ui'
 
-type Step = 'welcome' | 'show' | 'verify' | 'import' | 'watch' | 'password' | 'biometric' | 'done'
+type Step = 'welcome' | 'import' | 'watch' | 'password' | 'done'
 
 export function Onboarding({ embedded = false, onFinished }: { embedded?: boolean; onFinished?: () => void }) {
   const wallet = useWallet()
   const [step, setStep] = useState<Step>('welcome')
   const [strength, setStrength] = useState<128 | 256>(128)
   const [phrase, setPhrase] = useState('')
-  const [revealed, setRevealed] = useState(false)
-  const [quiz, setQuiz] = useState<number[]>([])
-  const [answers, setAnswers] = useState<Record<number, string>>({})
+  const [createdId, setCreatedId] = useState<string | null>(null)
+  const [backupOpen, setBackupOpen] = useState(false)
   const [importMode, setImportMode] = useState<'phrase' | 'key'>('phrase')
   const [importInput, setImportInput] = useState('')
   const [watchInput, setWatchInput] = useState('')
@@ -38,16 +36,15 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
   const [err, setErr] = useState<string | null>(null)
   const [source, setSource] = useState<'create' | 'phrase' | 'key'>('create')
 
-  const words = useMemo(() => phrase.split(' '), [phrase])
   const pwCheck = checkPassword(pw)
   const importCheck = importMode === 'phrase' ? checkMnemonic(importInput) : null
   const importKey = importMode === 'key' ? normalisePrivateKey(importInput) : null
 
+  // One step: the phrase is generated now and backed up later from the reminder.
   function startCreate() {
     setPhrase(createMnemonic(strength))
-    setRevealed(false)
     setSource('create')
-    setStep('show')
+    setStep('password')
   }
 
   async function finish() {
@@ -57,13 +54,17 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
     setBusy(true)
     try {
       if (source === 'key') await wallet.importPrivateKey({ name, privateKey: importKey!, password: pw })
-      else await wallet.createFromMnemonic({ name, phrase: source === 'create' ? phrase : normaliseMnemonic(importInput), password: pw, backedUp: true })
+      else {
+        // A created phrase is not backed up yet; an imported one already exists on paper.
+        const w = await wallet.createFromMnemonic({ name, phrase: source === 'create' ? phrase : normaliseMnemonic(importInput), password: pw, backedUp: source !== 'create' })
+        setCreatedId(source === 'create' ? w.id : null)
+      }
       // Clear secrets from component state as soon as they are encrypted.
       setPhrase('')
       setImportInput('')
       setPw('')
       setPw2('')
-      setStep('biometric')
+      setStep('done')
     } catch (e) {
       setErr((e as Error).message)
     } finally {
@@ -123,79 +124,6 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                   <p className="font-semibold">Watch an address</p>
                   <p className="text-xs text-mute">Track any public address. No keys, cannot sign.</p>
                 </div>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 'show' && (
-          <div>
-            <h2 className="font-display text-2xl font-bold">Your recovery phrase</h2>
-            <p className="mt-1 text-sm text-mute">These {words.length} words are the only way to recover your wallet. Write them on paper, in order. Never type them into a website or share them.</p>
-            <div className="relative mt-5">
-              <ol className={cx('grid grid-cols-2 gap-2 sm:grid-cols-3', !revealed && 'select-none blur-md')}>
-                {words.map((w, i) => (
-                  <li key={i} className="rounded-xl border border-white/10 bg-ink-900 px-3 py-2 text-sm">
-                    <span className="mr-2 text-mute">{i + 1}</span>
-                    <span className="font-medium">{w}</span>
-                  </li>
-                ))}
-              </ol>
-              {!revealed && (
-                <button className="btn-ghost absolute inset-0 m-auto h-fit w-fit" onClick={() => setRevealed(true)}>
-                  <Eye className="h-4 w-4" /> Reveal (make sure nobody is watching)
-                </button>
-              )}
-            </div>
-            <Notice tone="warn">InWIF never stores your phrase on a server and cannot recover it for you. Anyone with these words controls your funds.</Notice>
-            <div className="mt-5 flex gap-2">
-              <button className="btn-ghost" onClick={() => setRevealed(false)}>
-                <EyeOff className="h-4 w-4" /> Hide
-              </button>
-              <button
-                className="btn-primary flex-1"
-                disabled={!revealed}
-                onClick={() => {
-                  setQuiz(pickVerificationIndices(words.length, 3))
-                  setAnswers({})
-                  setStep('verify')
-                }}
-              >
-                I wrote it down
-              </button>
-            </div>
-          </div>
-        )}
-
-        {step === 'verify' && (
-          <div>
-            <h2 className="font-display text-2xl font-bold">Verify your backup</h2>
-            <p className="mt-1 text-sm text-mute">Enter the requested words from your written copy.</p>
-            <div className="mt-5 space-y-3">
-              {quiz.map((i) => (
-                <div key={i}>
-                  <label className="label" htmlFor={`w${i}`}>
-                    Word #{i + 1}
-                  </label>
-                  <input id={`w${i}`} className="input" autoComplete="off" spellCheck={false} value={answers[i] ?? ''} onChange={(e) => setAnswers({ ...answers, [i]: e.target.value })} />
-                </div>
-              ))}
-            </div>
-            {err && <div className="mt-3"><ErrorBox>{err}</ErrorBox></div>}
-            <div className="mt-5 flex gap-2">
-              <button className="btn-ghost" onClick={() => setStep('show')}>
-                Back
-              </button>
-              <button
-                className="btn-primary flex-1"
-                onClick={() => {
-                  if (verifyBackupWords(phrase, answers)) {
-                    setErr(null)
-                    setStep('password')
-                  } else setErr('One or more words do not match. Check your written copy.')
-                }}
-              >
-                Verify
               </button>
             </div>
           </div>
@@ -283,9 +211,9 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
               void finish()
             }}
           >
-            <h2 className="font-display text-2xl font-bold">Protect this wallet</h2>
+            <h2 className="font-display text-2xl font-bold">{source === 'create' ? 'Create your wallet' : 'Protect this wallet'}</h2>
             <p className="mt-1 text-sm text-mute">
-              Your keys are encrypted on this device with AES-256-GCM using a key derived from this password (PBKDF2, 600,000 iterations). Each wallet is encrypted separately.
+              Choose a password to unlock InWIF on this device. Your keys are encrypted with it (AES-256-GCM, PBKDF2 600,000 iterations) and never leave your device.
             </p>
             <div className="mt-5 space-y-3">
               <div>
@@ -304,31 +232,28 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
             </div>
             {err && <div className="mt-3"><ErrorBox>{err}</ErrorBox></div>}
             <button className="btn-primary mt-5 w-full" disabled={busy}>
-              {busy ? <Spinner /> : <ShieldCheck className="h-4 w-4" />} Encrypt & finish
+              {busy ? <Spinner /> : <ShieldCheck className="h-4 w-4" />} {source === 'create' ? 'Create wallet' : 'Encrypt & finish'}
             </button>
           </form>
-        )}
-
-        {step === 'biometric' && (
-          <div>
-            <Fingerprint className="h-10 w-10 text-lime" />
-            <h2 className="mt-4 font-display text-2xl font-bold">Biometric unlock</h2>
-            <p className="mt-2 text-sm text-mute">
-              Face ID, Touch ID and fingerprint unlock are provided by the InWIF mobile and desktop apps through the operating system&apos;s secure storage (Keychain / Android
-              Keystore). Browsers cannot hold wallet keys behind biometrics safely, so the web wallet uses your password.
-            </p>
-            <button className="btn-primary mt-6 w-full" onClick={() => setStep('done')}>
-              Continue
-            </button>
-          </div>
         )}
 
         {step === 'done' && (
           <div className="text-center">
             <ShieldCheck className="mx-auto h-12 w-12 text-ok" />
-            <h2 className="mt-4 font-display text-2xl font-bold">You&apos;re set</h2>
+            <h2 className="mt-4 font-display text-2xl font-bold">Your wallet is ready</h2>
             <p className="mt-2 text-sm text-mute">Every InWIF feature is free, for every user. No subscriptions, no paywalls, and you never need $WIF to use the wallet.</p>
-            <Link href="/app" className="btn-primary mt-6 w-full" onClick={onFinished}>
+            {createdId && (
+              <div className="mt-5 text-left">
+                <Notice tone="warn">
+                  Back up your recovery phrase before you add funds. It is the only way to restore this wallet if you lose this device or clear your browser.
+                </Notice>
+                <button className="btn-ghost mt-3 w-full" onClick={() => setBackupOpen(true)}>
+                  <KeyRound className="h-4 w-4" /> Back up now
+                </button>
+                <BackupModal walletId={createdId} open={backupOpen} onClose={() => setBackupOpen(false)} />
+              </div>
+            )}
+            <Link href="/app" className="btn-primary mt-3 w-full" onClick={onFinished}>
               Open my wallet
             </Link>
           </div>

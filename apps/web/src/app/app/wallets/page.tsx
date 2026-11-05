@@ -4,6 +4,7 @@ import { Archive, ArchiveRestore, Eye, KeyRound, Plus, Trash2, Unlock } from 'lu
 import { shortAddress, type WalletSecret } from '@inwif/core'
 import { useWallet, type WalletRec } from '@/lib/wallet-store'
 import { Onboarding } from '@/components/Onboarding'
+import { BackupModal } from '@/components/BackupModal'
 import { Badge, CopyButton, ErrorBox, Modal, Notice, PageHeader, cx } from '@/components/ui'
 
 export default function WalletsPage() {
@@ -47,6 +48,7 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
   const [secret, setSecret] = useState<WalletSecret | null>(null)
   const [err, setErr] = useState<string | null>(null)
   const [name, setName] = useState(wallet.name)
+  const [backup, setBackup] = useState(false)
   const unlocked = w.isUnlocked(wallet.id)
   const hasKeys = wallet.kind === 'mnemonic' || wallet.kind === 'privateKey'
 
@@ -81,6 +83,11 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
           {hasKeys && !unlocked && (
             <button className="btn-ghost px-2.5 py-1.5 text-xs" onClick={() => setMode('unlock')}>
               <Unlock className="h-3.5 w-3.5" /> Unlock
+            </button>
+          )}
+          {wallet.kind === 'mnemonic' && !wallet.backedUp && (
+            <button className="btn-primary px-2.5 py-1.5 text-xs" onClick={() => setBackup(true)}>
+              <KeyRound className="h-3.5 w-3.5" /> Back up now
             </button>
           )}
           {hasKeys && (
@@ -145,6 +152,7 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
       )}
       {err && !mode && <div className="mt-2"><ErrorBox>{err}</ErrorBox></div>}
 
+      <BackupModal walletId={wallet.id} open={backup} onClose={() => setBackup(false)} />
       <Modal
         open={!!mode}
         onClose={() => {
@@ -158,18 +166,6 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
           <div className="space-y-3">
             <Notice tone="warn">Anyone who sees this controls your funds. Close this window when done.</Notice>
             <p className="break-words rounded-xl bg-ink-900 p-4 font-mono text-sm">{secret.kind === 'mnemonic' ? secret.phrase : secret.privateKey}</p>
-            {!wallet.backedUp && (
-              <button
-                className="btn-primary w-full"
-                onClick={() => {
-                  w.markBackedUp(wallet.id)
-                  setSecret(null)
-                  setMode(null)
-                }}
-              >
-                I have written it down
-              </button>
-            )}
           </div>
         ) : (
           <form

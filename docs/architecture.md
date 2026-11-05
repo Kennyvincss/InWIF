@@ -60,18 +60,16 @@
 
 The desktop build is a static export without these routes. It calls the providers directly.
 
-## dApp connections (WalletConnect)
+## Wallets only live in InWIF
 
-`apps/web/src/lib/walletconnect.tsx` runs Reown WalletKit in the browser, connecting to the WalletConnect relay.
-Proposals show the dApp's metadata and the WalletConnect Verify result. Approved sessions share only the active
-account, on the networks InWIF supports.
+InWIF does not connect to other websites or apps: there is no WalletConnect, injected provider or "Connect Wallet"
+button. Every user gets a wallet created by InWIF on their own device, imports one (phrase or private key), watches
+an address, or pairs an InWIF hardware device. Nothing outside InWIF can request a signature.
 
-Each request is routed to an InWIF review screen:
-- transactions go to `TxFlow`
-- messages and typed data go to a signature review built on `reviewPersonalSign` / `reviewTypedData` in
-  `packages/core`, which flags permits, blind signing and domain mismatches
-
-Sessions are listed and revocable in the Security Centre.
+Creating a wallet takes one step: InWIF generates the BIP-39 phrase locally and encrypts it with the user's password.
+The wallet is marked "not backed up" and the dashboard and Wallets page show a **Back up now** reminder
+(`BackupModal`): the password decrypts the phrase, the words are revealed on request, and a three-word quiz
+(`pickVerificationIndices` / `verifyBackupWords`) records the backup.
 
 ## Backend (`apps/api`)
 
