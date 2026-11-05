@@ -56,10 +56,12 @@ try {
   console.log(`  · ${holders.replace(/\n/g, ' ')}`)
 
   await page.locator('aside').getByRole('link', { name: 'Swap', exact: true }).click()
-  await page.getByText('Uniswap V3 contracts verified on-chain').waitFor({ timeout: 30000 })
+  await page.getByText('Uniswap contracts verified on-chain').waitFor({ timeout: 30000 })
   await page.getByLabel('Amount to swap').fill('0.01')
   await page.getByText('Minimum received').waitFor({ timeout: 30000 })
-  ok('live Uniswap V3 quote ETH → WIF')
+  await page.getByText('Pons $WIF/ETH pool (Uniswap V4)').waitFor({ timeout: 30000 })
+  const vsMarket = await page.getByText(/% (below|above)$/).first().textContent({ timeout: 30000 }).catch(() => 'no market price')
+  ok(`live quote ETH → WIF routed through the Pons pool (Uniswap V4); vs market: ${vsMarket}`)
   await page.screenshot({ path: `${OUT}/live-swap.png` })
 
   await page.locator('aside').getByRole('link', { name: 'Activity', exact: true }).click()

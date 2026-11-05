@@ -24,7 +24,7 @@ InWIF is a free, self-custody wallet ecosystem for **Robinhood Chain**, built fo
 | Live chain-ID verification before every signature | ✅ |
 | Portfolio: on-chain balances, GeckoTerminal prices, 24h/7d/30d/90d/all charts, allocation | ✅ |
 | Send / receive: EIP-681 QR, address checks, simulation, decoded review, fee disclosure, receipt | ✅ |
-| Swaps: Uniswap V3 (QuoterV2 + SwapRouter02), slippage, price impact, exact approvals, **0% InWIF fee** | ✅ |
+| Swaps: best of Uniswap V3 and the reviewed Uniswap V4 $WIF pool (Pons), measured pool fee, market-price guard, slippage, price impact, exact approvals, **0% InWIF fee** | ✅ |
 | $WIF dashboard: verified on-chain metadata, market, holders, history, profile, quests, app registry | ✅ |
 | DeFi: Uniswap V3 LP position tracking (staking/lending: none verified yet, so none shown) | ✅ |
 | Security Centre: approval discovery + revoke, flagged addresses, checklist, devices | ✅ |

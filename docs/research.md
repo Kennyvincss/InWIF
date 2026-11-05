@@ -68,6 +68,39 @@ All code, branding, protocol (IWDP) and design are original to InWIF. Nothing wa
 Sources: `Uniswap/sdks` (`sdk-core/src/addresses.ts`, `entities/weth9.ts`) and `Uniswap/interface` (chain info).
 The swap screen verifies that each address has deployed code before quoting.
 
+### Uniswap V4 and the main $WIF market (checked 2026-11-05)
+
+| Contract | Address |
+|---|---|
+| V4 PoolManager | `0x8366a39cc670b4001a1121b8f6a443a643e40951` |
+| Universal Router v2.1.1 | `0x8876789976decbfcbbbe364623c63652db8c0904` |
+| V4 Quoter | `0x8dc178efb8111bb0973dd9d722ebeff267c98f94` |
+| StateView | `0xf3334192d15450cdd385c8b70e03f9a6bd9e673b` |
+| Permit2 | `0x000000000022D473030F116dDEE9F6B43aC78BA3` |
+
+Sources: `Uniswap/sdks` (`sdk-core/src/addresses.ts`, `universal-router-sdk/src/utils/constants.ts`).
+
+**Where $WIF trades.** GeckoTerminal lists about 20 $WIF pools. Almost all volume is in one: the Pons V2 pool
+(Uniswap V4 pool ID `0x71ef4106…48c79`), with about $102k of liquidity and $120k of 24-hour volume. $WIF launched
+on the Pons launchpad and graduated into this pool. The Uniswap V3 WIF/WETH 1% pool has no active liquidity, its
+price is at the maximum tick, and it had no trades in 24 hours; buying through it gave about 19–20% less $WIF than
+the market price, and selling failed.
+
+**The pool key** (decoded from a real trade and checked against the pool ID): currency0 native ETH, currency1 $WIF,
+fee 0, tick spacing 200, hook `0xe5e702641ea86f4ae6cc3cdaed2b886f976be044`. The hook's address flags are
+beforeInitialize, afterSwap and afterSwapReturnsDelta: it does not restrict adding liquidity, and it takes the swap
+fee itself. Measured on-chain, that fee is 1.00% of each swap.
+
+**Consequences:**
+- **Swaps** route through this pool when it gives the better price (it does, by about 25% at 0.01 ETH). InWIF's
+  calldata is byte-identical to a real Pons trade, and buys, sells (with Permit2) and the slippage revert were tested
+  on a mainnet fork.
+- **No "add liquidity" for $WIF.** The pool's LP fee is 0, so liquidity providers earn nothing and only carry
+  impermanent-loss risk. Adding liquidity to the dead V3 pool near its broken price would let bots take it almost for
+  free. InWIF offers neither.
+- **Hook risk is bounded.** The hook runs on every swap, but every swap carries a minimum output; if the hook took
+  more, the swap would revert. Pons V2's contracts were reported as still under audit in September 2026.
+
 ## 4. $WIF
 - **Contract:** `0x5173b8eA6923c2d40267890D45C46a3480954773`, as given in the brief. Public explorer and GeckoTerminal listings index
   it as "World is Flat (WIF)" on Robinhood Chain, with WIF/WETH pools on Uniswap V3.

@@ -2,13 +2,14 @@
 
 | Suite | Command | What it covers |
 |---|---|---|
-| Core (vitest) | `pnpm --filter @inwif/core test` | mnemonic vectors, keystore round-trip and tamper detection, validation, risk review, swap calldata (no InWIF fee), Blockscout parsing, network verification fail-closed, signing guards, hardware protocol and simulator (PIN wipe, rejection, chain allow-list, attestation, firmware signatures) |
+| Core (vitest) | `pnpm --filter @inwif/core test` | mnemonic vectors, keystore round-trip and tamper detection, validation, risk review, swap calldata (no InWIF fee), Uniswap V4 calldata byte-identical to a real Pons trade, pool-ID check, Permit2 approval steps, market-price guard, Blockscout parsing, network verification fail-closed, signing guards, hardware protocol and simulator (PIN wipe, rejection, chain allow-list, attestation, firmware signatures) |
 | Web (vitest) | `pnpm --filter @inwif/web test` | formatting never invents values; **free-policy guardrail** scanning the monorepo for paywall / subscription / payment code |
 | Web E2E (Playwright) | `node apps/web/e2e/smoke.mjs` | real browser against a local Anvil chain (see below) |
 | API (vitest + PostgreSQL) | `pnpm --filter @inwif/api test` | wallet-signature auth, nonce replay, secret rejection, device registry, input validation, rate limiting, no payment endpoints, schema has no secret columns |
 | Firmware (cargo) | `cd firmware && cargo test` | byte-identical signatures vs the TS implementation, RLP and tx parser hardening, PIN wipe, chain allow-list, attestation, firmware signature checks |
 | Live mainnet (read-only) | `NODE_USE_ENV_PROXY=1 pnpm --filter @inwif/core verify:live` | chain IDs, $WIF and token metadata, Uniswap deployments, a live quote, explorer and market reachability |
-| Live web (read-only) | `node apps/web/e2e/live-mainnet.mjs` (server on :3000) | watch-only wallet on mainnet: verification, live portfolio, charts, $WIF page, swap quote, activity (with RPC fallback) |
+| Live web (read-only) | `node apps/web/e2e/live-mainnet.mjs` (server on :3000) | watch-only wallet on mainnet: verification, live portfolio, charts, $WIF page, swap quote routed through the Pons pool and compared with market, activity (with RPC fallback) |
+| Swap on a mainnet fork | `anvil --fork-url https://rpc.mainnet.chain.robinhood.com --port 8545`, build with `NEXT_PUBLIC_ROBINHOOD_RPC_URL=http://127.0.0.1:8545`, then `NODE_USE_ENV_PROXY=1 node apps/web/e2e/swap-fork.mjs` | real contracts in a browser: buy $WIF through the Pons pool (fee measured at 1.00%), then sell it all back through both Permit2 approvals, each step's review checked |
 | Mobile | `cd apps/mobile && npx tsc --noEmit && npx expo export --platform android` | type safety and bundling |
 | Desktop | `cd apps/desktop/src-tauri && cargo build` | native shell compiles |
 

@@ -31,7 +31,7 @@ const fade = { initial: { opacity: 0, y: 18 }, whileInView: { opacity: 1, y: 0 }
 const FEATURES = [
   { icon: Wallet, title: 'Unlimited wallets', body: 'Create or import as many wallets and accounts as you need. Rename, archive and switch instantly.' },
   { icon: LineChart, title: 'Real portfolio data', body: 'Balances read straight from Robinhood Chain; prices from on-chain DEX markets. Never estimated, never invented.' },
-  { icon: ArrowLeftRight, title: 'Zero-fee swaps', body: 'Trade through the verified Uniswap V3 deployment. InWIF adds no fee — you see the pool fee and gas, nothing else.' },
+  { icon: ArrowLeftRight, title: 'Zero-fee swaps', body: 'The best price across verified Uniswap pools, including the main $WIF market. InWIF adds no fee — you see the pool fee and gas, nothing else.' },
   { icon: FileSearch, title: 'Simulate before you sign', body: 'Every transaction is simulated and decoded into plain language, with warnings for risky approvals.' },
   { icon: KeyRound, title: 'Approval manager', body: 'Find every live token allowance and revoke it in one tap. Unlimited approvals are flagged loudly.' },
   { icon: Layers, title: 'DeFi positions', body: 'Track Uniswap V3 liquidity positions, in-range status and uncollected fees — read-only, from the contracts.' },
@@ -184,7 +184,7 @@ export default function Home() {
             <p className="mt-6 text-lg">InWIF is the free, secure access point for the World Is Flat community on Robinhood Chain.</p>
             <ul className="mt-6 space-y-2 text-sm text-mute">
               <li>• Live $WIF dashboard: balance, verified contract data, market and transfer history</li>
-              <li>• Zero-fee $WIF swaps through Uniswap V3</li>
+              <li>• Zero-fee $WIF swaps at the best Uniswap price</li>
               <li>• Ecosystem profile from your public on-chain activity</li>
               <li>• A reviewed registry for apps built around $WIF</li>
             </ul>
