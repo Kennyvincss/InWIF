@@ -8,15 +8,13 @@ InWIF is a free, self-custody wallet ecosystem for **Robinhood Chain**, built fo
 - a web wallet
 - mobile and desktop companion apps
 - a hardware-wallet prototype with its own signing protocol and firmware core
-- optional, transparently funded rewards
 
 > **InWIF is free.** No subscriptions, no premium plans, no paywalls, no InWIF service fees,
 > and no feature ever requires holding or spending $WIF. The only costs are Robinhood Chain gas,
 > plus, for swaps, the Uniswap pool fee. Both are shown before you confirm.
 
 > **Status: pre-release, not independently audited.** The InWIF One hardware wallet is a
-> prototype: no device has been manufactured or independently tested. The rewards contract is
-> deliberately not deployable to mainnet until it has been audited.
+> prototype: no device has been manufactured or independently tested.
 
 ## What works today
 
@@ -27,12 +25,11 @@ InWIF is a free, self-custody wallet ecosystem for **Robinhood Chain**, built fo
 | Portfolio: on-chain balances, GeckoTerminal prices, 24h/7d/30d/90d/all charts, allocation | ✅ |
 | Send / receive: EIP-681 QR, address checks, simulation, decoded review, fee disclosure, receipt | ✅ |
 | Swaps: Uniswap V3 (QuoterV2 + SwapRouter02), slippage, price impact, exact approvals, **0% InWIF fee** | ✅ |
-| $WIF dashboard: verified on-chain metadata, market, holders, history, profile, quests, rewards, app registry | ✅ |
+| $WIF dashboard: verified on-chain metadata, market, holders, history, profile, quests, app registry | ✅ |
 | DeFi: Uniswap V3 LP position tracking (staking/lending: none verified yet, so none shown) | ✅ |
 | Security Centre: approval discovery + revoke, flagged addresses, checklist, devices | ✅ |
 | Hardware: IWDP v1 protocol, browser simulator, WebSerial, attestation, signed firmware, offline signing | ✅ prototype |
 | Firmware core (Rust, `no_std`): byte-identical signatures with the TS companion; builds for Cortex-M4F | ✅ prototype |
-| Rewards contract (Foundry): unit, fuzz, invariant tests; mainnet deploy blocked | ✅ testnet only |
 | Backend API (Fastify + PostgreSQL): public data, wallet-signature login, no secrets | ✅ |
 | Mobile (Expo): keychain + biometrics, portfolio, send, receive, $WIF, simulator | ✅ JS bundle; native builds need Xcode / Android SDK |
 | Desktop (Tauri): wallet UI + native USB-serial transport | ✅ compiles on Linux; Windows/macOS packaging needs those hosts |
@@ -45,7 +42,6 @@ apps/web          Landing site + web wallet (Next.js, Tailwind, Framer Motion, w
 apps/api          Public-data backend (Fastify, PostgreSQL, optional Redis)
 apps/mobile       iOS / Android app (Expo, React Native)
 apps/desktop      Desktop app (Tauri 2) with native USB transport
-contracts         InWIFRewards (Solidity, Foundry, OpenZeppelin)
 firmware          Hardware-wallet firmware core (Rust, no_std)
 docs              Architecture, security, hardware, deployment, testing, research
 ```

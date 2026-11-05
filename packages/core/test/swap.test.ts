@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { decodeFunctionData, getAddress, keccak256, encodeAbiParameters, concat } from 'viem'
-import { ADDRESS_THIS, NATIVE, ROBINHOOD_MAINNET, buildCampaignTree, buildSwapTx, minimumReceived, proofFor, swapRouter02Abi, WIF_ADDRESS } from '../src'
+import { decodeFunctionData, getAddress } from 'viem'
+import { ADDRESS_THIS, NATIVE, ROBINHOOD_MAINNET, buildSwapTx, minimumReceived, swapRouter02Abi, WIF_ADDRESS } from '../src'
 
 const cfg = ROBINHOOD_MAINNET.uniswapV3!
 const ME = getAddress('0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266')
@@ -36,28 +36,5 @@ describe('swap calldata', () => {
     const unwrap = decodeFunctionData({ abi: swapRouter02Abi, data: calls[1]! })
     expect(unwrap.functionName).toBe('unwrapWETH9')
     expect((unwrap.args as readonly [bigint, string])[1]).toBe(ME)
-  })
-})
-
-describe('reward campaign trees', () => {
-  it('builds OpenZeppelin-compatible leaves and proofs', () => {
-    const alice = ME
-    const bob = getAddress('0x70997970C51812dc3A010C7d01b50e0d17dc79C8')
-    const t = buildCampaignTree(1n, [
-      { account: alice, amount: 100n },
-      { account: bob, amount: 250n },
-    ])
-    expect(t.total).toBe(350n)
-    const p = proofFor(t, bob)!
-    expect(p.amount).toBe(250n)
-    // Leaf = keccak256(bytes.concat(keccak256(abi.encode(id, account, amount))))
-    const inner = keccak256(encodeAbiParameters([{ type: 'uint256' }, { type: 'address' }, { type: 'uint256' }], [1n, bob, 250n]))
-    const leaf = keccak256(concat([inner]))
-    expect(t.tree.verify([ '1', bob, '250' ], p.proof)).toBe(true)
-    expect(leaf).toMatch(/^0x/)
-  })
-  it('rejects duplicates and zero amounts', () => {
-    expect(() => buildCampaignTree(1n, [{ account: ME, amount: 1n }, { account: ME, amount: 2n }])).toThrow()
-    expect(() => buildCampaignTree(1n, [{ account: ME, amount: 0n }])).toThrow()
   })
 })

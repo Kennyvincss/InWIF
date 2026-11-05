@@ -29,7 +29,7 @@
 - **Dev firmware keys.** The firmware prototype keeps keys in MCU RAM. Production must use the secure element.
 - **Compromised device.** A compromised computer or phone can still observe the user. Hardware signing reduces this risk but does not remove it.
 - **No safety guarantee.** InWIF cannot detect every malicious contract. No warning does not mean safe.
-- **No audit yet.** No independent audit has happened. Do not deploy `InWIFRewards` to mainnet before one.
+- **No audit yet.** No independent audit has happened.
 
 ## Reporting vulnerabilities
 See [../SECURITY.md](../SECURITY.md).

@@ -58,7 +58,6 @@ export interface Settings {
     hardware: boolean
     firmware: boolean
     security: boolean
-    rewards: boolean
     browser: boolean
   }
 }
@@ -90,7 +89,6 @@ export const DEFAULT_SETTINGS: Settings = {
     hardware: true,
     firmware: true,
     security: true,
-    rewards: true,
     browser: false,
   },
 }

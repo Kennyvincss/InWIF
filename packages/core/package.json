@@ -12,12 +12,10 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
-    "verify:live": "tsx scripts/verify-live.mts",
-    "rewards:build": "tsx scripts/rewards-build.mts"
+    "verify:live": "tsx scripts/verify-live.mts"
   },
   "dependencies": {
     "@noble/hashes": "^1.8.0",
-    "@openzeppelin/merkle-tree": "^1.0.8",
     "@scure/bip32": "^1.7.0",
     "@scure/bip39": "^1.6.0",
     "viem": "^2.57.16"

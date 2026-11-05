@@ -10,7 +10,6 @@
     "build": "pnpm -r --filter ./packages/** --filter @inwif/web --filter @inwif/api build",
     "test": "pnpm -r --filter ./packages/** --filter @inwif/web --filter @inwif/api test",
     "typecheck": "pnpm -r typecheck",
-    "test:contracts": "cd contracts && forge test",
     "test:firmware": "cd firmware && cargo test"
   },
   "engines": { "node": ">=20" }

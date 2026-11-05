@@ -15,7 +15,6 @@ const NOTIFY_LABELS: Record<keyof Settings['notifications'], string> = {
   hardware: 'Hardware connections',
   firmware: 'Firmware updates',
   security: 'Security alerts',
-  rewards: 'Reward availability',
   browser: 'Also show system notifications',
 }
 

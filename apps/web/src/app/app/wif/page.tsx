@@ -2,8 +2,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { encodeFunctionData, getAddress, type Hex } from 'viem'
-import { BadgeCheck, ExternalLink, Gift, GraduationCap, Sparkles } from 'lucide-react'
+import { BadgeCheck, ExternalLink, GraduationCap, Sparkles } from 'lucide-react'
 import {
   SECURITY_QUESTS,
   WIF_ADDRESS,
@@ -12,9 +11,7 @@ import {
   explorerAddressUrl,
   explorerTokenUrl,
   fetchExplorerToken,
-  inwifRewardsAbi,
   readTokenMetadata,
-  rewardsContractAddress,
   type ChartRange,
 } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
@@ -24,7 +21,6 @@ import { ECOSYSTEM_APPS, LISTING_CRITERIA } from '@/lib/ecosystem'
 import { withExplorer } from '@/lib/net'
 import { AreaChart } from '@/components/Charts'
 import { ActivityList } from '@/components/ActivityList'
-import { TxFlow, type TxRequest } from '@/components/TxFlow'
 import { Badge, CopyButton, ErrorBox, Notice, PageHeader, Row, Skeleton, cx } from '@/components/ui'
 
 const WIF_LISTING = DEFAULT_TOKENS.robinhood.find((t) => t.isWif)!
@@ -150,8 +146,8 @@ export default function WifPage() {
             portfolio feature is identical for every user.
           </p>
           <p>
-            <span className="font-semibold text-white">Utility is real and on-chain.</span> Track $WIF, trade it via Uniswap, audit its approvals, take part in funded reward
-            campaigns, and discover reviewed apps built around it.
+            <span className="font-semibold text-white">Utility is real and on-chain.</span> Track $WIF, trade it via Uniswap, audit its approvals, build an
+            on-chain ecosystem profile, and discover reviewed apps built around it.
           </p>
         </div>
       </section>
@@ -206,8 +202,6 @@ export default function WifPage() {
         </section>
       </div>
 
-      <Rewards />
-
       <section className="card p-5">
         <h2 className="mb-2 font-display font-bold">Your $WIF transfer history</h2>
         <ActivityList items={transfers.data} loading={transfers.isLoading} error={transfers.error as Error | null} emptyText="No $WIF transfers for this address yet." />
@@ -236,98 +230,5 @@ export default function WifPage() {
         </details>
       </section>
     </div>
-  )
-}
-
-interface ClaimFile {
-  claims: Record<string, { amount: string; proof: Hex[] }>
-}
-
-function Rewards() {
-  const { activeAccount } = useWallet()
-  const { network, client } = useNetwork()
-  const contract = rewardsContractAddress(network.chainId)
-  const [req, setReq] = useState<TxRequest | null>(null)
-  const campaigns = useQuery({
-    queryKey: ['campaigns', network.key, contract, activeAccount?.address],
-    enabled: !!contract && !!activeAccount,
-    queryFn: async () => {
-      const n = await client.readContract({ address: contract!, abi: inwifRewardsAbi, functionName: 'campaignCount' })
-      const ids = Array.from({ length: Number(n) }, (_, i) => BigInt(i + 1))
-      return Promise.all(
-        ids.map(async (id) => {
-          const [token, root, funded, claimed, deadline, active, uri] = await client.readContract({ address: contract!, abi: inwifRewardsAbi, functionName: 'campaigns', args: [id] })
-          const has = await client.readContract({ address: contract!, abi: inwifRewardsAbi, functionName: 'hasClaimed', args: [id, activeAccount!.address] })
-          let mine: { amount: bigint; proof: Hex[] } | null = null
-          if (/^https:\/\//.test(uri)) {
-            try {
-              const f = (await (await fetch(uri)).json()) as ClaimFile
-              const c = f.claims[getAddress(activeAccount!.address)] ?? f.claims[activeAccount!.address.toLowerCase()]
-              if (c) mine = { amount: BigInt(c.amount), proof: c.proof }
-            } catch {
-              /* distribution file unavailable */
-            }
-          }
-          return { id, token, root, funded, claimed, deadline, active, uri, has, mine }
-        }),
-      )
-    },
-  })
-
-  return (
-    <section id="rewards" className="card p-5">
-      <h2 className="mb-1 flex items-center gap-2 font-display font-bold">
-        <Gift className="h-5 w-5 text-lime" /> Ecosystem rewards
-      </h2>
-      <p className="mb-3 text-xs text-mute">
-        Rewards are optional and paid only from tokens already deposited into the InWIFRewards contract for each campaign — every deposit and claim is public on-chain. No
-        returns are promised.
-      </p>
-      {!contract ? (
-        <Notice>
-          No rewards contract is deployed on {network.name}. The InWIFRewards contract is written and tested but unaudited, so InWIF does not deploy it to mainnet. Developers
-          can deploy it to testnet with <code className="text-white">contracts/script/DeployRewards.s.sol</code>.
-        </Notice>
-      ) : campaigns.isLoading ? (
-        <Skeleton className="h-24" />
-      ) : campaigns.isError ? (
-        <ErrorBox>{(campaigns.error as Error).message}</ErrorBox>
-      ) : !campaigns.data?.length ? (
-        <Notice>No campaigns have been created yet.</Notice>
-      ) : (
-        <ul className="space-y-2">
-          {campaigns.data.map((c) => (
-            <li key={c.id.toString()} className="flex flex-wrap items-center gap-3 rounded-xl border border-white/[0.06] p-3 text-sm">
-              <div className="flex-1">
-                <p className="font-medium">Campaign #{c.id.toString()}</p>
-                <p className="text-xs text-mute">
-                  Funded {fmtToken(c.funded, 18)} · claimed {fmtToken(c.claimed, 18)} · ends {new Date(Number(c.deadline) * 1000).toLocaleDateString()}
-                </p>
-              </div>
-              {c.has ? (
-                <Badge tone="ok">Claimed</Badge>
-              ) : c.mine ? (
-                <button
-                  className="btn-primary"
-                  onClick={() =>
-                    setReq({
-                      to: contract,
-                      data: encodeFunctionData({ abi: inwifRewardsAbi, functionName: 'claim', args: [c.id, c.mine!.amount, c.mine!.proof] }),
-                      summary: `Claim reward from campaign #${c.id}`,
-                      kind: 'claim',
-                    })
-                  }
-                >
-                  Claim {fmtToken(c.mine.amount, 18)}
-                </button>
-              ) : (
-                <Badge>Not eligible</Badge>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-      <TxFlow request={req} onClose={() => setReq(null)} onDone={() => void campaigns.refetch()} />
-    </section>
   )
 }

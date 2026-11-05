@@ -11,7 +11,7 @@
             │  networks · client/verify · keystore     │
             │  mnemonic · validation · risk · simulate │
             │  approvals · activity · market · swap    │
-            │  defi · rewards · signer · redact        │
+            │  defi · quests · signer · redact         │
             │  hardware/{protocol,simulator,companion, │
             │            vendor,webserial}             │
             └──┬───────────┬──────────────┬────────────┘
@@ -73,13 +73,11 @@ Endpoints:
 - `GET /api/devices`
 - `POST /api/devices/connect`
 - `GET /api/security/alerts`
-- `GET /api/rewards`
 - auth: `/api/auth/challenge`, `/api/auth/verify`, `/api/me`
 
 The schema is in `apps/api/migrations/001_init.sql`. It has no secret columns, and a test asserts that.
 
 ## Contracts
 
-`InWIFRewards` handles optional, Merkle-committed reward campaigns, paid only from deposits that
-already exist on-chain. There is no subscription, membership, paid-access or purchase contract,
-by design.
+InWIF deploys no smart contracts. It interacts only with existing, verified contracts (ERC-20 tokens and the
+Uniswap V3 deployment), and there is no subscription, membership, paid-access or purchase contract, by design.

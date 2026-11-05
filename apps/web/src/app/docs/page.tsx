@@ -20,7 +20,7 @@ export default function DocsPage() {
           </nav>
           <div className="prose-invert min-w-0 max-w-3xl space-y-4 break-words text-[15px] leading-relaxed text-mute [&_b]:text-white [&_code]:break-all [&_code]:text-lime-soft">
             <H id="architecture">Architecture</H>
-            <p>InWIF is a monorepo. <b>packages/core</b> is the wallet engine shared by every client: network config, keystore, BIP-39 wallets, validation, transaction review and simulation, approvals, activity, market data, swaps, rewards helpers and the hardware protocol. <b>apps/web</b> is this site and the web wallet (Next.js). <b>apps/api</b> is an optional backend for public, non-sensitive data (PostgreSQL). <b>apps/mobile</b> (Expo) and <b>apps/desktop</b> (Tauri) reuse the core. <b>contracts</b> holds the Foundry rewards contract, and <b>firmware</b> the Rust signing core for the device.</p>
+            <p>InWIF is a monorepo. <b>packages/core</b> is the wallet engine shared by every client: network config, keystore, BIP-39 wallets, validation, transaction review and simulation, approvals, activity, market data, swaps, security quests and the hardware protocol. <b>apps/web</b> is this site and the web wallet (Next.js). <b>apps/api</b> is an optional backend for public, non-sensitive data (PostgreSQL). <b>apps/mobile</b> (Expo) and <b>apps/desktop</b> (Tauri) reuse the core. <b>firmware</b> holds the Rust signing core for the device.</p>
             <p>Signing is always local: in the browser for software wallets, on the device for hardware wallets. The backend never signs and never receives keys.</p>
 
             <H id="network">Network</H>
@@ -35,9 +35,7 @@ export default function DocsPage() {
             <pre className="overflow-x-auto rounded-xl bg-ink-900 p-4 text-xs text-white">{`pnpm install
 pnpm dev                      # web wallet on http://localhost:3000
 pnpm test                     # core + web + api tests
-cd contracts && forge test    # rewards contract (unit, fuzz, invariant)
 cd firmware && cargo test     # firmware signing core`}</pre>
-            <p>Deploy the rewards contract to testnet only: <code>forge script script/DeployRewards.s.sol --rpc-url $RH_TESTNET_RPC --broadcast --sig &quot;run(address)&quot; &lt;admin&gt;</code>. The script refuses chain 4663.</p>
 
             <H id="faq">FAQ</H>
             <p><b>Is it free?</b> Yes — every feature, permanently. <b>Do I need $WIF?</b> No. <b>Can you recover my wallet?</b> No; only your recovery phrase can. <b>Is the hardware available?</b> Not yet; it is a prototype.</p>
@@ -46,7 +44,7 @@ cd firmware && cargo test     # firmware signing core`}</pre>
             <p>InWIF does not require an account. Keys and recovery phrases never leave your device. To show balances, prices and history, your browser (or the InWIF relay acting for it) queries public blockchain RPCs, the Blockscout explorer and GeckoTerminal with your public address or token addresses; those providers may log requests under their own policies. InWIF runs no analytics on the wallet.</p>
 
             <H id="terms">Terms of use (summary)</H>
-            <p>InWIF is provided free, as-is, without warranty. You are solely responsible for your keys and transactions; blockchain transactions are irreversible. Third-party protocols (e.g. Uniswap) have their own fees and risks. The software is pre-release and unaudited. Nothing in InWIF is investment advice, and rewards — where offered — carry no promise of value.</p>
+            <p>InWIF is provided free, as-is, without warranty. You are solely responsible for your keys and transactions; blockchain transactions are irreversible. Third-party protocols (e.g. Uniswap) have their own fees and risks. The software is pre-release and unaudited. Nothing in InWIF is investment advice.</p>
           </div>
         </div>
       </Section>

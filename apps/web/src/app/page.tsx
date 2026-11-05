@@ -43,7 +43,7 @@ const FAQ = [
   { q: 'Where are my keys stored?', a: 'On your device only, encrypted with AES-256-GCM under a key derived from your password. InWIF servers never receive recovery phrases or private keys, and no InWIF API accepts them.' },
   { q: 'Can InWIF recover my wallet if I lose my phrase?', a: 'No. That is what self-custody means: only your recovery phrase can restore your wallet. Write it down and store it offline.' },
   { q: 'Can I buy the hardware wallet?', a: 'Not yet. InWIF One is a prototype in development. You can try the full hardware signing flow today with the built-in device simulator or a development board.' },
-  { q: 'Has InWIF been audited?', a: 'Not yet. The code is open and tested, but no independent audit has been completed. The rewards contract will not be deployed to mainnet until it is audited.' },
+  { q: 'Has InWIF been audited?', a: 'Not yet. The code is open and tested, but no independent audit has been completed.' },
 ]
 
 export default function Home() {
@@ -186,7 +186,6 @@ export default function Home() {
               <li>• Live $WIF dashboard: balance, verified contract data, market and transfer history</li>
               <li>• Zero-fee $WIF swaps through Uniswap V3</li>
               <li>• Ecosystem profile from your public on-chain activity</li>
-              <li>• Transparently funded reward campaigns (testnet until audited)</li>
               <li>• A reviewed registry for apps built around $WIF</li>
             </ul>
             <Link href="/ecosystem" className="btn-primary mt-8">Explore the $WIF ecosystem</Link>
@@ -283,7 +282,7 @@ export default function Home() {
           {[
             { t: 'Architecture', b: 'How the wallet engine, hardware protocol, contracts and backend fit together.', h: '/docs#architecture' },
             { t: 'Security model', b: 'Threat model, key handling, simulation and what InWIF does not protect against.', h: '/security' },
-            { t: 'Developers', b: 'Run InWIF locally, deploy the rewards contract to testnet, build on IWDP.', h: '/docs#developers' },
+            { t: 'Developers', b: 'Run InWIF locally, test against a local chain, build on IWDP.', h: '/docs#developers' },
           ].map((d) => (
             <Link key={d.t} href={d.h} className="card p-6 transition hover:border-lime/30">
               <BookOpen className="h-5 w-5 text-lime" />

@@ -26,14 +26,6 @@ export const ECOSYSTEM_APPS: EcosystemApp[] = [
     status: 'live',
   },
   {
-    id: 'inwif-rewards',
-    name: 'InWIF Rewards',
-    description: 'Transparently funded reward campaigns for security education and community activity. Unaudited — testnet only.',
-    category: 'built-in',
-    href: '/app/wif#rewards',
-    status: 'testnet',
-  },
-  {
     id: 'inwif-security',
     name: 'Approval checker',
     description: 'See and revoke every live $WIF allowance your wallet has granted.',

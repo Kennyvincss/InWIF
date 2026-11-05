@@ -24,13 +24,6 @@ jobs:
       - run: pnpm --filter @inwif/api test
         env: { TEST_DATABASE_URL: 'postgres://inwif:inwif-dev@localhost:5432/inwif_test' }
       - run: pnpm --filter @inwif/mobile typecheck
-  contracts:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with: { submodules: recursive }
-      - uses: foundry-rs/foundry-toolchain@v1
-      - run: forge test --root contracts
   firmware:
     runs-on: ubuntu-latest
     steps:

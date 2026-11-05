@@ -15,17 +15,16 @@ Recommended order:
 | # | Step | Time | Cost |
 |---|---|---|---|
 | 1 | Dedicated RPC endpoint (Dwellir, integrated) | 5 min | free tier |
-| 2 | Etherscan API key (full transaction history) | 10 min | free tier |
-| 3 | Rewards on testnet | 1–2 h | free (testnet) |
-| 4 | WalletConnect (connect InWIF to dApps) | 15 min (you) + build (Claude) | free |
-| 5 | Custom domain | 30 min | domain price |
-| 6 | Shared rate limiting (Upstash Redis) | 10 min | free tier |
-| 7 | Backend API hosting | 30 min | free tiers |
-| 8 | Mobile apps (iOS / Android) | days, mostly store review | $99/yr Apple, $25 Google |
-| 9 | Desktop installers (Windows / macOS) | 1–2 h | signing certificates |
-| 10 | Hardware wallet on a dev board | 1 day | about $15 of parts |
-| 11 | Security audit | weeks | quote-based |
-| 12 | Legal: privacy policy and terms | weeks | lawyer |
+| 2 | Etherscan API key (full transaction history) — optional | 10 min | **paid** Etherscan plan |
+| 3 | WalletConnect (connect InWIF to dApps) | 15 min (you) + build (Claude) | free |
+| 4 | Custom domain | 30 min | domain price |
+| 5 | Shared rate limiting (Upstash Redis) | 10 min | free tier |
+| 6 | Backend API hosting | 30 min | free tiers |
+| 7 | Mobile apps (iOS / Android) | days, mostly store review | $99/yr Apple, $25 Google |
+| 8 | Desktop installers (Windows / macOS) | 1–2 h | signing certificates |
+| 9 | Hardware wallet on a dev board | 1 day | about $15 of parts |
+| 10 | Security audit | weeks | quote-based |
+| 11 | Legal: privacy policy and terms | weeks | lawyer |
 | — | Housekeeping | 5 min | — |
 
 ---
@@ -51,7 +50,7 @@ Recommended order:
    **Production** (and Preview if you want previews to use it). Do **not** add a `NEXT_PUBLIC_` prefix.
 3. **Redeploy.** The build reads whether the key exists in order to send browser RPC through the relay. Only that
    yes/no flag reaches the browser, never the key.
-4. If you host the backend API (step 7), set `DWELLIR_API_KEY` there too.
+4. If you host the backend API (step 6), set `DWELLIR_API_KEY` there too.
 
 **Check:**
 - `pnpm --filter @inwif/core verify:live` with the key set prints a "Managed RPC (Dwellir)" section.
@@ -67,8 +66,11 @@ falls back to the public RPCs, so the site keeps working.
 token transfers read from the chain, without ETH transfers or contract calls. Etherscan's Robinhood explorer
 (robin.etherscan.io) offers an API that would fill that gap.
 
+**Plan required.** Etherscan's API covers Robinhood Chain (4663) only on **paid** plans (Lite and above); the Free plan
+refuses requests for this chain. Skip this step unless you want to pay for complete history.
+
 **You:**
-1. Create a free account at etherscan.io. Then go to **API Keys** and choose **Add**.
+1. Create an account at etherscan.io, subscribe to a paid API plan, then go to **API Keys** and choose **Add**.
 2. Tell me when you have the key. I'll show you a secure form to save it. It must stay on the server, so never
    add it as a `NEXT_PUBLIC_` variable. Instead, I'll ask you to add it in Vercel as `ETHERSCAN_API_KEY`
    (Production only, server-side).
@@ -76,68 +78,7 @@ token transfers read from the chain, without ETH transfers or contract calls. Et
 **Claude:** add Etherscan as a second history source behind the existing relay, with Blockscout still tried first,
 plus tests. Then redeploy.
 
-## 3. Rewards on testnet
-
-**Why.** This turns on the "Ecosystem rewards" section. Mainnet stays off until the contract is audited (step 11), and
-the deploy script refuses mainnet.
-
-**You: set up wallets and testnet ETH**
-1. **Admin wallet.** This wallet can create campaigns, pause claims and reclaim unclaimed funds after a
-   campaign's deadline. Use a hardware wallet. Use a multisig (such as Safe) if it supports Robinhood Chain.
-   Note its address.
-2. **Deployer wallet.** A separate, low-value wallet that only pays gas for the deployment.
-3. **Testnet ETH:**
-   1. Look for an official faucet on docs.robinhood.com/chain.
-   2. If there isn't one, get Sepolia ETH from a Sepolia faucet.
-   3. Bridge it to Robinhood Chain Testnet with the Arbitrum bridge (portal.arbitrum.io).
-
-**You: deploy (or let Claude run these commands with you)**
-
-```bash
-# One-time: install Foundry and fetch contract dependencies
-curl -L https://foundry.paradigm.xyz | bash && foundryup
-git clone https://github.com/Kennyvincss/InWIF && cd InWIF
-git submodule update --init --recursive
-
-# Store the deployer key in Foundry's encrypted keystore (it prompts; nothing goes in a file or your shell history)
-cast wallet import inwif-deployer --interactive
-
-# Test, then deploy to Robinhood Chain Testnet (chain 46630)
-cd contracts && forge test
-forge script script/DeployRewards.s.sol \
-  --rpc-url https://rpc.testnet.chain.robinhood.com/rpc \
-  --account inwif-deployer --broadcast \
-  --sig "run(address)" <ADMIN_ADDRESS>
-```
-
-4. Copy the printed `InWIFRewards deployed at 0x…` address.
-5. Optionally, verify the source on the explorer:
-
-   ```bash
-   forge verify-contract <ADDRESS> src/InWIFRewards.sol:InWIFRewards \
-     --chain-id 46630 \
-     --verifier blockscout --verifier-url https://explorer.testnet.chain.robinhood.com/api/ \
-     --constructor-args $(cast abi-encode "constructor(address)" <ADMIN_ADDRESS>)
-   ```
-
-6. In Vercel, add `NEXT_PUBLIC_REWARDS_ADDRESS_46630` = the contract address, then redeploy.
-
-**Create a campaign (you choose the token and the recipients):**
-1. Write the allocation list: addresses and amounts.
-2. Claude builds the Merkle tree and the claims file.
-3. Upload the claims file to a public HTTPS URL. The simplest option is committing it to `apps/web/public/` so it's
-   served by Vercel.
-4. Send from the admin wallet:
-   - `createCampaign(token, root, deadline, claimsUrl)`
-   - `approve` the token
-   - `fund(id, amount)`
-
-**Claude:** add a `rewards:build` script (CSV of addresses and amounts → root + claims JSON) and the cast commands for
-steps 4. Ask when you're ready.
-
-**Check.** On the wallet's **$WIF** page with **Robinhood Chain Testnet** selected, eligible addresses see **Claim**.
-
-## 4. WalletConnect (connect InWIF to other apps)
+## 3. WalletConnect (connect InWIF to other apps)
 
 **Why.** This lets users connect their InWIF wallet to dApps, with every request going through InWIF's review,
 simulation and signing screens.
@@ -154,7 +95,7 @@ simulation and signing screens.
 - each request routed through the existing review and signing flow
 - list and revoke of connected apps in the Security Centre
 
-## 5. Custom domain
+## 4. Custom domain
 
 **You:**
 1. Buy a domain from a registrar such as Cloudflare, Namecheap or Porkbun.
@@ -163,9 +104,9 @@ simulation and signing screens.
    **Valid Configuration**.
 4. Change the Production variable `NEXT_PUBLIC_SITE_URL` to your domain (with or without `https://`), then redeploy.
    Share cards and the sitemap use it.
-5. If you restricted your RPC key (step 1) or WalletConnect project (step 4) by domain, add the new domain there too.
+5. If you restricted your RPC key (step 1) or WalletConnect project (step 3) by domain, add the new domain there too.
 
-## 6. Shared rate limiting (Upstash Redis)
+## 5. Shared rate limiting (Upstash Redis)
 
 **Why.** The `/api` relays limit request rates per server instance. Under heavy traffic Vercel runs many instances, so
 the limit needs one shared store.
@@ -177,11 +118,11 @@ the limit needs one shared store.
 **Claude:** switch the rate limiter and response cache to Redis when those variables exist, keeping memory as the
 fallback.
 
-## 7. Backend API hosting (`apps/api`)
+## 6. Backend API hosting (`apps/api`)
 
 **Why.** The website works without it. The backend adds:
 - sign-in with a wallet signature
-- a server-side device registry and rewards ledger
+- a server-side device registry
 - a public-data API for other apps
 
 **You:**
@@ -195,9 +136,9 @@ fallback.
      - `REDIS_URL` (optional)
 3. Check that `https://<your-api-host>/api/health` returns `"free": true`.
 
-**Claude:** connect the website to it: wallet sign-in, device sync and the rewards ledger.
+**Claude:** connect the website to it: wallet sign-in and device sync.
 
-## 8. Mobile apps (iOS and Android)
+## 7. Mobile apps (iOS and Android)
 
 **You: accounts**
 1. **Apple Developer Program** ($99/year). Apple's App Store rules only allow cryptocurrency wallet apps from
@@ -205,7 +146,7 @@ fallback.
    entity and a D-U-N-S number, which is free from Dun & Bradstreet but can take days.
 2. **Google Play Console** ($25 one-time). Complete Google's financial-services and crypto declarations. Requirements
    differ by country.
-3. Both stores require a **privacy policy URL** (step 12), screenshots and a description.
+3. Both stores require a **privacy policy URL** (step 11), screenshots and a description.
 
 **You and Claude: build and submit with Expo EAS**
 
@@ -221,10 +162,10 @@ eas build -p ios         # then: eas submit -p ios
 **Claude:** add `eas.json`, app icons, a splash screen and store screenshots, and extend the mobile app with swaps,
 activity and the Security Centre so it matches the web wallet.
 
-## 9. Desktop installers (Windows and macOS)
+## 8. Desktop installers (Windows and macOS)
 
 **You:**
-1. **macOS:** a "Developer ID Application" certificate, included with the Apple Developer account from step 8. Also
+1. **macOS:** a "Developer ID Application" certificate, included with the Apple Developer account from step 7. Also
    create an app-specific password for notarisation.
 2. **Windows:** a code-signing certificate. Azure Trusted Signing is the cheapest; an OV or EV certificate from a
    certificate authority also works. Without one, Windows shows "unknown publisher" warnings.
@@ -234,7 +175,7 @@ activity and the Security Centre so it matches the web wallet.
 **Claude:** add a GitHub Actions release workflow (`tauri-action`) that builds signed `.msi`/`.exe` and notarised `.dmg`
 files on GitHub's Windows and macOS machines and attaches them to a GitHub Release.
 
-## 10. Hardware wallet on a development board
+## 9. Hardware wallet on a development board
 
 **You: buy parts (about $15)**
 - Raspberry Pi Pico (RP2040) with pre-soldered headers
@@ -261,24 +202,23 @@ files on GitHub's Windows and macOS machines and attaches them to a GitHub Relea
 | Independent hardware security testing (fault injection, side channels) | a specialist lab |
 | Manufacturing and factory attestation provisioning | a manufacturing partner |
 
-## 11. Security audit
+## 10. Security audit
 
 **You:**
-1. **Smart contract (`InWIFRewards`).** Get quotes from audit firms such as OpenZeppelin, Trail of Bits or Spearbit,
-   or run a competitive audit contest (Code4rena, Sherlock, Cantina), which often costs less for a small contract.
-2. **Wallet application** (key handling, signing flow, web security). Use an application security firm such as Cure53
-   or NCC Group.
-3. After launch, start a **bug bounty** (e.g. on Immunefi).
+1. **Wallet application** (key handling, signing flow, hardware protocol, web security). Get quotes from an application
+   security firm such as Cure53, NCC Group or Trail of Bits. InWIF deploys no smart contracts of its own, so there is
+   no contract audit to commission.
+2. After launch, start a **bug bounty** (e.g. on Immunefi).
 
 **Claude:** prepare the audit package (scope, threat model, architecture, test instructions, known limitations) and fix
 the findings.
 
-## 12. Legal: privacy policy and terms
+## 11. Legal: privacy policy and terms
 
 **You:**
 1. Talk to a lawyer experienced in crypto and consumer software where you operate. Non-custodial wallets are treated
    differently from exchanges in most places, but the rules vary, and app stores require proper policies.
-2. Consider forming a legal entity. Apple requires one for wallet apps (step 8).
+2. Consider forming a legal entity. Apple requires one for wallet apps (step 7).
 3. Give me the approved texts.
 
 **Claude:** publish them on the site, link them from the footer and the stores, and keep the privacy policy in line
