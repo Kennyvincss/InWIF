@@ -7,10 +7,6 @@ coverage/
 .env
 .env.local
 .env.*.local
-# foundry
-contracts/out/
-contracts/cache/
-contracts/broadcast/*/31337/
 # rust
 firmware/target/
 apps/desktop/src-tauri/target/

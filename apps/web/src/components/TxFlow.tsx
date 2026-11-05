@@ -35,7 +35,7 @@ export interface TxRequest {
   data?: Hex
   /** Short label for notifications, e.g. "Send 10 WIF". */
   summary: string
-  kind?: 'send' | 'swap' | 'approve' | 'revoke' | 'claim' | 'other'
+  kind?: 'send' | 'swap' | 'approve' | 'revoke' | 'other'
 }
 
 type Phase = 'review' | 'signing' | 'pending' | 'done' | 'failed'

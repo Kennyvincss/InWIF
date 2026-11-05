@@ -90,7 +90,7 @@ export interface ReviewContext {
   nativeBalance?: bigint
   /** Addresses (lower-case) the user has flagged. */
   blocklist?: Set<string>
-  /** Contracts the app itself knows (router, WIF, rewards…), lower-case → label. */
+  /** Contracts the app itself knows (router, WIF…), lower-case → label. */
   knownContracts?: Record<string, string>
   tokenDecimals?: Record<string, number>
   tokenSymbols?: Record<string, string>

@@ -132,7 +132,7 @@ describe('InWIF API', () => {
 
   it('has no subscription or payment endpoints', async () => {
     const a = await app()
-    for (const u of ['/api/subscriptions', '/api/payments', '/api/premium', '/api/checkout']) expect((await a.inject(u)).statusCode).toBe(404)
+    for (const u of ['/api/subscriptions', '/api/payments', '/api/premium', '/api/checkout', '/api/rewards']) expect((await a.inject(u)).statusCode).toBe(404)
   })
 
   it('rate limits', async () => {
@@ -146,5 +146,7 @@ describe('InWIF API', () => {
     const cols = await pool.query("SELECT table_name, column_name FROM information_schema.columns WHERE table_schema = 'public'")
     const bad = cols.rows.filter((c) => /private|mnemonic|seed|phrase|password|vault|secret|pin$/i.test(c.column_name))
     expect(bad).toEqual([])
+    const t = await pool.query("SELECT to_regclass('public.rewards') AS t")
+    expect(t.rows[0].t).toBeNull() // rewards feature removed (migration 002)
   })
 })

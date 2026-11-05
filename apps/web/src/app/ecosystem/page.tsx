@@ -80,7 +80,7 @@ export default function EcosystemPage() {
             ['Send & receive', 'Validated addresses, decoded reviews and simulation for every $WIF transfer.'],
             ['Protect', 'See and revoke every contract allowed to spend your $WIF.'],
             ['Participate', 'Ecosystem profile from public on-chain activity, plus free security quests.'],
-            ['Earn (optional)', 'Transparently funded reward campaigns — every deposit and claim public on-chain. Testnet until audited.'],
+            ['Discover', 'A reviewed registry of applications built around $WIF, with clear listing criteria.'],
           ].map(([t, b]) => (
             <div key={t} className="card p-5">
               <Sparkles className="h-5 w-5 text-lime" />

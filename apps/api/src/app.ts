@@ -221,7 +221,6 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
       { id: 'swap', title: 'Zero-fee swaps', description: 'Swap via Uniswap V3 with no InWIF fee.' },
       { id: 'profile', title: 'Ecosystem profile', description: 'Public on-chain participation summary.' },
       { id: 'approvals', title: 'Approval protection', description: 'Find and revoke $WIF allowances.' },
-      { id: 'rewards', title: 'Funded rewards', description: 'Optional campaigns paid only from on-chain deposits (testnet until audited).' },
     ],
   }))
 
@@ -282,15 +281,6 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     }
     alerts.push({ severity: 'info', code: 'not-a-guarantee', message: 'No alert does not mean an address or contract is safe.' })
     return { address: q.address, network: n.key, alerts }
-  })
-
-  // ---------------------------------------------------------------- rewards (optional, informational)
-  app.get('/api/rewards', async (req) => {
-    const { userId } = await auth(req)
-    const r = await db.query('SELECT campaign_id, reward_type, amount::text, claim_status, claim_tx_hash, created_at FROM rewards WHERE user_id = $1 ORDER BY created_at DESC', [
-      userId,
-    ])
-    return { rewards: r.rows, note: 'Rewards are optional, funded on-chain in advance, and never unlock InWIF features.' }
   })
 
   return app
