@@ -12,7 +12,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit",
-    "verify:live": "tsx scripts/verify-live.mts"
+    "verify:live": "tsx scripts/verify-live.mts",
+    "rewards:build": "tsx scripts/rewards-build.mts"
   },
   "dependencies": {
     "@noble/hashes": "^1.8.0",
