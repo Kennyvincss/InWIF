@@ -15,7 +15,7 @@ Recommended order:
 | # | Step | Time | Cost |
 |---|---|---|---|
 | 1 | Dedicated RPC endpoint (Dwellir, integrated) | 5 min | free tier |
-| 2 | WalletConnect (connect InWIF to dApps) | 15 min (you) + build (Claude) | free |
+| 2 | WalletConnect (connect InWIF to dApps, integrated) | done | free |
 | 3 | Custom domain | 30 min | domain price |
 | 4 | Shared rate limiting (Upstash Redis) | 10 min | free tier |
 | 5 | Backend API hosting | 30 min | free tiers |
@@ -59,22 +59,34 @@ Recommended order:
 session makes roughly 10–15 reads a minute (polling balances and network checks). If you exceed the quota, the relay
 falls back to the public RPCs, so the site keeps working.
 
-## 2. WalletConnect (connect InWIF to other apps)
+## 2. WalletConnect (connect InWIF to other apps) — integrated
 
-**Why.** This lets users connect their InWIF wallet to dApps, with every request going through InWIF's review,
-simulation and signing screens.
+InWIF is a WalletConnect wallet (Reown WalletKit), using the project ID from the Reown dashboard
+(`8b2edb1e560d95b69a5eac692b07b323`, built in; override with `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID`).
 
-**You:**
-1. Create a free account at cloud.reown.com (Reown, formerly WalletConnect).
-2. Create a project of type **WalletKit** (this is for wallets). Add `inwif.vercel.app` (and later your custom domain)
-   to its allowed domains.
-3. Give me the **Project ID**. It isn't secret: it's designed to be public in the browser.
+**How users connect:**
+1. On the dApp's site, choose **WalletConnect** and copy the connection link (`wc:…`).
+2. In InWIF, click the **plug icon** in the top bar (or **Security → Connect an app**), paste the link and review the
+   connection request: who is asking, whether WalletConnect verified the domain, and which networks.
+3. dApps can also link directly to `https://inwif.vercel.app/app/connect?uri=wc:…`. InWIF still asks before
+   connecting.
 
-**Claude:** build the WalletConnect integration:
-- pairing by QR code or link
-- session approval screen
-- each request routed through the existing review and signing flow
-- list and revoke of connected apps in the Security Centre
+**What dApps can ask for (each opens an InWIF review screen; nothing is signed automatically):**
+- `eth_sendTransaction`: the normal review, simulation and fee screen, labelled with the dApp's name.
+- `personal_sign`: the decoded message. Unreadable or hash-like payloads are flagged, and so are sign-in messages
+  for a different domain.
+- `eth_signTypedData_v4`: decoded fields. EIP-2612 permits and Permit2 are flagged **high risk**, with UNLIMITED
+  amounts highlighted, and need an extra confirmation.
+- `wallet_switchEthereumChain`: allowed between Robinhood Chain mainnet and testnet only.
+
+**Limits and safety:**
+- Only the active account is shared. Watch-only wallets can't connect, and sites WalletConnect flags as scams are
+  blocked.
+- Connected apps are listed in the **Security Centre**, where they can be disconnected.
+- Typed-data signing on InWIF hardware isn't supported yet; message signing and transactions are.
+
+**You (optional):** in the Reown dashboard, keep the domain allowlist up to date: `inwif.vercel.app`, `localhost`
+for testing, and your custom domain once you have one (step 3).
 
 ## 3. Custom domain
 

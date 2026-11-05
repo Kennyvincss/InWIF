@@ -51,7 +51,7 @@ await shot('02-phrase')
 await page.getByRole('button', { name: 'I wrote it down' }).click()
 for (const label of await page.locator('label[for^="w"]').allTextContents()) {
   const n = Number(label.replace(/\D/g, ''))
-  await page.getByLabel(label).fill(words[n - 1])
+  await page.getByLabel(label, { exact: true }).fill(words[n - 1])
 }
 await page.getByRole('button', { name: 'Verify' }).click()
 await page.getByLabel('Password', { exact: true }).fill('correct horse battery 42')

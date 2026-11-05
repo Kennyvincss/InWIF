@@ -35,12 +35,25 @@ export interface TxRequest {
   data?: Hex
   /** Short label for notifications, e.g. "Send 10 WIF". */
   summary: string
-  kind?: 'send' | 'swap' | 'approve' | 'revoke' | 'other'
+  kind?: 'send' | 'swap' | 'approve' | 'revoke' | 'dapp' | 'other'
+  /** Set when a connected dApp (WalletConnect) asked for this transaction. */
+  origin?: { name: string; url: string; icon?: string; verified?: 'VALID' | 'INVALID' | 'UNKNOWN' }
 }
 
 type Phase = 'review' | 'signing' | 'pending' | 'done' | 'failed'
 
-export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null; onClose: () => void; onDone?: (hash: Hex, ok: boolean) => void }) {
+export function TxFlow({
+  request,
+  onClose,
+  onDone,
+  onBroadcast,
+}: {
+  request: TxRequest | null
+  onClose: () => void
+  onDone?: (hash: Hex, ok: boolean) => void
+  /** Called as soon as the signed transaction is broadcast (before the receipt). */
+  onBroadcast?: (hash: Hex) => void
+}) {
   const { activeWallet, activeAccount, state, isUnlocked, unlock, softwareSignerFor } = useWallet()
   const { network, client } = useNetwork()
   const verification = useVerification()
@@ -153,6 +166,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
         hwCtx.logStep(8, 'Companion broadcast the signed transaction')
       }
       setHash(h)
+      onBroadcast?.(h)
       setPhase('pending')
       const receipt = await client.waitForTransactionReceipt({ hash: h, timeout: 180_000 })
       const ok = receipt.status === 'success'
@@ -199,6 +213,19 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
         </div>
       ) : (
         <div className="space-y-4">
+          {request.origin && (
+            <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-ink-900 p-3">
+              {request.origin.icon && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={request.origin.icon} alt="" width={28} height={28} className="rounded-lg bg-ink-700" />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">Requested by {request.origin.name}</p>
+                <p className="truncate text-xs text-mute">{request.origin.url}</p>
+              </div>
+              {request.origin.verified === 'VALID' ? <Badge tone="ok">Domain verified</Badge> : request.origin.verified === 'INVALID' ? <Badge tone="bad">Domain mismatch</Badge> : <Badge tone="warn">Unverified</Badge>}
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             {verification.isLoading ? (
               <Badge>Checking network…</Badge>

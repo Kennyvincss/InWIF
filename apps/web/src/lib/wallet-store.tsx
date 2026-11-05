@@ -10,6 +10,7 @@
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { getAddress, type Address } from 'viem'
+import { privateKeyToAccount, type PrivateKeyAccount } from 'viem/accounts'
 import {
   DEFAULT_NETWORK,
   accountFromMnemonic,
@@ -129,6 +130,8 @@ interface Ctx {
   markBackedUp: (walletId: string) => void
   revealSecret: (walletId: string, password: string) => Promise<WalletSecret>
   softwareSignerFor: (walletId: string, index: number) => SignerHandle
+  /** Message / typed-data signer for an UNLOCKED software wallet (used for dApp signature requests). */
+  softwareAccountFor: (walletId: string, index: number) => PrivateKeyAccount
   update: (fn: (s: Persisted) => Persisted) => void
   resetAll: () => void
 }
@@ -245,6 +248,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     return rec
   }
 
+  const softwareAccountFor: Ctx['softwareAccountFor'] = (walletId, index) => {
+    const secret = secrets.current.get(walletId)
+    if (!secret) throw new Error('Wallet is locked.')
+    return privateKeyToAccount(secret.kind === 'mnemonic' ? derivePrivateKey(secret.phrase, index) : secret.privateKey)
+  }
+
   const softwareSignerFor: Ctx['softwareSignerFor'] = (walletId, index) => {
     const secret = secrets.current.get(walletId)
     if (!secret) throw new Error('Wallet is locked.')
@@ -291,6 +300,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     markBackedUp: (id) => update((s) => ({ ...s, wallets: s.wallets.map((w) => (w.id === id ? { ...w, backedUp: true } : w)) })),
     revealSecret,
     softwareSignerFor,
+    softwareAccountFor,
     update,
     resetAll: () => {
       lock()

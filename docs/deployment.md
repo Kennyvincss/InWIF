@@ -28,6 +28,7 @@ Optional env vars (see `apps/web/.env.example`):
 |---|---|
 | `NEXT_PUBLIC_ROBINHOOD_RPC_URL` | default: public RPC |
 | `NEXT_PUBLIC_ENABLE_LOCAL_NETWORK=true` | adds the Anvil network for development |
+| `NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID` | override the built-in Reown project ID (public; restrict domains in the Reown dashboard) |
 
 Security headers and CSP are set in `next.config.mjs`. Behind a load balancer, replace the in-memory rate limiter
 in `src/server/guard.ts` with a shared one.

@@ -27,6 +27,8 @@ import { useVerification } from '@/lib/hooks'
 import { useNotify } from '@/lib/notifications'
 import { SELECTABLE_NETWORKS } from '@/lib/net'
 import { DevicePanel } from './DevicePanel'
+import { WalletConnectProvider } from '@/lib/walletconnect'
+import { WcConnectButton, WcProposalModal, WcRequestHandler } from './WalletConnectUI'
 import { timeAgo } from '@/lib/format'
 
 const NAV = [
@@ -139,6 +141,16 @@ function WalletSwitcher() {
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <WalletConnectProvider>
+      <Shell>{children}</Shell>
+      <WcProposalModal />
+      <WcRequestHandler />
+    </WalletConnectProvider>
+  )
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
   const path = usePathname()
   const { lock, unlocked } = useWallet()
   const [mobileNav, setMobileNav] = useState(false)
@@ -200,6 +212,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="hidden sm:block">
               <WalletSwitcher />
             </div>
+            <WcConnectButton />
             <Bellbox />
             {unlocked.size > 0 && (
               <button className="rounded-lg border border-white/10 p-2 hover:bg-white/5" onClick={lock} aria-label="Lock wallet" title="Lock now">

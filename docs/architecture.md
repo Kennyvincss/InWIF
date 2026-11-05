@@ -60,6 +60,19 @@
 
 The desktop build is a static export without these routes. It calls the providers directly.
 
+## dApp connections (WalletConnect)
+
+`apps/web/src/lib/walletconnect.tsx` runs Reown WalletKit in the browser, connecting to the WalletConnect relay.
+Proposals show the dApp's metadata and the WalletConnect Verify result. Approved sessions share only the active
+account, on the networks InWIF supports.
+
+Each request is routed to an InWIF review screen:
+- transactions go to `TxFlow`
+- messages and typed data go to a signature review built on `reviewPersonalSign` / `reviewTypedData` in
+  `packages/core`, which flags permits, blind signing and domain mismatches
+
+Sessions are listed and revocable in the Security Centre.
+
 ## Backend (`apps/api`)
 
 This backend is optional and holds public data only. Sign-in works by EIP-191 signature over a
