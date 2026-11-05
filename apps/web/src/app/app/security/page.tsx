@@ -8,6 +8,8 @@ import { checkRecipient, explorerAddressUrl, findApprovals, revokeCalldata, shor
 import { useWallet } from '@/lib/wallet-store'
 import { useActivity, useNetwork, useTokens, useVerification } from '@/lib/hooks'
 import { useHardware } from '@/lib/hardware'
+import { useWalletConnect } from '@/lib/walletconnect'
+import { WcConnectModal } from '@/components/WalletConnectUI'
 import { useNotify } from '@/lib/notifications'
 import { fmtToken } from '@/lib/format'
 import { ActivityList } from '@/components/ActivityList'
@@ -200,7 +202,7 @@ export default function SecurityPage() {
           <h2 className="mb-1 flex items-center gap-2 font-display font-bold">
             <AppWindow className="h-5 w-5 text-lime" /> Connected applications
           </h2>
-          <Notice>No applications are connected. The InWIF web wallet does not expose your accounts to websites; dApp connections (WalletConnect) are on the roadmap and will be listed and revocable here.</Notice>
+          <ConnectedApps />
           <h3 className="mb-1 mt-4 text-sm font-semibold">Settings</h3>
           <Row label="Auto-lock">{state.settings.autoLockMinutes} minutes</Row>
           <Row label="Key storage">AES-256-GCM, per-wallet, this device only</Row>
@@ -217,6 +219,48 @@ export default function SecurityPage() {
       </section>
 
       <TxFlow request={req} onClose={() => setReq(null)} onDone={() => void approvals.refetch()} />
+    </div>
+  )
+}
+
+function ConnectedApps() {
+  const wc = useWalletConnect()
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="space-y-2">
+      {wc.status === 'starting' && <Skeleton className="h-12" />}
+      {wc.status === 'error' && <ErrorBox>WalletConnect could not start: {wc.error}</ErrorBox>}
+      {wc.status === 'ready' && wc.sessions.length === 0 && (
+        <Notice>No apps are connected. Connect one with WalletConnect; every request it makes will open an InWIF review screen.</Notice>
+      )}
+      <ul className="space-y-2">
+        {wc.sessions.map((s) => {
+          const m = s.peer.metadata
+          return (
+            <li key={s.topic} className="flex items-center gap-3 rounded-xl border border-white/[0.06] p-3 text-sm">
+              {m.icons?.[0]?.startsWith('https://') ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={m.icons[0]} alt="" width={28} height={28} className="rounded-lg bg-ink-700" />
+              ) : (
+                <AppWindow className="h-5 w-5 text-mute" />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{m.name}</p>
+                <p className="truncate text-xs text-mute">
+                  {m.url} · expires {new Date(s.expiry * 1000).toLocaleDateString()}
+                </p>
+              </div>
+              <button className="btn-danger px-3 py-1.5 text-xs" onClick={() => void wc.disconnect(s.topic)}>
+                Disconnect
+              </button>
+            </li>
+          )
+        })}
+      </ul>
+      <button className="btn-ghost w-full text-xs" onClick={() => setOpen(true)} disabled={wc.status !== 'ready'}>
+        Connect an app
+      </button>
+      <WcConnectModal open={open} onClose={() => setOpen(false)} />
     </div>
   )
 }

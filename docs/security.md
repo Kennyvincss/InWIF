@@ -23,6 +23,8 @@
 | PIN brute force | On-device PIN, constant-time compare, wipe after 10 failures (secure element counter planned) |
 | XSS / supply chain in web | Strict CSP, no third-party scripts, `frame-ancestors 'none'`, pinned lockfile |
 | Phishing (secret pasted) | Recipient field detects pasted keys and phrases and blocks them |
+| Malicious dApp (WalletConnect) | Verify API domain check shown on every request, known scams blocked, only the active account shared, every request reviewed in InWIF, sessions revocable |
+| Permit / off-chain signature phishing | EIP-2612 and Permit2 decoded and flagged high risk (UNLIMITED highlighted), extra confirmation required; hash-like `personal_sign` payloads and mismatched sign-in domains flagged |
 
 ## Known limitations (be honest with users)
 - **Prototype simulator.** The browser device simulator is not secure hardware: its keys live in JS memory.
