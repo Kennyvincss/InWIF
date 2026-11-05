@@ -4,6 +4,9 @@ import { NETWORKS, type NetworkConfig, type NetworkKey } from '@inwif/core'
 /** Desktop (Tauri) build: static export with no InWIF server, so no relays. */
 export const DESKTOP = process.env.NEXT_PUBLIC_DESKTOP === '1'
 
+/** Set at build time when the server holds a managed RPC key (the key itself is never exposed). */
+export const RELAY_FIRST = process.env.NEXT_PUBLIC_RPC_RELAY_FIRST === '1'
+
 export const LOCAL_ENABLED = process.env.NEXT_PUBLIC_ENABLE_LOCAL_NETWORK === 'true'
 
 export const SELECTABLE_NETWORKS: NetworkKey[] = LOCAL_ENABLED
@@ -19,9 +22,13 @@ export function browserNetwork(key: NetworkKey): NetworkConfig {
   const base = NETWORKS[key]
   if (typeof window === 'undefined' || key === 'local' || DESKTOP) return base
   const origin = window.location.origin
+  const relay = `${origin}/api/rpc/${key}`
+  // With a managed RPC (Dwellir) configured on the server, the relay is the primary path:
+  // it adds the server-side key and fails over to the public RPCs by itself.
+  const relayFirst = RELAY_FIRST && !!base.managedRpc
   return {
     ...base,
-    rpcUrls: [...base.rpcUrls, `${origin}/api/rpc/${key}`],
+    rpcUrls: relayFirst ? [relay, ...base.rpcUrls] : [...base.rpcUrls, relay],
     explorer: base.explorer.apiV2 ? { ...base.explorer, apiV2: `${origin}/api/explorer/${key}` } : base.explorer,
   }
 }

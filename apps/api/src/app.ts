@@ -26,6 +26,7 @@ import {
   fetchTransactions,
   findApprovals,
   getPublicClient,
+  getServerPublicClient,
   mergeActivity,
   readBalances,
   readTokenMetadata,
@@ -39,7 +40,10 @@ import type { Db } from './db/pool'
 
 export interface AppDeps {
   db: Db
+  /** Read client (managed RPC first when its key is configured). */
   clientFor?: (n: NetworkConfig) => PublicClient
+  /** Client for eth_getLogs scans — public RPCs only (managed providers cap log ranges). */
+  logsClientFor?: (n: NetworkConfig) => PublicClient
   fetchImpl?: typeof fetch
   corsOrigins?: string[]
   redisUrl?: string
@@ -66,7 +70,8 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     trustProxy: true,
   })
   const db = deps.db
-  const clientFor = deps.clientFor ?? getPublicClient
+  const clientFor = deps.clientFor ?? ((n: NetworkConfig) => getServerPublicClient(n))
+  const logsClientFor = deps.logsClientFor ?? deps.clientFor ?? getPublicClient
   const f = deps.fetchImpl ?? fetch
 
   await app.register(helmet, { contentSecurityPolicy: false })
@@ -267,7 +272,7 @@ export async function buildApp(deps: AppDeps): Promise<FastifyInstance> {
     if (!verification.ok) alerts.push({ severity: 'danger', code: 'network-unverified', message: verification.reason })
     const tokens = DEFAULT_TOKENS[q.network].map((t) => t.address as Address)
     if (verification.ok && tokens.length) {
-      const { approvals } = await findApprovals(client, q.address, tokens)
+      const { approvals } = await findApprovals(logsClientFor(n), q.address, tokens)
       for (const a of approvals)
         alerts.push({
           severity: a.unlimited ? 'danger' : 'warning',

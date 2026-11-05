@@ -27,6 +27,9 @@ const DESKTOP = process.env.NEXT_PUBLIC_DESKTOP === '1'
 
 const nextConfig = {
   reactStrictMode: true,
+  // Expose only WHETHER a server-side managed RPC key exists — never the key itself — so the
+  // browser routes RPC through /api/rpc, where the key is added. Desktop builds have no server.
+  env: { NEXT_PUBLIC_RPC_RELAY_FIRST: !DESKTOP && process.env.DWELLIR_API_KEY?.trim() ? '1' : '' },
   // Desktop (Tauri) build: static export (see scripts/build-desktop.mjs, which
   // leaves the server-only relays in src/app/api out of the build).
   ...(DESKTOP ? { output: 'export', images: { unoptimized: true }, trailingSlash: true } : {}),

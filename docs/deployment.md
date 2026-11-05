@@ -5,8 +5,8 @@
 1. On vercel.com choose **Add New… → Project**, then **Import** the `Kennyvincss/InWIF` GitHub repository.
 2. Set **Root Directory** to `apps/web`. Leave "Include files outside the root directory" enabled, because the app imports
    `packages/core`. Vercel detects Next.js and pnpm. `apps/web/vercel.json` sets the install and build commands.
-3. **Environment variables:** none are required. Optionally set `NEXT_PUBLIC_ROBINHOOD_RPC_URL` to a dedicated RPC provider
-   for higher rate limits.
+3. **Environment variables:** none are required. For a managed RPC, set `DWELLIR_API_KEY` (server-side only; see
+   LAUNCH_GUIDE step 1). Reads then go through Dwellir with automatic failover to the public RPCs.
 4. Deploy.
    - **Production** deploys build from the repository's default branch (`main`).
    - **Other branches**, such as `claude/chat-session-kr64hi`, get Preview URLs.

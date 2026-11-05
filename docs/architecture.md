@@ -54,7 +54,7 @@
 
 | Route | Purpose | Guards |
 |---|---|---|
-| `/api/rpc/[network]` | JSON-RPC fallback for RPCs without CORS | method allow-list (reads + `eth_sendRawTransaction`), secret rejection, size and rate limits |
+| `/api/rpc/[network]` | JSON-RPC relay; with `DWELLIR_API_KEY` set, the primary browser path to Dwellir (key added server-side as `X-Api-Key`) with failover to public RPCs; `eth_getLogs` always uses public RPCs | method allow-list (reads + `eth_sendRawTransaction`), secret rejection, size and rate limits |
 | `/api/explorer/[network]/…` | Blockscout v2 relay | path and query allow-list, cache, rate limit |
 | `/api/market/*` | GeckoTerminal relay | parameter validation, cache, rate limit |
 

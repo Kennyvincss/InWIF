@@ -33,6 +33,25 @@ export interface UniswapV3Config {
   feeTiers: readonly number[]
 }
 
+/**
+ * Managed RPC provider used only from SERVER code (relays, backend), never
+ * shipped to browsers. The API key is sent in a header from a server-side
+ * environment variable.
+ */
+export interface ManagedRpcConfig {
+  provider: 'dwellir'
+  /** Base HTTPS URL, without the key. */
+  url: string
+  /** Header that carries the key. */
+  apiKeyHeader: string
+  /** Server-side environment variable holding the key. */
+  apiKeyEnv: string
+  /** Node type offered by the provider for this network. */
+  node: 'archive' | 'full'
+  /** Methods that must NOT be sent to this provider (plan / range limits). */
+  excludedMethods: readonly string[]
+}
+
 export interface NetworkConfig {
   key: NetworkKey
   chainId: number
@@ -42,6 +61,8 @@ export interface NetworkConfig {
   nativeCurrency: { name: string; symbol: string; decimals: number }
   rpcUrls: string[]
   explorer: ExplorerConfig
+  /** Optional managed RPC (server-side only, see ManagedRpcConfig). */
+  managedRpc?: ManagedRpcConfig
   /** Optional market-data network slug for GeckoTerminal. */
   geckoTerminalNetwork?: string
   uniswapV3?: UniswapV3Config
@@ -78,6 +99,17 @@ export const ROBINHOOD_MAINNET: NetworkConfig = {
     name: 'Blockscout',
     url: 'https://robinhoodchain.blockscout.com',
     apiV2: 'https://robinhoodchain.blockscout.com/api/v2',
+  },
+  // Dwellir Robinhood Chain mainnet (archive). https://www.dwellir.com/docs/robinhood
+  // eth_getLogs is unavailable on the Free plan and capped at 500 / 10,000 blocks on paid plans,
+  // far below InWIF's history scans, so log queries always use the public RPCs.
+  managedRpc: {
+    provider: 'dwellir',
+    url: 'https://api-robinhood-mainnet-archive.n.dwellir.com',
+    apiKeyHeader: 'X-Api-Key',
+    apiKeyEnv: 'DWELLIR_API_KEY',
+    node: 'archive',
+    excludedMethods: ['eth_getLogs', 'eth_newFilter', 'eth_getFilterLogs', 'eth_getFilterChanges'],
   },
   geckoTerminalNetwork: 'robinhood',
   uniswapV3: {

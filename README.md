@@ -67,6 +67,8 @@ node e2e/smoke.mjs           # creates a wallet, sends real txs (software + hard
 
 See [docs/deployment.md](docs/deployment.md) and [docs/testing.md](docs/testing.md).
 
+**Going live:** follow [docs/LAUNCH_GUIDE.md](docs/LAUNCH_GUIDE.md), which covers everything needed to make InWIF fully functional, step by step.
+
 ## Network
 
 | | Mainnet | Testnet |
