@@ -17,7 +17,10 @@ import {
   fetchTokenTransfers,
   getBestQuote,
   getPublicClient,
+  getServerPublicClient,
+  managedRpcKey,
   readTokenMetadata,
+  rpcUpstreams,
   verifyNetwork,
   verifyUniswapDeployment,
 } from '../src'
@@ -79,6 +82,26 @@ try {
   m ? ok(`WIF price $${m.priceUsd}, liquidity $${Math.round(m.liquidityUsd ?? 0).toLocaleString()}, top pool ${m.topPool}`) : bad('WIF has no GeckoTerminal market')
 } catch (e) {
   bad(`geckoterminal: ${(e as Error).message}`)
+}
+
+console.log('Managed RPC (Dwellir, server-side)')
+if (!managedRpcKey(N)) {
+  console.log('  · DWELLIR_API_KEY not set — skipped (public RPCs are used)')
+} else {
+  const up = rpcUpstreams(N, ['eth_chainId'])[0]!
+  ;(up.managed ? ok : bad)(`first upstream for reads: ${up.url}`)
+  ;(rpcUpstreams(N, ['eth_getLogs']).every((u) => !u.managed) ? ok : bad)('eth_getLogs routed to public RPCs only')
+  const dc = getServerPublicClient({ ...N, rpcUrls: [] })
+  const v = await verifyNetwork(N, dc)
+  v.ok ? ok(`Dwellir: chain ${v.chainId}, block ${v.blockNumber}`) : bad(`Dwellir: ${v.reason}`)
+  try {
+    const m = await readTokenMetadata(dc, WIF_ADDRESS)
+    ok(`Dwellir eth_call: ${m.name} (${m.symbol}), ${m.decimals} decimals`)
+    const q = await getBestQuote(dc, N.uniswapV3!, NATIVE, WIF_ADDRESS, parseEther('0.01'))
+    ok(`Dwellir quote 0.01 ETH → ${(Number(q.amountOut) / 1e18).toLocaleString()} WIF`)
+  } catch (e) {
+    bad(`Dwellir reads: ${(e as Error).message.split('\n')[0]}`)
+  }
 }
 
 console.log(failures ? `\n${failures} check(s) FAILED` : '\nAll live checks passed')

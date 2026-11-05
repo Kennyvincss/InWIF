@@ -1,10 +1,14 @@
 /**
- * Read-only JSON-RPC relay for browsers whose RPC lacks CORS.
+ * Read-only JSON-RPC relay.
  * - Method allow-list (reads + eth_sendRawTransaction for already-signed txs).
  * - Never accepts or forwards anything secret-shaped; never signs.
+ * - Upstreams: the managed RPC (Dwellir) first when DWELLIR_API_KEY is set — the key
+ *   stays on the server and is sent as a header — then the public RPCs. eth_getLogs
+ *   always goes to the public RPCs (Dwellir plan / block-range limits), and limit or
+ *   plan errors from the managed provider fail over to the public RPCs.
  */
 import { NextResponse } from 'next/server'
-import { NETWORKS, containsSecret, type NetworkKey } from '@inwif/core'
+import { NETWORKS, containsSecret, rpcUpstreams, shouldFailOver, type NetworkKey } from '@inwif/core'
 import { logError, rateLimit } from '@/server/guard'
 
 const ALLOWED = new Set([
@@ -47,11 +51,18 @@ export async function POST(req: Request, ctx: { params: Promise<{ network: strin
     if (!c || typeof c.method !== 'string' || !ALLOWED.has(c.method)) return NextResponse.json({ error: `Method not allowed` }, { status: 403 })
     if (containsSecret(c.params)) return NextResponse.json({ error: 'Refusing to relay secret-shaped data' }, { status: 400 })
   }
-  for (const url of cfg.rpcUrls) {
+  const methods = (calls as { method: string }[]).map((c) => c.method)
+  for (const up of rpcUpstreams(cfg, methods)) {
     try {
-      const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: text, signal: AbortSignal.timeout(15_000) })
-      if (!r.ok && r.status >= 500) continue
-      return new NextResponse(await r.text(), { status: r.status, headers: { 'content-type': 'application/json' } })
+      const r = await fetch(up.url, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...up.headers },
+        body: text,
+        signal: AbortSignal.timeout(15_000),
+      })
+      const out = await r.text()
+      if (up.managed ? shouldFailOver(r.status, out) : !r.ok && r.status >= 500) continue
+      return new NextResponse(out, { status: r.status, headers: { 'content-type': 'application/json', 'x-inwif-upstream': up.managed ? 'managed' : 'public' } })
     } catch (e) {
       logError('rpc', e)
     }

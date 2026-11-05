@@ -27,3 +27,4 @@ export const INWIF_POLICY = {
   wifRequiredForFeatures: false,
 } as const
 export * from './defi'
+export * from './server-rpc'

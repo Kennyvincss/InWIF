@@ -14,7 +14,7 @@ Recommended order:
 
 | # | Step | Time | Cost |
 |---|---|---|---|
-| 1 | Dedicated RPC endpoint | 15 min | free tier |
+| 1 | Dedicated RPC endpoint (Dwellir, integrated) | 5 min | free tier |
 | 2 | Etherscan API key (full transaction history) | 10 min | free tier |
 | 3 | Rewards on testnet | 1–2 h | free (testnet) |
 | 4 | WalletConnect (connect InWIF to dApps) | 15 min (you) + build (Claude) | free |
@@ -30,25 +30,36 @@ Recommended order:
 
 ---
 
-## 1. Dedicated RPC endpoint
+## 1. Dedicated RPC endpoint (Dwellir) — integrated
 
-**Why.** The public Robinhood Chain RPC is free but rate-limited. With many users, balance and transaction calls start
-failing.
+**Why.** The public Robinhood Chain RPC is free but rate-limited. InWIF supports **Dwellir** (archive node,
+`api-robinhood-mainnet-archive.n.dwellir.com`) as a managed RPC for mainnet.
+
+**How it works:**
+- **The key stays on the server.** It is sent as an `X-Api-Key` header by the `/api/rpc` relay and the backend API.
+  It is never in a URL and never in the browser bundle.
+- **Traffic routing.** When the key is set, browsers send their RPC calls through `/api/rpc`. Reads go to Dwellir
+  first, and any limit, plan or auth error fails over to the public RPCs automatically.
+- **Log queries stay public.** `eth_getLogs` and filter calls always go to the public RPCs. Dwellir's Free plan has no
+  `eth_getLogs`, and paid plans cap it at 500 or 10,000 blocks, far below InWIF's history scans.
+- **Not covered:** testnet (Dwellir has no Robinhood testnet), the mobile and desktop apps (they have no server to hold
+  the key) and local development all keep using public RPCs.
 
 **You:**
-1. Create an account with a provider that supports Robinhood Chain, such as Chainstack, QuickNode, dRPC or Dwellir.
-2. Create a **Robinhood Chain mainnet** endpoint and copy its **HTTPS** URL.
-3. **Restrict the key.** This URL is used from users' browsers, so anyone can see it. In the provider's dashboard,
-   restrict the key to your domain (`inwif.vercel.app`, plus your custom domain later) if the provider supports origin
-   or domain allow-lists.
-4. Add the variable in Vercel:
-   1. Go to Vercel → project **inwif** → **Settings → Environment Variables**.
-   2. Add `NEXT_PUBLIC_ROBINHOOD_RPC_URL` = your URL, for **Production** and **Preview**.
-5. Go to Vercel → **Deployments**, open the latest production deployment, and choose **⋯ → Redeploy**.
-   `NEXT_PUBLIC_` variables are built into the site, so they only take effect after a redeploy.
+1. Get a key at dashboard.dwellir.com.
+2. Go to Vercel → project **inwif** → **Settings → Environment Variables** and add `DWELLIR_API_KEY` = your key for
+   **Production** (and Preview if you want previews to use it). Do **not** add a `NEXT_PUBLIC_` prefix.
+3. **Redeploy.** The build reads whether the key exists in order to send browser RPC through the relay. Only that
+   yes/no flag reaches the browser, never the key.
+4. If you host the backend API (step 7), set `DWELLIR_API_KEY` there too.
 
-**Check.** The top bar of the wallet still shows `chain 4663`. The wallet still verifies the chain ID live, so a wrong
-URL can never cause signing on the wrong network.
+**Check:**
+- `pnpm --filter @inwif/core verify:live` with the key set prints a "Managed RPC (Dwellir)" section.
+- On the live site, responses from `/api/rpc` carry `x-inwif-upstream: managed`.
+
+**Capacity.** The Free plan allows 20 responses per second and 100,000 per day, across all users. An active wallet
+session makes roughly 10–15 reads a minute (polling balances and network checks). If you exceed the quota, the relay
+falls back to the public RPCs, so the site keeps working.
 
 ## 2. Etherscan API key (complete transaction history)
 

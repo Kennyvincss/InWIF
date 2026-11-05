@@ -13,6 +13,14 @@ const proxy = process.env.HTTPS_PROXY ? { server: process.env.HTTPS_PROXY, bypas
 const browser = await chromium.launch({ proxy })
 const page = await browser.newPage({ viewport: { width: 1360, height: 900 }, deviceScaleFactor: Number(process.env.SHOT_SCALE ?? 1), ignoreHTTPSErrors: false })
 const ok = (m) => console.log(`  ✓ ${m}`)
+// Which RPC path does the browser use? (relay = /api/rpc, direct = public RPC hosts)
+const rpcPaths = { relay: 0, direct: 0 }
+page.on('request', (r) => {
+  if (r.method() !== 'POST') return
+  const u = r.url()
+  if (u.includes('/api/rpc/')) rpcPaths.relay++
+  else if (/chain\.robinhood\.com|publicnode\.com/.test(u)) rpcPaths.direct++
+})
 try {
   await page.goto(`${BASE}/app`)
   await page.getByRole('button', { name: /Watch an address/ }).click()
@@ -60,6 +68,7 @@ try {
   const rows = await page.locator('main li').count()
   ok(`activity shows ${rows} real transfers ${/unreachable right now/.test(act) ? '(RPC log fallback — explorer blocked here)' : '(Blockscout)'}`)
   await page.screenshot({ path: `${OUT}/live-activity.png` })
+  console.log(`  · browser RPC requests: ${rpcPaths.relay} via InWIF relay, ${rpcPaths.direct} direct to public RPCs`)
   console.log(process.exitCode ? '\nLive mainnet check FAILED' : '\nLive mainnet check passed')
 } catch (e) {
   console.error('FAILED:', String(e.message).split('\n')[0])
