@@ -96,6 +96,10 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
       known[network.uniswapV3.swapRouter02.toLowerCase()] = 'Uniswap V3 SwapRouter02'
       known[network.uniswapV3.weth9.toLowerCase()] = 'WETH'
     }
+    if (network.uniswapV4) {
+      known[network.uniswapV4.universalRouter.toLowerCase()] = 'Uniswap Universal Router'
+      known[network.uniswapV4.permit2.toLowerCase()] = 'Uniswap Permit2'
+    }
     return reviewTransaction(
       { to: request.to, value: request.value, data: request.data, chainId: network.chainId },
       {
@@ -284,7 +288,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
 
           {error && <ErrorBox>{error}</ErrorBox>}
 
-          <Notice>InWIF charges no fees. The only cost is the network fee shown above{request.kind === 'swap' ? ' plus the Uniswap pool fee shown on the swap screen' : ''}.</Notice>
+          <Notice>InWIF charges no fees. The only cost is the network fee shown above{request.kind === 'swap' ? ' plus the pool fee shown on the swap screen' : ''}.</Notice>
 
           <div className="flex gap-2">
             <button className="btn-ghost flex-1" onClick={onClose} disabled={phase === 'signing'}>

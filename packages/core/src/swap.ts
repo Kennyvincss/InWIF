@@ -8,6 +8,7 @@
  */
 import {
   encodeFunctionData,
+  formatUnits,
   getAddress,
   parseAbi,
   zeroAddress,
@@ -15,7 +16,7 @@ import {
   type Hex,
   type PublicClient,
 } from 'viem'
-import type { UniswapV3Config } from './networks'
+import type { UniswapV3Config, V4PoolKey } from './networks'
 
 export const NATIVE = 'native' as const
 export type SwapToken = Address | typeof NATIVE
@@ -34,6 +35,8 @@ export const swapRouter02Abi = parseAbi([
 export const ADDRESS_THIS: Address = '0x0000000000000000000000000000000000000002'
 
 export interface SwapQuote {
+  /** Uniswap protocol version that produced the quote (default 'v3'). */
+  protocol?: 'v3' | 'v4'
   tokenIn: SwapToken
   tokenOut: SwapToken
   amountIn: bigint
@@ -44,6 +47,42 @@ export interface SwapQuote {
   priceImpact: number | null
   gasEstimate: bigint
   route: string
+  /**
+   * Fraction of the trade the pool keeps as its fee. V3: the fee tier. V4: measured
+   * on-chain (quote against spot price), so it includes any fee a hook takes.
+   */
+  poolFeeFraction?: number | null
+  /** Who receives the pool fee. */
+  feeNote?: string
+  /** V4 only: what the Universal Router needs to execute the swap. */
+  v4?: { router: Address; key: V4PoolKey; zeroForOne: boolean }
+}
+
+export type MarketCheckLevel = 'ok' | 'warn' | 'block' | 'unknown'
+
+/** Above these, a swap is flagged / refused compared with the market price. */
+export const MARKET_WARN_FRACTION = 0.03
+export const MARKET_BLOCK_FRACTION = 0.1
+
+/**
+ * Compare what a swap gives with what the same tokens are worth at market prices
+ * (USD, e.g. from GeckoTerminal). `loss` is the fraction of value lost; it includes
+ * pool fees and price impact, and is negative when the swap beats the market price.
+ */
+export function compareWithMarket(p: {
+  amountIn: bigint
+  decimalsIn: number
+  priceInUsd: number | null | undefined
+  amountOut: bigint
+  decimalsOut: number
+  priceOutUsd: number | null | undefined
+}): { loss: number | null; level: MarketCheckLevel } {
+  if (!p.priceInUsd || !p.priceOutUsd || p.priceInUsd <= 0 || p.priceOutUsd <= 0) return { loss: null, level: 'unknown' }
+  const inUsd = Number(formatUnits(p.amountIn, p.decimalsIn)) * p.priceInUsd
+  const outUsd = Number(formatUnits(p.amountOut, p.decimalsOut)) * p.priceOutUsd
+  if (!(inUsd > 0) || !Number.isFinite(outUsd)) return { loss: null, level: 'unknown' }
+  const loss = 1 - outUsd / inUsd
+  return { loss, level: loss > MARKET_BLOCK_FRACTION ? 'block' : loss > MARKET_WARN_FRACTION ? 'warn' : 'ok' }
 }
 
 const resolve = (t: SwapToken, cfg: UniswapV3Config): Address => (t === NATIVE ? getAddress(cfg.weth9) : getAddress(t))
@@ -116,6 +155,7 @@ export async function getBestQuote(
   }
 
   return {
+    protocol: 'v3',
     tokenIn,
     tokenOut,
     amountIn,
@@ -125,6 +165,8 @@ export async function getBestQuote(
     priceImpact,
     gasEstimate: best.gasEstimate,
     route: `Uniswap V3 · ${(best.fee / 10_000).toFixed(2)}% pool`,
+    poolFeeFraction: best.fee / 1_000_000,
+    feeNote: 'to Uniswap liquidity providers',
   }
 }
 

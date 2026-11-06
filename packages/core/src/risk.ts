@@ -24,6 +24,17 @@ export const extraAbi = parseAbi([
   'function safeTransferFrom(address from, address to, uint256 tokenId)',
 ])
 
+/** Permit2 (Uniswap) on-chain allowance: lets `spender` pull `token` through Permit2 until `expiration`. */
+export const permit2ApproveAbi = parseAbi(['function approve(address token, address spender, uint160 amount, uint48 expiration)'])
+const UINT160_MAX = 2n ** 160n - 1n
+
+/** Function names shown for calls InWIF builds itself (selector → name). */
+export const KNOWN_FUNCTIONS: Record<string, string> = {
+  '0x3593564c': 'execute (Uniswap Universal Router swap)',
+  '0xac9650d8': 'multicall',
+  '0x5ae401dc': 'multicall (Uniswap SwapRouter02 swap)',
+}
+
 /** Treat anything ≥ 2^255 as effectively unlimited (common "infinite approval" values). */
 export const UNLIMITED_THRESHOLD = 2n ** 255n
 
@@ -33,6 +44,7 @@ export type DecodedAction =
   | { kind: 'erc20-transferFrom'; token: Address; from: Address; to: Address; amount: bigint }
   | { kind: 'erc20-approve'; token: Address; spender: Address; amount: bigint; unlimited: boolean }
   | { kind: 'set-approval-for-all'; collection: Address; operator: Address; approved: boolean }
+  | { kind: 'permit2-approve'; permit2: Address; token: Address; spender: Address; amount: bigint; expiration: number; unlimited: boolean }
   | { kind: 'contract-call'; to: Address; selector: Hex; value: bigint; functionName?: string }
   | { kind: 'contract-deploy'; value: bigint }
 
@@ -80,8 +92,15 @@ export function decodeTransaction(tx: TxLike, knownFunctions?: Record<string, st
   } catch {
     /* unknown */
   }
+  try {
+    const d = decodeFunctionData({ abi: permit2ApproveAbi, data })
+    const [token, spender, amount, expiration] = d.args
+    return { kind: 'permit2-approve', permit2: to, token: getAddress(token), spender: getAddress(spender), amount, expiration, unlimited: amount >= UINT160_MAX }
+  } catch {
+    /* not Permit2 */
+  }
   const selector = data.slice(0, 10) as Hex
-  return { kind: 'contract-call', to, selector, value, functionName: knownFunctions?.[selector] }
+  return { kind: 'contract-call', to, selector, value, functionName: knownFunctions?.[selector] ?? KNOWN_FUNCTIONS[selector] }
 }
 
 export interface ReviewContext {
@@ -161,6 +180,23 @@ export function reviewTransaction(tx: TxLike, ctx: ReviewContext): TxReview {
           severity: 'danger',
           message: 'Unlimited approval: the spender can move ALL of this token from your wallet, now and in future. Prefer an exact amount.',
         })
+      if (action.amount > 0n && !label(action.spender))
+        findings.push({ code: 'unknown-spender', severity: 'warning', message: 'Spender is not a contract InWIF recognises. Verify it on the explorer.' })
+      if (flagged(action.spender)) findings.push({ code: 'flagged-spender', severity: 'danger', message: 'Spender is on your flagged list.' })
+      break
+    case 'permit2-approve':
+      title = 'Approve token spending via Permit2'
+      lines.push(
+        { label: 'Token', value: label(action.token) ?? action.token },
+        { label: 'Spender', value: label(action.spender) ? `${label(action.spender)} (${action.spender})` : action.spender },
+        { label: 'Allowance', value: action.unlimited ? 'UNLIMITED' : fmt(action.amount, action.token, ctx) },
+        { label: 'Expires', value: new Date(action.expiration * 1000).toUTCString() },
+        { label: 'Via', value: label(action.permit2) ?? action.permit2 },
+      )
+      if (action.unlimited)
+        findings.push({ code: 'unlimited-approval', severity: 'danger', message: 'Unlimited Permit2 allowance: the spender can move ALL of this token until it expires.' })
+      if (!label(action.permit2))
+        findings.push({ code: 'unknown-contract', severity: 'warning', message: 'This is not the Permit2 contract InWIF knows. Do not continue unless you are sure.' })
       if (action.amount > 0n && !label(action.spender))
         findings.push({ code: 'unknown-spender', severity: 'warning', message: 'Spender is not a contract InWIF recognises. Verify it on the explorer.' })
       if (flagged(action.spender)) findings.push({ code: 'flagged-spender', severity: 'danger', message: 'Spender is on your flagged list.' })

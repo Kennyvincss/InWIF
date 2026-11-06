@@ -12,7 +12,7 @@
  *  - Uniswap/interface `packages/uniswap/src/features/chains/evm/info/robinhood.ts`
  *  - Uniswap/sdks `sdks/sdk-core/src/addresses.ts` and `entities/weth9.ts`
  */
-import { defineChain, type Address, type Chain } from 'viem'
+import { defineChain, type Address, type Chain, type Hex } from 'viem'
 
 export type NetworkKey = 'robinhood' | 'robinhoodTestnet' | 'local'
 
@@ -31,6 +31,37 @@ export interface UniswapV3Config {
   /** Wrapped native token used for ETH routes. */
   weth9: Address
   feeTiers: readonly number[]
+}
+
+/** Uniswap V4 pool key (currency 0x0 = native ETH). */
+export interface V4PoolKey {
+  currency0: Address
+  currency1: Address
+  fee: number
+  tickSpacing: number
+  hooks: Address
+}
+
+export interface V4PoolListing {
+  /** keccak256(abi.encode(key)); checked against `key` before every quote. */
+  id: Hex
+  key: V4PoolKey
+  label: string
+  /** Who receives the swap fee. Shown to the user before they swap. */
+  feeNote: string
+}
+
+export interface UniswapV4Config {
+  poolManager: Address
+  universalRouter: Address
+  quoter: Address
+  stateView: Address
+  permit2: Address
+  /**
+   * The only V4 pools InWIF routes through. A V4 pool can carry a hook that
+   * runs on every swap, so pools are listed one by one after review, never discovered.
+   */
+  pools: readonly V4PoolListing[]
 }
 
 /**
@@ -66,6 +97,7 @@ export interface NetworkConfig {
   /** Optional market-data network slug for GeckoTerminal. */
   geckoTerminalNetwork?: string
   uniswapV3?: UniswapV3Config
+  uniswapV4?: UniswapV4Config
   sources: string[]
   /**
    * Whether value-moving transactions are allowed on this network at all.
@@ -75,13 +107,22 @@ export interface NetworkConfig {
   transactionsEnabled: boolean
 }
 
-const env = (k: string): string | undefined => {
+/**
+ * Optional RPC overrides. Each variable is written out literally because Next.js only
+ * inlines `process.env.NEXT_PUBLIC_*` into browser code when the name is spelled out;
+ * a lookup by computed name is always undefined in the browser.
+ */
+const read = (f: () => string | undefined): string | undefined => {
   try {
-    // Works in Node and in Next.js (NEXT_PUBLIC_* are inlined at build time).
-    return typeof process !== 'undefined' ? process.env?.[k] : undefined
+    return f() || undefined
   } catch {
-    return undefined
+    return undefined // no `process` in this runtime
   }
+}
+const RPC_OVERRIDE = {
+  robinhood: read(() => process.env.NEXT_PUBLIC_ROBINHOOD_RPC_URL),
+  robinhoodTestnet: read(() => process.env.NEXT_PUBLIC_ROBINHOOD_TESTNET_RPC_URL),
+  local: read(() => process.env.NEXT_PUBLIC_LOCAL_RPC_URL),
 }
 
 export const ROBINHOOD_MAINNET: NetworkConfig = {
@@ -92,7 +133,7 @@ export const ROBINHOOD_MAINNET: NetworkConfig = {
   isTestnet: false,
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: [
-    env('NEXT_PUBLIC_ROBINHOOD_RPC_URL') ?? 'https://rpc.mainnet.chain.robinhood.com',
+    RPC_OVERRIDE.robinhood ?? 'https://rpc.mainnet.chain.robinhood.com',
     'https://robinhood-rpc.publicnode.com',
   ],
   explorer: {
@@ -120,10 +161,36 @@ export const ROBINHOOD_MAINNET: NetworkConfig = {
     weth9: '0x0Bd7D308f8E1639FAb988df18A8011f41EAcAD73',
     feeTiers: [100, 500, 3000, 10000],
   },
+  // Official Uniswap V4 deployment for chain 4663 (Uniswap/sdks sdk-core addresses.ts;
+  // Universal Router v2.1.1 from universal-router-sdk constants.ts).
+  uniswapV4: {
+    poolManager: '0x8366a39cc670b4001a1121b8f6a443a643e40951',
+    universalRouter: '0x8876789976decbfcbbbe364623c63652db8c0904',
+    quoter: '0x8dc178efb8111bb0973dd9d722ebeff267c98f94',
+    stateView: '0xf3334192d15450cdd385c8b70e03f9a6bd9e673b',
+    permit2: '0x000000000022D473030F116dDEE9F6B43aC78BA3',
+    pools: [
+      {
+        // The main $WIF market: created by Pons V2 when $WIF graduated from its bonding curve.
+        // The LP fee is 0; the Pons hook (afterSwap with return delta) takes the swap fee.
+        id: '0x71ef4106340f0a3b9c19ec994eef4fc44a1d2513f38faac39d7636b156548c79',
+        key: {
+          currency0: '0x0000000000000000000000000000000000000000',
+          currency1: '0x5173b8eA6923c2d40267890D45C46a3480954773',
+          fee: 0,
+          tickSpacing: 200,
+          hooks: '0xe5e702641ea86f4ae6cc3cdaed2b886f976be044',
+        },
+        label: 'Pons $WIF/ETH pool (Uniswap V4)',
+        feeNote: 'charged by the Pons hook; goes to Pons and the token creator, not to liquidity providers',
+      },
+    ],
+  },
   sources: [
     'https://github.com/ethereum-lists/chains/blob/master/_data/chains/eip155-4663.json',
     'https://github.com/Uniswap/sdks/blob/main/sdks/sdk-core/src/addresses.ts',
     'https://github.com/Uniswap/sdks/blob/main/sdks/sdk-core/src/entities/weth9.ts',
+    'https://github.com/Uniswap/sdks/blob/main/sdks/universal-router-sdk/src/utils/constants.ts',
     'https://docs.robinhood.com/chain/',
   ],
   transactionsEnabled: true,
@@ -137,7 +204,7 @@ export const ROBINHOOD_TESTNET: NetworkConfig = {
   isTestnet: true,
   nativeCurrency: { name: 'Sepolia Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: [
-    env('NEXT_PUBLIC_ROBINHOOD_TESTNET_RPC_URL') ?? 'https://rpc.testnet.chain.robinhood.com/rpc',
+    RPC_OVERRIDE.robinhoodTestnet ?? 'https://rpc.testnet.chain.robinhood.com/rpc',
     'https://robinhood-sepolia-rpc.publicnode.com',
   ],
   explorer: {
@@ -157,7 +224,7 @@ export const LOCAL_DEV: NetworkConfig = {
   shortName: 'local',
   isTestnet: true,
   nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-  rpcUrls: [env('NEXT_PUBLIC_LOCAL_RPC_URL') ?? 'http://127.0.0.1:8545'],
+  rpcUrls: [RPC_OVERRIDE.local ?? 'http://127.0.0.1:8545'],
   explorer: { name: 'None', url: '' },
   sources: ['foundry anvil default'],
   transactionsEnabled: true,

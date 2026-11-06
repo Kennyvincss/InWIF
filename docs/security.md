@@ -15,7 +15,9 @@
 | Key leakage via network | No endpoint accepts secrets; relays and API reject secret-shaped payloads; logs redacted (`redact`) |
 | Wrong / malicious RPC | `verifyNetwork` chain-ID check before every signature; signing disabled on mismatch |
 | Blind signing | Decoded review, simulation (`eth_simulateV1` where supported, else revert check), risk findings |
-| Unlimited approvals | Exact approvals by default; unlimited requires opt-in and is flagged high risk; revoke tooling |
+| Unlimited approvals | Exact approvals by default; unlimited requires opt-in and is flagged high risk; revoke tooling; Permit2 allowances are exact and expire after 24 hours, and are decoded in the review |
+| Bad swap price (dead or manipulated pool) | Every quote is compared with GeckoTerminal market prices: warning above 3% worse, swap blocked above 10%; best route across Uniswap V3 and V4 |
+| Malicious V4 hook | V4 pools are routed only if listed after review; pool ID checked against its key before every quote; fee measured on-chain and shown; minimum output on every swap, so a hook taking more makes the swap revert |
 | Address mistakes / poisoning | EIP-55 checksum, zero-address and token-contract checks, self-send warning, user blocklist |
 | Malicious companion (hardware) | Device decodes and displays the tx itself; physical confirmation; chain allow-list |
 | Counterfeit device | Challenge-response attestation against a vendor root; dev root is never reported as genuine |

@@ -53,6 +53,10 @@ export default function SecurityPage() {
 
   const known: Record<string, string> = {}
   if (network.uniswapV3) known[network.uniswapV3.swapRouter02.toLowerCase()] = 'Uniswap V3 SwapRouter02'
+  if (network.uniswapV4) {
+    known[network.uniswapV4.permit2.toLowerCase()] = 'Uniswap Permit2'
+    known[network.uniswapV4.universalRouter.toLowerCase()] = 'Uniswap Universal Router'
+  }
 
   const flagCheck = flag ? checkRecipient(flag) : null
   const score = [

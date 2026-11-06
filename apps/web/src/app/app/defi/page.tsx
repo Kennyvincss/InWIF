@@ -1,6 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
-import { ExternalLink, Layers, ShieldQuestion } from 'lucide-react'
+import Link from 'next/link'
+import { ExternalLink, Info, Layers, ShieldQuestion } from 'lucide-react'
 import { explorerAddressUrl, fetchLpPositions } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useNetwork } from '@/lib/hooks'
@@ -70,6 +71,25 @@ export default function DefiPage() {
           </ul>
         )}
         <p className="mt-3 text-xs text-mute">Liquidity provision carries impermanent-loss risk. Uniswap pool fees go to liquidity providers, not to InWIF.</p>
+      </section>
+
+      <section className="card p-5">
+        <h2 className="mb-2 flex items-center gap-2 font-display font-bold">
+          <Info className="h-5 w-5 text-lime" /> Earning from $WIF liquidity
+        </h2>
+        <p className="text-sm text-mute">
+          InWIF doesn&apos;t offer a $WIF liquidity option, because no $WIF pool on Robinhood Chain pays liquidity providers today:
+        </p>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-mute">
+          <li>
+            The main $WIF market (the Pons pool on Uniswap V4) has a 0% liquidity-provider fee. Its swap fee, about 1% measured on-chain, goes to Pons and the token creator.
+            Liquidity there would earn nothing and still carry impermanent-loss risk.
+          </li>
+          <li>The Uniswap V3 $WIF pool has no active liquidity or trading, and its price is far from the market.</li>
+        </ul>
+        <p className="mt-2 text-sm text-mute">
+          InWIF will add a liquidity option when a $WIF pool pays its providers. You can still <Link href="/app/swap" className="text-lime">swap $WIF</Link> at the market price.
+        </p>
       </section>
 
       <section className="card p-5">
