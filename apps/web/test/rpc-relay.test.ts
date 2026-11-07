@@ -75,4 +75,25 @@ describe('/api/rpc relay with Dwellir', () => {
     expect(r.status).toBe(403)
     expect(calls).toHaveLength(0)
   })
+
+  it('relays transaction hashes and log topics (32-byte hex), but never recovery phrases or key fields', async () => {
+    mockFetch(() => ok('0x1'))
+    const hash = '0x394da5a9bdf42ca3f73af80fd2c90cf5b98912f988c2442a960d54d1cfa2064a'
+    expect((await relay({ jsonrpc: '2.0', id: 1, method: 'eth_getTransactionReceipt', params: [hash] })).status).toBe(200)
+    const topic = '0x000000000000000000000000156064f872eb6dedc953e7af21e7a7991910ef09'
+    expect((await relay({ jsonrpc: '2.0', id: 1, method: 'eth_getLogs', params: [{ topics: [hash, topic, null] }] })).status).toBe(200)
+    const phrase = 'test test test test test test test test test test test junk'
+    expect((await relay({ jsonrpc: '2.0', id: 1, method: 'eth_call', params: [{ data: phrase }] })).status).toBe(400)
+    expect((await relay({ jsonrpc: '2.0', id: 1, method: 'eth_call', params: [{ privateKey: '0x1' }] })).status).toBe(400)
+  })
+
+  it('counts every call in a batch against the rate limit', async () => {
+    mockFetch(() => ok('0x1'))
+    const batch = Array.from({ length: 20 }, (_, i) => ({ jsonrpc: '2.0', id: i, method: 'eth_chainId', params: [] }))
+    const ip = '192.0.2.77'
+    const statuses: number[] = []
+    for (let i = 0; i < 31; i++) statuses.push((await relay(batch, ip)).status)
+    expect(statuses.slice(0, 30).every((x) => x === 200)).toBe(true) // 30 × 20 = 600 calls
+    expect(statuses[30]).toBe(429)
+  })
 })

@@ -73,7 +73,7 @@ export function Onboarding() {
             <Field key={i} label={`Word #${i + 1}`} value={answers[i] ?? ''} onChangeText={(t) => setAnswers({ ...answers, [i]: t })} />
           ))}
           {err && <Notice tone="bad" text={err} />}
-          <Button title="Verify & secure with biometrics" onPress={() => (verifyBackupWords(phrase, answers) ? finish(phrase, true) : setErr('Words do not match.'))} />
+          <Button title="Verify & secure with biometrics" onPress={() => (verifyBackupWords(phrase, answers, quiz) ? finish(phrase, true) : setErr('Words do not match.'))} />
         </>
       )}
       {step === 'import' && (

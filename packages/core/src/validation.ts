@@ -104,15 +104,26 @@ export function looksLikeSecret(input: string): boolean {
   return false
 }
 
-/** Recursively check an arbitrary payload for secret-shaped strings (used by API + logger). */
-export function containsSecret(value: unknown, depth = 0): boolean {
+/**
+ * Recursively check an arbitrary payload for secret-shaped strings (used by API + logger).
+ *
+ * `allowHex32`: JSON-RPC params are full of legitimate 32-byte hex values (transaction
+ * hashes, log topics, storage slots) that are indistinguishable from a raw private key,
+ * so the RPC relay sets this and keeps only the recovery-phrase and key-named-field checks.
+ */
+export function containsSecret(value: unknown, depthOrOpts: number | { allowHex32?: boolean } = 0, opts: { allowHex32?: boolean } = {}): boolean {
+  const depth = typeof depthOrOpts === 'number' ? depthOrOpts : 0
+  const o = typeof depthOrOpts === 'number' ? opts : depthOrOpts
   if (depth > 8) return false
-  if (typeof value === 'string') return looksLikeSecret(value)
-  if (Array.isArray(value)) return value.some((v) => containsSecret(v, depth + 1))
+  if (typeof value === 'string') {
+    if (o.allowHex32 && /^(0x)?[0-9a-fA-F]{64}$/.test(value.trim())) return false
+    return looksLikeSecret(value)
+  }
+  if (Array.isArray(value)) return value.some((v) => containsSecret(v, depth + 1, o))
   if (value && typeof value === 'object') {
     for (const [k, v] of Object.entries(value)) {
       if (/^(mnemonic|seed|seedphrase|recoveryphrase|privatekey|private_key|secret|phrase)$/i.test(k)) return true
-      if (containsSecret(v, depth + 1)) return true
+      if (containsSecret(v, depth + 1, o)) return true
     }
   }
   return false

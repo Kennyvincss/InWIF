@@ -48,6 +48,15 @@ describe('mnemonic', () => {
     expect(verifyBackupWords(ANVIL, { 0: words[0]!, 11: 'junk' })).toBe(true)
     expect(verifyBackupWords(ANVIL, { 11: 'test' })).toBe(false)
   })
+
+  it('backup quiz cannot be skipped with empty or partial answers', () => {
+    const words = ANVIL.split(' ')
+    expect(verifyBackupWords(ANVIL, {})).toBe(false)
+    expect(verifyBackupWords(ANVIL, {}, [0, 5, 11])).toBe(false)
+    expect(verifyBackupWords(ANVIL, { 0: words[0]! }, [0, 5, 11])).toBe(false)
+    expect(verifyBackupWords(ANVIL, { 0: words[0]!, 5: '', 11: words[11]! }, [0, 5, 11])).toBe(false)
+    expect(verifyBackupWords(ANVIL, { 0: ' TEST ', 5: words[5]!, 11: words[11]! }, [0, 5, 11])).toBe(true)
+  })
 })
 
 describe('private keys', () => {

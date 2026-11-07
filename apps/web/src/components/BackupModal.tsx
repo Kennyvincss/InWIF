@@ -110,7 +110,7 @@ export function BackupModal({ walletId, open, onClose }: { walletId: string; ope
           className="space-y-3"
           onSubmit={(e) => {
             e.preventDefault()
-            if (verifyBackupWords(phrase, answers)) {
+            if (verifyBackupWords(phrase, answers, quiz)) {
               markBackedUp(walletId)
               setPhrase('')
               setErr(null)

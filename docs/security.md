@@ -23,7 +23,8 @@
 | Counterfeit device | Challenge-response attestation against a vendor root; dev root is never reported as genuine |
 | Malicious firmware | Firmware accepted only with a vendor signature over (version, image hash) |
 | PIN brute force | On-device PIN, constant-time compare, wipe after 10 failures (secure element counter planned) |
-| XSS / supply chain in web | Strict CSP, no third-party scripts, `frame-ancestors 'none'`, pinned lockfile |
+| XSS / supply chain in web | CSP with `connect-src` limited to InWIF, the Robinhood Chain RPCs and the explorer; no third-party scripts; `frame-ancestors 'none'`; pinned lockfile; `pnpm audit` (inline scripts still allowed, see `security-review-2026-11.md`) |
+| Skipped backup | The backup quiz requires every requested word; a wallet that was never backed up can be deleted only by typing DELETE |
 | Phishing (secret pasted) | Recipient field detects pasted keys and phrases and blocks them |
 
 ## Known limitations (be honest with users)
