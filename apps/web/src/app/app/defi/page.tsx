@@ -1,7 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { ExternalLink, Info, Layers, ShieldQuestion } from 'lucide-react'
+import { Coins, ExternalLink, Info, Layers, ShieldQuestion } from 'lucide-react'
 import { explorerAddressUrl, fetchLpPositions } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useNetwork } from '@/lib/hooks'
@@ -28,6 +28,20 @@ export default function DefiPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="DeFi" subtitle="Only verified protocols on Robinhood Chain. Access is free; protocol fees and risks are always disclosed." />
+
+      <section className="card relative overflow-hidden p-5">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-lime/10 blur-3xl" />
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="flex items-center gap-2 font-display font-bold">
+            <Coins className="h-5 w-5 text-lime" /> $WIF staking
+          </h2>
+          <Badge tone="ok">Coming soon</Badge>
+        </div>
+        <p className="mt-2 text-sm text-mute">
+          Stake your $WIF and earn rewards, right here in InWIF. Staking isn&apos;t available yet. It will open once a funded, independently audited staking contract is live on
+          Robinhood Chain. Until then InWIF shows no staking rates, so nothing here is a promise of a return.
+        </p>
+      </section>
 
       <section className="card p-5">
         <div className="mb-3 flex items-center justify-between">
