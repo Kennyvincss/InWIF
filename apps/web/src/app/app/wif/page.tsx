@@ -212,10 +212,7 @@ export default function WifPage() {
         <div className="grid gap-3 md:grid-cols-3">
           {ECOSYSTEM_APPS.map((a) => (
             <Link key={a.id} href={a.href} className="rounded-xl border border-white/[0.06] p-4 hover:border-lime/30">
-              <div className="flex items-center justify-between">
-                <p className="font-semibold">{a.name}</p>
-                <Badge tone={a.status === 'live' ? 'ok' : 'warn'}>{a.status}</Badge>
-              </div>
+              <p className="font-semibold">{a.name}</p>
               <p className="mt-1 text-xs text-mute">{a.description}</p>
             </Link>
           ))}
