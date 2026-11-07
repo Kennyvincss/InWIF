@@ -88,9 +88,19 @@ export function pickVerificationIndices(wordCount: number, count = 3): number[] 
   return [...picked].sort((a, b) => a - b)
 }
 
-export function verifyBackupWords(phrase: string, answers: Record<number, string>): boolean {
+/**
+ * Check the backup quiz. Every position in `required` (the quiz the user was shown)
+ * must be answered with the right word; with no `required`, every given answer must
+ * match and there must be at least one. Empty or missing answers never pass.
+ */
+export function verifyBackupWords(phrase: string, answers: Record<number, string>, required?: readonly number[]): boolean {
   const words = normaliseMnemonic(phrase).split(' ')
-  return Object.entries(answers).every(([i, w]) => words[Number(i)] === w.trim().toLowerCase())
+  const positions = required ?? Object.keys(answers).map(Number)
+  if (positions.length === 0) return false
+  return positions.every((i) => {
+    const w = answers[i]?.trim().toLowerCase()
+    return !!w && words[i] === w
+  })
 }
 
 export { wordlist as bip39Wordlist }

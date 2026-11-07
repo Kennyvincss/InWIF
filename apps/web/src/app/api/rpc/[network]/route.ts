@@ -47,9 +47,14 @@ export async function POST(req: Request, ctx: { params: Promise<{ network: strin
   }
   const calls = Array.isArray(body) ? body : [body]
   if (calls.length > 20) return NextResponse.json({ error: 'Batch too large' }, { status: 413 })
+  // Each call in a batch counts against the limit (the first was charged above).
+  if (calls.length > 1) {
+    const over = rateLimit(req, 600, calls.length - 1)
+    if (over) return over
+  }
   for (const c of calls as { method?: string; params?: unknown }[]) {
     if (!c || typeof c.method !== 'string' || !ALLOWED.has(c.method)) return NextResponse.json({ error: `Method not allowed` }, { status: 403 })
-    if (containsSecret(c.params)) return NextResponse.json({ error: 'Refusing to relay secret-shaped data' }, { status: 400 })
+    if (containsSecret(c.params, { allowHex32: true })) return NextResponse.json({ error: 'Refusing to relay secret-shaped data' }, { status: 400 })
   }
   const methods = (calls as { method: string }[]).map((c) => c.method)
   for (const up of rpcUpstreams(cfg, methods)) {

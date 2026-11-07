@@ -5,19 +5,24 @@ import { redact } from '@inwif/core'
 /** Tiny in-memory token bucket per client IP. Suitable for a single instance; use Redis behind a load balancer. */
 const buckets = new Map<string, { tokens: number; at: number }>()
 
-export function rateLimit(req: Request, perMinute = 120): NextResponse | null {
+const MAX_TRACKED = 10_000
+
+/** Charge `cost` tokens (e.g. one per call in a JSON-RPC batch). */
+export function rateLimit(req: Request, perMinute = 120, cost = 1): NextResponse | null {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('x-real-ip') || 'local'
   const now = Date.now()
   const b = buckets.get(ip) ?? { tokens: perMinute, at: now }
   b.tokens = Math.min(perMinute, b.tokens + ((now - b.at) / 60_000) * perMinute)
   b.at = now
-  if (b.tokens < 1) {
+  if (b.tokens < cost) {
     buckets.set(ip, b)
     return NextResponse.json({ error: 'Too many requests' }, { status: 429, headers: { 'retry-after': '10' } })
   }
-  b.tokens -= 1
-  buckets.set(ip, b)
-  if (buckets.size > 10_000) buckets.clear()
+  b.tokens -= cost
+  buckets.delete(ip)
+  buckets.set(ip, b) // re-insert so the Map stays ordered by last use
+  // Evict the least recently seen clients; never reset everyone's limits at once.
+  while (buckets.size > MAX_TRACKED) buckets.delete(buckets.keys().next().value!)
   return null
 }
 

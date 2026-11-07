@@ -103,6 +103,14 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
             <button
               className="btn-ghost px-2.5 py-1.5 text-xs text-bad"
               onClick={() => {
+                if (wallet.kind === 'mnemonic' && !wallet.backedUp) {
+                  // Deleting an unbacked-up wallet loses its funds for good: require typing DELETE.
+                  const typed = prompt(
+                    `"${wallet.name}" is NOT backed up. If you delete it, nobody can ever recover it or its funds.\n\nBack it up first with "Back up now". To delete anyway, type DELETE:`,
+                  )
+                  if (typed?.trim() === 'DELETE') w.deleteWallet(wallet.id)
+                  return
+                }
                 if (confirm(`Delete "${wallet.name}" from this device? Without your recovery phrase or key, funds cannot be recovered.`)) w.deleteWallet(wallet.id)
               }}
             >
