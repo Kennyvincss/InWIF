@@ -66,7 +66,6 @@ export default function HardwarePage() {
                 <p className="font-semibold">{s.t}</p>
                 <p className="text-sm text-mute">{s.b}</p>
               </div>
-              <span className={`chip ${s.s === 'done' ? 'border-ok/40 text-ok' : s.s === 'in progress' ? 'border-lime/40 text-lime' : ''}`}>{s.s}</span>
             </li>
           ))}
         </ol>

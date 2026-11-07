@@ -68,7 +68,7 @@ export default function EcosystemPage() {
         <div className="grid gap-4 md:grid-cols-3">
           {ECOSYSTEM_APPS.map((a) => (
             <Link key={a.id} href={a.href} className="card p-5 hover:border-lime/30">
-              <p className="font-semibold">{a.name} <span className="chip ml-1">{a.status}</span></p>
+              <p className="font-semibold">{a.name}</p>
               <p className="mt-1.5 text-sm text-mute">{a.description}</p>
             </Link>
           ))}
