@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AtSign, CheckCircle2, XCircle } from 'lucide-react'
 import type { Address } from 'viem'
 import { USERNAME_MAX, type UsernameClaim } from '@inwif/core'
@@ -119,6 +119,7 @@ export function MyUsernameCard({ compact }: { compact?: boolean }) {
           <p className="font-display text-2xl font-semibold text-accent" data-testid="my-username">@{u.data.username}</p>
           <CopyButton value={`@${u.data.username}`} label="Copy" />
           <p className="w-full text-sm text-mute">Anyone on InWIF can send to @{u.data.username}. It always points to this account&apos;s address.</p>
+          <PayPageLink username={u.data.username} />
         </div>
       ) : activeWallet.kind === 'watch' ? (
         <p className="text-sm text-mute">Watch-only wallets can&apos;t claim a username.</p>
@@ -131,5 +132,28 @@ export function MyUsernameCard({ compact }: { compact?: boolean }) {
         </>
       )}
     </section>
+  )
+}
+
+/** The user's public pay page link, with copy, open and post-on-X. */
+function PayPageLink({ username }: { username: string }) {
+  const [origin, setOrigin] = useState('')
+  useEffect(() => setOrigin(window.location.origin), [])
+  if (!origin) return null
+  const link = `${origin}/@${username}`
+  return (
+    <div className="w-full rounded-xl border border-white/[0.08] bg-black/40 p-3">
+      <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">Your pay page</p>
+      <div className="mt-1.5 flex flex-wrap items-center gap-2">
+        <a href={`/@${username}`} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-mono text-sm text-white hover:text-accent" data-testid="pay-page-link">
+          {link.replace(/^https?:\/\//, '')}
+        </a>
+        <CopyButton value={link} label="Copy link" />
+        <a className="btn-ghost px-3 py-1.5 text-xs" href={`https://x.com/intent/post?text=${encodeURIComponent(`Pay me in $WIF: ${link}`)}`} target="_blank" rel="noreferrer">
+          Post on X
+        </a>
+      </div>
+      <p className="mt-1.5 text-xs text-dim">Put it in your bio. Anyone can open it and pay you in $WIF.</p>
+    </div>
   )
 }

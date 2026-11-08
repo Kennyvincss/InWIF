@@ -72,6 +72,14 @@ export async function claimByAddress(address: string) {
   return parse(await get(K.addr(address)))
 }
 
+/** Current claims for up to 50 addresses in one round trip (Activity). */
+export async function claimsByAddresses(addresses: string[]): Promise<(UsernameClaim | null)[]> {
+  if (!addresses.length) return []
+  const keys = addresses.map(K.addr)
+  const vals = useMemory() ? keys.map((k) => mem.get(k) ?? null) : await redis<(string | null)[]>(['MGET', ...keys])
+  return vals.map(parse)
+}
+
 /** Owner address of a look-alike of `name`, if one is taken. */
 export async function lookalikeOwner(name: string) {
   return get(K.skel(name))

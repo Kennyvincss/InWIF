@@ -59,6 +59,29 @@ export async function claimUsername(name: string, address: Address, sign: (messa
   return ok
 }
 
+/** Verified usernames for many addresses (lower-case address → username). Unknown ones are left out. */
+export async function lookupAddresses(addresses: string[]): Promise<Record<string, string>> {
+  const list = [...new Set(addresses.map((a) => a.toLowerCase()))].slice(0, 50)
+  if (!list.length) return {}
+  const r = await fetch(`/api/names?addresses=${list.join(',')}`, { cache: 'no-store' })
+  if (!r.ok) return {}
+  const j = (await r.json()) as { addresses?: string[]; claims?: unknown[] }
+  const out: Record<string, string> = {}
+  await Promise.all(
+    (j.addresses ?? []).map(async (a, i) => {
+      const c = await verified(j.claims?.[i], { address: a })
+      if (c) out[a] = c.username
+    }),
+  )
+  return out
+}
+
+/** Usernames for the counterparties shown in a list (e.g. Activity). Failures just show addresses. */
+export function useUsernamesFor(addresses: (string | undefined)[]) {
+  const list = [...new Set(addresses.filter((a): a is string => !!a).map((a) => a.toLowerCase()))].sort().slice(0, 50)
+  return useQuery({ queryKey: ['usernames', list.join(',')], queryFn: () => lookupAddresses(list), enabled: list.length > 0, staleTime: 5 * 60_000, retry: 0 })
+}
+
 const addrKey = (a?: string) => ['username', a?.toLowerCase()] as const
 
 /** The verified username of an address (null when it has none). */

@@ -1,16 +1,33 @@
 import { NextResponse } from 'next/server'
 import { CLAIM_MAX_AGE_MS, CLAIM_REFUSAL_TEXT, verifyUsernameClaim } from '@inwif/core'
 import { ADDRESS_RE, logError, rateLimit } from '@/server/guard'
-import { claimByAddress, registryAvailable, storeClaim } from '@/server/names'
+import { claimByAddress, claimsByAddresses, registryAvailable, storeClaim } from '@/server/names'
 
 export const dynamic = 'force-dynamic'
 const NO_STORE = { 'cache-control': 'no-store' }
 const unavailable = () => NextResponse.json({ error: 'Usernames are unavailable right now.' }, { status: 503, headers: NO_STORE })
 
-/** Reverse lookup: GET /api/names?address=0x… → { claim | null }. Clients verify the signature. */
+/**
+ * Reverse lookup: GET /api/names?address=0x… → { claim | null }, or
+ * GET /api/names?addresses=0x…,0x… (up to 50) → { claims: (claim | null)[] }.
+ * Clients verify every signature themselves.
+ */
 export async function GET(req: Request) {
   const limited = await rateLimit(req)
   if (limited) return limited
+  const many = new URL(req.url).searchParams.get('addresses')
+  if (many !== null) {
+    const list = [...new Set(many.split(',').map((a) => a.trim().toLowerCase()).filter(Boolean))]
+    if (list.length > 50 || !list.every((a) => ADDRESS_RE.test(a))) return NextResponse.json({ error: 'Invalid addresses' }, { status: 400 })
+    if (!registryAvailable()) return unavailable()
+    try {
+      const claims = await claimsByAddresses(list)
+      return NextResponse.json({ addresses: list, claims }, { headers: NO_STORE })
+    } catch (e) {
+      logError('names', e)
+      return unavailable()
+    }
+  }
   const address = new URL(req.url).searchParams.get('address') ?? ''
   if (!ADDRESS_RE.test(address)) return NextResponse.json({ error: 'Invalid address' }, { status: 400 })
   if (!registryAvailable()) return unavailable()
