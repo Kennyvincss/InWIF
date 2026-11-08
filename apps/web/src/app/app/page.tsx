@@ -5,7 +5,7 @@ import { ArrowDownLeft, ArrowLeftRight, ArrowRight, ArrowUpRight, Check, Cpu, Ey
 import { RANGE_QUERY, explorerAddressUrl, type ChartRange } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useActivity, usePortfolio, usePortfolioHistory, useVerification } from '@/lib/hooks'
-import { fmtPct, fmtToken, fmtUsd, fmtValue } from '@/lib/format'
+import { fmtPct, fmtToken, fmtUsd, fmtValue, fmtWif } from '@/lib/format'
 import { AllocationBar, AreaChart } from '@/components/Charts'
 import { ActivityList } from '@/components/ActivityList'
 import { BackupModal } from '@/components/BackupModal'
@@ -34,6 +34,9 @@ export default function Dashboard() {
   const currency = state.settings.displayCurrency ?? 'WIF'
   const inWif = currency === 'WIF' && !!wif?.priceUsd
   const value = (usd: number | null | undefined) => fmtValue(usd, currency, wif?.priceUsd)
+  // The chart follows the same setting; without $WIF price history it stays in USD.
+  const chartInWif = currency === 'WIF' && !!history.data?.wif
+  const chart = chartInWif ? history.data?.wif : history.data?.usd
 
   const actions = [
     { href: '/app/send', label: 'Send', icon: ArrowUpRight },
@@ -192,7 +195,7 @@ export default function Dashboard() {
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <div>
               <Label>Portfolio value</Label>
-              <p className="mt-1 text-sm text-mute">Your current holdings at past prices.</p>
+              <p className="mt-1 text-sm text-mute">Your current holdings at past prices{chartInWif ? ", in $WIF" : ""}.</p>
             </div>
             <div className="flex rounded-full border border-white/[0.08] bg-black/40 p-0.5 font-mono text-[11px]">
               {RANGES.map((r) => (
@@ -208,8 +211,8 @@ export default function Dashboard() {
           </div>
           {history.isLoading ? (
             <Skeleton className="h-52" />
-          ) : history.data && history.data.length > 1 && !hide ? (
-            <AreaChart data={history.data} label="Portfolio value" height={220} />
+          ) : chart && chart.length > 1 && !hide ? (
+            <AreaChart data={chart} label="Portfolio value" height={220} format={chartInWif ? (v) => `${fmtWif(v)} WIF` : undefined} />
           ) : (
             <Notice>
               {hide

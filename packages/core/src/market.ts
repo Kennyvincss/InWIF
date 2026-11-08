@@ -151,6 +151,22 @@ export function holdingsValueSeries(series: { amount: number; prices: PricePoint
   })
 }
 
+/**
+ * Re-express a USD value series in another asset (e.g. $WIF): each point is divided by that
+ * asset's last known USD price at or before the point's time. Points earlier than the first
+ * known price are dropped rather than estimated.
+ */
+export function denominateSeries(valuesUsd: PricePoint[], assetPricesUsd: PricePoint[]): PricePoint[] {
+  const prices = [...assetPricesUsd].filter((p) => p.close > 0).sort((a, b) => a.t - b.t)
+  const out: PricePoint[] = []
+  let j = -1
+  for (const v of [...valuesUsd].sort((a, b) => a.t - b.t)) {
+    while (j + 1 < prices.length && prices[j + 1]!.t <= v.t) j++
+    if (j >= 0) out.push({ t: v.t, close: v.close / prices[j]!.close })
+  }
+  return out
+}
+
 // ---------------------------------------------------------------- live market (pool trades + stats)
 
 export interface PoolTrade {
