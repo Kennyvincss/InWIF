@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Cpu, KeyRound, Plus, ScanEye, ShieldCheck } from 'lucide-react'
+import { AtSign, Cpu, KeyRound, Plus, ScanEye, ShieldCheck } from 'lucide-react'
+import type { Address } from 'viem'
 import {
   accountFromMnemonic,
   checkMnemonic,
@@ -17,8 +18,10 @@ import { LogoMark } from './Logo'
 import { BackupModal } from './BackupModal'
 import { HARDWARE_ENABLED } from '@/lib/features'
 import { ErrorBox, Notice, Spinner, cx } from './ui'
+import { UsernameClaimForm } from './Username'
+import { useUsername } from '@/lib/usernames'
 
-type Step = 'welcome' | 'import' | 'watch' | 'password' | 'done'
+type Step = 'welcome' | 'import' | 'watch' | 'password' | 'username' | 'done'
 
 export function Onboarding({ embedded = false, onFinished }: { embedded?: boolean; onFinished?: () => void }) {
   const wallet = useWallet()
@@ -36,6 +39,9 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [source, setSource] = useState<'create' | 'phrase' | 'key'>('create')
+  const [newWallet, setNewWallet] = useState<{ id: string; address: Address } | null>(null)
+  const [claimed, setClaimed] = useState<string | null>(null)
+  const existingName = useUsername(step === 'username' ? newWallet?.address : undefined)
 
   const pwCheck = checkPassword(pw)
   const importCheck = importMode === 'phrase' ? checkMnemonic(importInput) : null
@@ -54,18 +60,20 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
     if (pw !== pw2) return setErr('Passwords do not match.')
     setBusy(true)
     try {
-      if (source === 'key') await wallet.importPrivateKey({ name, privateKey: importKey!, password: pw })
+      let w
+      if (source === 'key') w = await wallet.importPrivateKey({ name, privateKey: importKey!, password: pw })
       else {
         // A created phrase is not backed up yet; an imported one already exists on paper.
-        const w = await wallet.createFromMnemonic({ name, phrase: source === 'create' ? phrase : normaliseMnemonic(importInput), password: pw, backedUp: source !== 'create' })
+        w = await wallet.createFromMnemonic({ name, phrase: source === 'create' ? phrase : normaliseMnemonic(importInput), password: pw, backedUp: source !== 'create' })
         setCreatedId(source === 'create' ? w.id : null)
       }
+      setNewWallet({ id: w.id, address: w.accounts[0].address })
       // Clear secrets from component state as soon as they are encrypted.
       setPhrase('')
       setImportInput('')
       setPw('')
       setPw2('')
-      setStep('done')
+      setStep('username')
     } catch (e) {
       setErr((e as Error).message)
     } finally {
@@ -88,7 +96,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
             <span className="text-gradient">made simple.</span>
           </h2>
           <ul className="mt-8 space-y-3 text-mute">
-            {['Your keys never leave this device', 'No account, email or sign-up', 'Send, receive and swap with 0% InWIF fees'].map((t) => (
+            {['Your keys never leave this device', 'No email or personal details', 'Send, receive and swap with 0% InWIF fees'].map((t) => (
               <li key={t} className="flex items-center gap-3">
                 <span className="grid h-6 w-6 place-items-center rounded-full border border-accent/30 bg-accent/10 text-accent">
                   <ShieldCheck className="h-3.5 w-3.5" />
@@ -281,10 +289,53 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
           </form>
         )}
 
+        {step === 'username' && newWallet && (
+          <div>
+            <span className="grid h-11 w-11 place-items-center rounded-xl border border-accent/30 bg-accent/10 text-accent">
+              <AtSign className="h-5 w-5" />
+            </span>
+            {existingName.data ? (
+              <>
+                <h2 className="mt-5 font-display text-2xl font-bold">Welcome back, @{existingName.data.username}</h2>
+                <p className="mt-1 text-sm text-mute">This wallet already has a username. Friends can send to @{existingName.data.username}.</p>
+                <button className="btn-primary mt-6 w-full" onClick={() => setStep('done')}>
+                  Continue
+                </button>
+              </>
+            ) : (
+              <>
+                <h2 className="mt-5 font-display text-2xl font-bold">Pick your username</h2>
+                <p className="mt-1 text-sm text-mute">
+                  Friends can send you $WIF at <span className="text-white">@username</span> instead of a long 0x address. It&apos;s free: you sign a message, no transaction.
+                </p>
+                <div className="mt-5">
+                  {existingName.isLoading ? (
+                    <p className="flex items-center gap-2 text-sm text-mute"><Spinner /> Checking this wallet…</p>
+                  ) : (
+                    <UsernameClaimForm
+                      address={newWallet.address}
+                      sign={(m) => wallet.softwareSignerFor(newWallet.id, 0).signMessage!(m)}
+                      onDone={(c) => {
+                        setClaimed(c.username)
+                        setStep('done')
+                      }}
+                      autoFocus
+                    />
+                  )}
+                </div>
+                <p className="mt-3 text-xs text-dim">Your username is public and shows your wallet address to anyone who looks it up.</p>
+                <button className="mt-4 w-full text-center text-xs text-mute transition hover:text-white" onClick={() => setStep('done')}>
+                  Skip for now, add one later in Settings
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
         {step === 'done' && (
           <div className="text-center">
             <ShieldCheck className="mx-auto h-12 w-12 text-ok" />
-            <h2 className="mt-4 font-display text-2xl font-bold">Your wallet is ready</h2>
+            <h2 className="mt-4 font-display text-2xl font-bold">{claimed ? `You're @${claimed}` : 'Your wallet is ready'}</h2>
             <p className="mt-2 text-sm text-mute">Every InWIF feature is free, for every user. No subscriptions, no paywalls, and you never need $WIF to use the wallet.</p>
             {createdId && (
               <div className="mt-5 text-left">

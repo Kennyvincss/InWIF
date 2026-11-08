@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, ArrowUpRight, Check, Eye, HandCoins, IdCard, KeyRound, Layers, Lock, Radio, ScanSearch, ShieldCheck, Smartphone, Sparkles, Wallet, Zap } from 'lucide-react'
+import { ArrowRight, AtSign, ArrowUpRight, Check, Eye, HandCoins, IdCard, KeyRound, Layers, Lock, Radio, ScanSearch, ShieldCheck, Smartphone, Sparkles, Zap } from 'lucide-react'
 import { WIF_ADDRESS } from '@inwif/core'
 import { Section, SitePage } from '@/components/site/Site'
 import { DeviceRender } from '@/components/site/DeviceRender'
@@ -89,7 +89,7 @@ export default function Home() {
             },
             { k: 'InWIF fees', v: '0%', sub: 'On everything, forever' },
             { k: 'Custody', v: '100%', sub: 'Your keys, your device' },
-            { k: 'Accounts needed', v: 'None', sub: 'No sign-up, no email' },
+            { k: 'Email needed', v: 'None', sub: 'No email, no personal details' },
           ].map((s, i) => (
             <div key={s.k} className={cx('p-6 sm:p-7', i % 2 === 1 && 'border-l border-white/[0.07]', i >= 2 && 'border-t border-white/[0.07] md:border-t-0', i === 2 && 'md:border-l')}>
               <p className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">
@@ -135,7 +135,7 @@ export default function Home() {
             </svg>
           </Bento>
           <Bento className="md:col-span-2" icon={KeyRound} title="Approval manager" body="See every app allowed to spend your tokens, and revoke it in one tap." />
-          <Bento className="md:col-span-2" icon={Wallet} title="Unlimited wallets" body="Create or import as many wallets and accounts as you like. Switch instantly." />
+          <Bento className="md:col-span-2" icon={AtSign} title="Send to @username" body="Pick a username when you sign up. Friends send you $WIF at @name — no long addresses, no copy-paste mistakes." />
           <Bento className="md:col-span-3" icon={Lock} title="Keys stay with you" body="Your recovery phrase is created and encrypted on your device. InWIF never sees it, and nothing outside InWIF can ask your wallet to sign." />
           <Bento className="md:col-span-3" icon={Layers} title="Free. Forever." body="No subscriptions, no premium tier, no paywalls. Every feature, for every user.">
             <p className="mt-4 font-display text-6xl font-semibold text-accent drop-shadow-[0_0_24px_rgba(0,229,155,.45)]">0%</p>
@@ -263,7 +263,7 @@ export default function Home() {
           <h2 className="relative font-display text-[36px] font-semibold leading-tight sm:text-[56px]">
             <span className="text-fade">Own your keys.</span> <span className="text-gradient">Start in seconds.</span>
           </h2>
-          <p className="relative mx-auto mt-4 max-w-md text-mute">No sign-up, no email, no fees. Just a wallet that is yours.</p>
+          <p className="relative mx-auto mt-4 max-w-md text-mute">No email, no fees. Just a wallet that is yours.</p>
           <Link href="/app" className="btn-primary relative mt-8 px-7 py-3 text-[15px]">
             Create your wallet <ArrowRight className="h-4 w-4" />
           </Link>

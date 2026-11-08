@@ -73,6 +73,8 @@ export interface Persisted {
   blocklist: string[]
   quests: Record<string, number>
   deviceNames: Record<string, string>
+  /** Usernames this device has paid before (name → address). A change is flagged before sending. */
+  namePins: Record<string, Address>
 }
 
 const KEY = 'inwif:v1'
@@ -103,6 +105,7 @@ const EMPTY: Persisted = {
   blocklist: [],
   quests: {},
   deviceNames: {},
+  namePins: {},
 }
 
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2))

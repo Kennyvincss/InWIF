@@ -24,6 +24,7 @@ import {
 import { NETWORKS, shortAddress } from '@inwif/core'
 import { Logo } from './Logo'
 import { AddressAvatar, Badge, cx } from './ui'
+import { UsernameText } from './Username'
 import { useWallet } from '@/lib/wallet-store'
 import { useVerification } from '@/lib/hooks'
 import { useNotify } from '@/lib/notifications'
@@ -201,7 +202,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <AddressAvatar address={activeAccount.address} size={32} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-[13px] font-medium">{activeWallet?.name}</p>
-        <p className="truncate font-mono text-[11px] text-dim">{shortAddress(activeAccount.address)}</p>
+        <p className="truncate font-mono text-[11px] text-dim">
+          <UsernameText address={activeAccount.address} className="mr-1.5 text-accent" />
+          {shortAddress(activeAccount.address)}
+        </p>
       </div>
       <span className="live-dot" title="Connected" />
     </div>

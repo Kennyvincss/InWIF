@@ -45,7 +45,7 @@ export function checkRecipient(
   if (/\.(eth|hood|wif)$/i.test(raw)) {
     return {
       ok: false,
-      findings: [{ code: 'name-unsupported', severity: 'danger', message: 'Name resolution is not supported on Robinhood Chain yet. Paste a 0x address.' }],
+      findings: [{ code: 'name-unsupported', severity: 'danger', message: 'ENS-style names do not work on Robinhood Chain. Use an InWIF @username or a 0x address.' }],
     }
   }
 

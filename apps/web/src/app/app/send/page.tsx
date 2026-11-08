@@ -2,13 +2,14 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { encodeFunctionData, erc20Abi, formatUnits, type Address } from 'viem'
-import { ArrowUpRight } from 'lucide-react'
-import { checkRecipient, parseAmount, parsePaymentRequest } from '@inwif/core'
+import { ArrowUpRight, BadgeCheck } from 'lucide-react'
+import { checkRecipient, looksLikeUsername, parseAmount, parsePaymentRequest, type Finding } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useNetwork, usePortfolio, useTokens } from '@/lib/hooks'
 import { fmtToken, fmtUsd } from '@/lib/format'
 import { TxFlow, type TxRequest } from '@/components/TxFlow'
-import { ErrorBox, Findings, Notice, PageHeader, PercentButtons, TokenPicker } from '@/components/ui'
+import { AddressAvatar, ErrorBox, Findings, Notice, PageHeader, PercentButtons, Spinner, TokenPicker } from '@/components/ui'
+import { useNameLookup } from '@/lib/usernames'
 import { percentOf, useGasReserve } from '@/lib/amount'
 
 export default function SendPage() {
@@ -20,7 +21,7 @@ export default function SendPage() {
 }
 
 function SendForm() {
-  const { activeAccount, activeWallet, state } = useWallet()
+  const { activeAccount, activeWallet, state, update } = useWallet()
   const { network } = useNetwork()
   const tokens = useTokens()
   const { rows } = usePortfolio(activeAccount?.address)
@@ -53,31 +54,59 @@ function SendForm() {
   const reserve = useGasReserve(21_000n)
   const available = row ? (asset === 'native' ? (reserve === undefined ? undefined : row.raw > reserve ? row.raw - reserve : 0n) : row.raw) : undefined
   const decimals = row?.decimals ?? 18
-  const recipient = useMemo(
-    () =>
-      to
-        ? checkRecipient(to, {
-            self: activeAccount?.address,
-            knownTokens: tokens.map((t) => t.address),
-            blocklist: new Set(state.blocklist),
-          })
-        : null,
-    [to, activeAccount, tokens, state.blocklist],
-  )
+  // "@kenny" or "kenny" is a username: resolve it (signature verified on this device).
+  const byName = !!to && looksLikeUsername(to)
+  const name = useNameLookup(byName ? to : '')
+  const claim = name.lookup?.status === 'taken' ? name.lookup.claim : null
+  const pinned = claim ? state.namePins?.[claim.username] : undefined
+  const nameFinding: Finding | null = !byName
+    ? null
+    : name.check && !name.check.ok
+      ? { code: 'name-invalid', severity: 'danger', message: name.check.error }
+      : name.error
+        ? { code: 'name-error', severity: 'danger', message: name.error.message }
+        : name.lookup && name.lookup.status !== 'taken'
+          ? { code: 'name-missing', severity: 'danger', message: `No InWIF user is called @${name.name}. Check the spelling.` }
+          : null
+  const recipient = useMemo(() => {
+    if (!to) return null
+    if (byName && !claim) return nameFinding ? { ok: false, findings: [nameFinding] } : null
+    const r = checkRecipient(claim ? claim.address : to, {
+      self: activeAccount?.address,
+      knownTokens: tokens.map((t) => t.address),
+      blocklist: new Set(state.blocklist),
+    })
+    if (!claim) return r
+    // A username's address is checksummed by its signed claim; drop the "no checksum" hint.
+    const findings = r.findings.filter((f) => f.code !== 'no-checksum')
+    if (pinned && pinned.toLowerCase() !== claim.address.toLowerCase()) {
+      return {
+        ok: false,
+        address: r.address,
+        findings: [{ code: 'name-changed', severity: 'danger' as const, message: `@${claim.username} now points to a different address than when you last paid them. Confirm with them directly and send to their 0x address.` }, ...findings],
+      }
+    }
+    if (!pinned) findings.push({ code: 'name-new', severity: 'info', message: `First payment to @${claim.username}. Check the address with them if this is a large amount.` })
+    return { ...r, findings }
+  }, [to, byName, claim, pinned, nameFinding?.message, activeAccount, tokens, state.blocklist]) // eslint-disable-line react-hooks/exhaustive-deps
   const amt = amount ? parseAmount(amount, decimals, row?.raw) : null
   const usd = amt?.raw !== undefined && row?.priceUsd ? Number(formatUnits(amt.raw, decimals)) * row.priceUsd : null
   const ready = recipient?.ok && amt?.ok && activeWallet?.kind !== 'watch'
 
+  const pin = useRef<{ username: string; address: Address } | null>(null)
   function review() {
     if (!recipient?.address || !amt?.raw || !row) return
-    const summary = `Send ${amount} ${row.symbol}`
-    if (asset === 'native') setReq({ to: recipient.address, value: amt.raw, summary, kind: 'send' })
+    pin.current = claim ? { username: claim.username, address: claim.address } : null
+    const summary = `Send ${amount} ${row.symbol}${claim ? ` to @${claim.username}` : ''}`
+    const named = pin.current ?? undefined
+    if (asset === 'native') setReq({ to: recipient.address, value: amt.raw, summary, kind: 'send', recipient: named })
     else
       setReq({
         to: asset as Address,
         data: encodeFunctionData({ abi: erc20Abi, functionName: 'transfer', args: [recipient.address, amt.raw] }),
         summary,
         kind: 'send',
+        recipient: named,
       })
   }
 
@@ -107,8 +136,22 @@ function SendForm() {
           {row && <p className="mt-1 text-xs text-mute">Balance {fmtToken(row.raw, row.decimals)} {row.symbol}</p>}
         </div>
         <div>
-          <label className="label" htmlFor="to">Recipient address</label>
-          <input id="to" className="input font-mono" placeholder="0x…" value={to} onChange={(e) => setTo(e.target.value)} spellCheck={false} autoComplete="off" />
+          <label className="label" htmlFor="to">Recipient</label>
+          <input id="to" className="input font-mono" placeholder="@username or 0x address" value={to} onChange={(e) => setTo(e.target.value)} spellCheck={false} autoComplete="off" autoCapitalize="none" aria-label="Recipient address" />
+          {byName && name.pending && (
+            <p className="mt-2 flex items-center gap-2 text-xs text-mute"><Spinner /> Looking up @{name.name}…</p>
+          )}
+          {claim && (
+            <div className="mt-2 flex items-center gap-3 rounded-xl border border-accent/25 bg-accent/[0.05] p-3" data-testid="resolved-username">
+              <AddressAvatar address={claim.address} size={32} />
+              <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-1.5 text-sm font-medium">
+                  @{claim.username} <BadgeCheck className="h-4 w-4 text-accent" aria-label="Verified username" />
+                </p>
+                <p className="break-all font-mono text-[11px] text-mute">{claim.address}</p>
+              </div>
+            </div>
+          )}
           {recipient && (
             <div className="mt-2">
               <Findings findings={recipient.findings} />
@@ -138,6 +181,9 @@ function SendForm() {
         onClose={() => setReq(null)}
         onDone={(_, ok) => {
           if (ok) {
+            // Remember who @name was, so a later change of address is caught before sending.
+            const p = pin.current
+            if (p) update((s) => ({ ...s, namePins: { ...s.namePins, [p.username]: p.address } }))
             setAmount('')
             setTo('')
           }

@@ -55,6 +55,7 @@ try {
   await page.getByLabel('Password', { exact: true }).fill('correct horse battery 42')
   await page.getByLabel('Confirm password').fill('correct horse battery 42')
   await page.getByRole('button', { name: 'Encrypt & finish' }).click()
+  await page.getByRole('button', { name: /Skip for now/ }).click()
   await page.getByRole('link', { name: 'Open my wallet' }).click()
 
   console.log('Buy $WIF with ETH')

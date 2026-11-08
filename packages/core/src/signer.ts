@@ -21,6 +21,8 @@ export interface SignerHandle {
   kind: 'software' | 'hardware'
   address: Address
   signTransaction(tx: TransactionSerializableEIP1559): Promise<Hex>
+  /** EIP-191 personal_sign of a plain-text message (software wallets only). */
+  signMessage?(message: string): Promise<Hex>
 }
 
 export function softwareSigner(privateKey: Hex): SignerHandle {
@@ -29,6 +31,7 @@ export function softwareSigner(privateKey: Hex): SignerHandle {
     kind: 'software',
     address: account.address,
     signTransaction: (tx) => account.signTransaction({ ...tx, type: 'eip1559' }),
+    signMessage: (message) => account.signMessage({ message }),
   }
 }
 
