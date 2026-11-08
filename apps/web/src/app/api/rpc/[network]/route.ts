@@ -32,7 +32,7 @@ const ALLOWED = new Set([
 ])
 
 export async function POST(req: Request, ctx: { params: Promise<{ network: string }> }) {
-  const limited = rateLimit(req, 600)
+  const limited = await rateLimit(req, 600)
   if (limited) return limited
   const { network } = await ctx.params
   const cfg = NETWORKS[network as NetworkKey]
@@ -49,7 +49,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ network: strin
   if (calls.length > 20) return NextResponse.json({ error: 'Batch too large' }, { status: 413 })
   // Each call in a batch counts against the limit (the first was charged above).
   if (calls.length > 1) {
-    const over = rateLimit(req, 600, calls.length - 1)
+    const over = await rateLimit(req, 600, calls.length - 1)
     if (over) return over
   }
   for (const c of calls as { method?: string; params?: unknown }[]) {

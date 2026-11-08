@@ -3,7 +3,7 @@ import { POOL_ID_RE, RANGE_QUERY, fetchPriceHistory, type ChartRange } from '@in
 import { ADDRESS_RE, cached, geckoFetch, logError, rateLimit } from '@/server/guard'
 
 export async function GET(req: Request) {
-  const limited = rateLimit(req)
+  const limited = await rateLimit(req)
   if (limited) return limited
   const u = new URL(req.url)
   const network = u.searchParams.get('network') ?? ''

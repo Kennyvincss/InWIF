@@ -16,7 +16,7 @@ Recommended order:
 |---|---|---|---|
 | 1 | Dedicated RPC endpoint (Dwellir, integrated) | 5 min | free tier |
 | 2 | Custom domain | 30 min | domain price |
-| 3 | Shared rate limiting (Upstash Redis) | 10 min | free tier |
+| 3 | Shared rate limiting (Upstash Redis, integrated) | done | free tier |
 | 4 | Backend API hosting | 30 min | free tiers |
 | 5 | Mobile apps (iOS / Android) | days, mostly store review | $99/yr Apple, $25 Google |
 | 6 | Desktop installers (Windows / macOS) | 1–2 h | signing certificates |
@@ -69,17 +69,24 @@ falls back to the public RPCs, so the site keeps working.
    Share cards and the sitemap use it.
 5. If you restricted your RPC key (step 1) by domain, add the new domain there too.
 
-## 3. Shared rate limiting (Upstash Redis)
+## 3. Shared rate limiting (Upstash Redis) — integrated
 
 **Why.** The `/api` relays limit request rates per server instance. Under heavy traffic Vercel runs many instances, so
 the limit needs one shared store.
 
-**You:**
-1. Go to Vercel → **inwif → Storage** (or the Marketplace) and add **Upstash Redis** on the free tier.
-2. Connect it to the project. Vercel adds the connection variables automatically.
+**How it works:**
+- **Rate limits** apply across all server instances. Each instance adds up usage locally and syncs it to Redis in
+  batches, so most requests make no Redis call and the free tier's command quota lasts.
+- **Relay responses** (explorer and market data) are cached in Redis, so one upstream call serves every instance.
+- **If Redis is unreachable,** the site keeps working on per-instance limits and caches.
+- The site accepts either variable naming from the Vercel integration: `UPSTASH_REDIS_REST_URL` and
+  `UPSTASH_REDIS_REST_TOKEN`, or `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
 
-**Claude:** switch the rate limiter and response cache to Redis when those variables exist, keeping memory as the
-fallback.
+**Check:** https://inwif.vercel.app/api/health shows `"sharedLimitsAndCache": "connected"`. If it says
+`not configured`, make sure the variables are set for **Production** and redeploy.
+
+**Usage:** watch the command count in the Upstash console. If the free tier runs out, the site falls back to
+per-instance limits; upgrade the Upstash plan if that happens often.
 
 ## 4. Backend API hosting (`apps/api`)
 
