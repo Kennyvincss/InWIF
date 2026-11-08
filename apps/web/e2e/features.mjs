@@ -28,7 +28,8 @@ page.on('pageerror', (e) => errors.push(e.message))
 
 try {
   console.log('1. Installable app')
-  const manifest = await (await page.request.get(`${BASE}/manifest.webmanifest`)).json()
+  await page.goto(`${BASE}/`)
+  const manifest = await page.evaluate(async () => (await fetch('/manifest.webmanifest')).json())
   if (manifest.display !== 'standalone' || !manifest.icons.some((i) => i.purpose === 'maskable') || manifest.shortcuts?.length < 3) fail('manifest incomplete')
   ok(`manifest: standalone, ${manifest.icons.length} icons incl. maskable, ${manifest.shortcuts.length} shortcuts`)
   await page.goto(`${BASE}/app`)
