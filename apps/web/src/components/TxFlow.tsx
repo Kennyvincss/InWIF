@@ -180,7 +180,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
     <Modal open={!!request} onClose={phase === 'signing' || phase === 'pending' ? () => {} : onClose} title={review?.title ?? 'Review transaction'}>
       {phase === 'done' || phase === 'failed' || phase === 'pending' ? (
         <div className="space-y-4 text-center">
-          {phase === 'pending' && <Spinner className="mx-auto h-10 w-10 text-lime" />}
+          {phase === 'pending' && <Spinner className="mx-auto h-10 w-10 text-accent" />}
           {phase === 'done' && <CheckCircle2 className="mx-auto h-12 w-12 text-ok" />}
           {phase === 'failed' && <XCircle className="mx-auto h-12 w-12 text-bad" />}
           <p className="font-display text-lg font-bold">
@@ -279,7 +279,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
           )}
 
           <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 p-3 text-sm">
-            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#A6F36A]" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
+            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#00E59B]" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
             <span>
               I have checked the recipient, amounts and network fee. I understand blockchain transactions are irreversible.
               {isHardware && ' I will verify the same details on my device screen.'}

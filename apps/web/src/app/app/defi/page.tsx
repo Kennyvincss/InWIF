@@ -30,10 +30,10 @@ export default function DefiPage() {
       <PageHeader title="DeFi" subtitle="Only verified protocols on Robinhood Chain. Access is free; protocol fees and risks are always disclosed." />
 
       <section className="card relative overflow-hidden p-5">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-lime/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="flex items-center gap-2 font-display font-bold">
-            <Coins className="h-5 w-5 text-lime" /> $WIF staking
+            <Coins className="h-5 w-5 text-accent" /> $WIF staking
           </h2>
           <Badge tone="ok">Coming soon</Badge>
         </div>
@@ -46,7 +46,7 @@ export default function DefiPage() {
       <section className="card p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="flex items-center gap-2 font-display font-bold">
-            <Layers className="h-5 w-5 text-lime" /> Liquidity positions
+            <Layers className="h-5 w-5 text-accent" /> Liquidity positions
           </h2>
         </div>
         {!cfg ? (
@@ -84,7 +84,7 @@ export default function DefiPage() {
 
       <section className="card p-5">
         <h2 className="mb-2 flex items-center gap-2 font-display font-bold">
-          <Info className="h-5 w-5 text-lime" /> Earning from $WIF liquidity
+          <Info className="h-5 w-5 text-accent" /> Earning from $WIF liquidity
         </h2>
         <p className="text-sm text-mute">
           InWIF doesn&apos;t offer a $WIF liquidity option, because no $WIF pool on Robinhood Chain pays liquidity providers today:
@@ -97,13 +97,13 @@ export default function DefiPage() {
           <li>Other $WIF pools have little or no trading.</li>
         </ul>
         <p className="mt-2 text-sm text-mute">
-          InWIF will add a liquidity option when a $WIF pool pays its providers. You can still <Link href="/app/swap" className="text-lime">swap $WIF</Link> at the market price.
+          InWIF will add a liquidity option when a $WIF pool pays its providers. You can still <Link href="/app/swap" className="text-accent">swap $WIF</Link> at the market price.
         </p>
       </section>
 
       <section className="card p-5">
         <h2 className="mb-2 flex items-center gap-2 font-display font-bold">
-          <ShieldQuestion className="h-5 w-5 text-lime" /> Staking, lending & borrowing
+          <ShieldQuestion className="h-5 w-5 text-accent" /> Staking, lending & borrowing
         </h2>
         <p className="text-sm text-mute">
           No staking, lending or borrowing protocol on Robinhood Chain has yet met InWIF&apos;s integration criteria, so none is offered. InWIF will not show yields it cannot verify on-chain.

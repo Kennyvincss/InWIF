@@ -159,7 +159,7 @@ export default function SwapPage() {
 
         <div className="-my-2 flex justify-center">
           <button
-            className="rounded-xl border border-white/10 bg-ink-800 p-2 hover:border-lime/40"
+            className="rounded-xl border border-white/10 bg-ink-800 p-2 hover:border-accent/40"
             aria-label="Switch tokens"
             onClick={() => {
               setFrom(toKey)
@@ -196,7 +196,7 @@ export default function SwapPage() {
             {SLIPPAGES.map((s) => (
               <button
                 key={s}
-                className={cx('chip', slippageBps === s && 'border-lime/40 text-lime')}
+                className={cx('chip', slippageBps === s && 'border-accent/40 text-accent')}
                 onClick={() => update((st) => ({ ...st, settings: { ...st.settings, slippageBps: s } }))}
               >
                 {s / 100}%

@@ -9,7 +9,7 @@ function GetWalletPanel() {
   return (
     <div className="card p-6">
       <h3 className="flex items-center gap-2 font-display text-lg font-bold">
-        <Wallet className="h-5 w-5 text-lime" /> Get your free InWIF wallet
+        <Wallet className="h-5 w-5 text-accent" /> Get your free InWIF wallet
       </h3>
       <p className="mt-2 text-sm text-mute">
         Create a wallet in seconds: InWIF generates it on your device, and only you hold the keys. Already have a wallet? Import it with your recovery phrase, or watch any address
@@ -34,13 +34,13 @@ export default function EcosystemPage() {
         <div className="grid gap-6 lg:grid-cols-2">
           <div className="space-y-4 text-mute">
             <p>World Is Flat ($WIF) is a community token on Robinhood Chain. InWIF gives that community a secure, self-custody wallet with first-class $WIF support — and asks nothing in return.</p>
-            <p className="flex gap-2 rounded-xl border border-lime/25 bg-lime/[0.06] p-4 text-sm text-lime-soft">
+            <p className="flex gap-2 rounded-xl border border-accent/25 bg-accent/[0.06] p-4 text-sm text-accent-soft">
               <ShieldCheck className="h-5 w-5 shrink-0" /> You never need to hold, spend or stake $WIF to use any InWIF feature. No token payments, no burns, no hidden deductions.
             </p>
             <div className="card p-5">
               <p className="label">Official contract · {ROBINHOOD_MAINNET.name}</p>
               <p className="break-all font-mono text-sm text-white">{WIF_ADDRESS}</p>
-              <a className="mt-2 inline-block text-xs text-lime" href={explorerTokenUrl(ROBINHOOD_MAINNET, WIF_ADDRESS)} target="_blank" rel="noreferrer">View on explorer ↗</a>
+              <a className="mt-2 inline-block text-xs text-accent" href={explorerTokenUrl(ROBINHOOD_MAINNET, WIF_ADDRESS)} target="_blank" rel="noreferrer">View on explorer ↗</a>
             </div>
           </div>
           <GetWalletPanel />
@@ -57,7 +57,7 @@ export default function EcosystemPage() {
             ['Discover', 'A reviewed registry of applications built around $WIF, with clear listing criteria.'],
           ].map(([t, b]) => (
             <div key={t} className="card p-5">
-              <Sparkles className="h-5 w-5 text-lime" />
+              <Sparkles className="h-5 w-5 text-accent" />
               <p className="mt-3 font-semibold">{t}</p>
               <p className="mt-1.5 text-sm text-mute">{b}</p>
             </div>
@@ -67,7 +67,7 @@ export default function EcosystemPage() {
       <Section eyebrow="Ecosystem applications" title="Built around $WIF.">
         <div className="grid gap-4 md:grid-cols-3">
           {ECOSYSTEM_APPS.map((a) => (
-            <Link key={a.id} href={a.href} className="card p-5 hover:border-lime/30">
+            <Link key={a.id} href={a.href} className="card p-5 hover:border-accent/30">
               <p className="font-semibold">{a.name}</p>
               <p className="mt-1.5 text-sm text-mute">{a.description}</p>
             </Link>

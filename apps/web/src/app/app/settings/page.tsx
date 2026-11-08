@@ -55,7 +55,7 @@ export default function SettingsPage() {
       <PageHeader title="Settings" />
 
       <section className="card p-5">
-        <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><Network className="h-5 w-5 text-lime" /> Network</h2>
+        <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><Network className="h-5 w-5 text-accent" /> Network</h2>
         <select className="input" value={state.network} onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))} aria-label="Network">
           {SELECTABLE_NETWORKS.map((k) => (
             <option key={k} value={k}>{NETWORKS[k].name}</option>
@@ -68,7 +68,7 @@ export default function SettingsPage() {
       </section>
 
       <section className="card p-5">
-        <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><ShieldCheck className="h-5 w-5 text-lime" /> Security</h2>
+        <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><ShieldCheck className="h-5 w-5 text-accent" /> Security</h2>
         <label className="label" htmlFor="autolock">Auto-lock after inactivity</label>
         <select id="autolock" className="input" value={state.settings.autoLockMinutes} onChange={(e) => set({ autoLockMinutes: Number(e.target.value) })}>
           {[1, 5, 15, 30, 60].map((m) => (
@@ -76,19 +76,19 @@ export default function SettingsPage() {
           ))}
         </select>
         <label className="mt-4 flex items-center gap-3 text-sm">
-          <input type="checkbox" className="accent-[#A6F36A]" checked={state.settings.hideBalances} onChange={(e) => set({ hideBalances: e.target.checked })} />
+          <input type="checkbox" className="accent-[#00E59B]" checked={state.settings.hideBalances} onChange={(e) => set({ hideBalances: e.target.checked })} />
           Hide balances by default
         </label>
       </section>
 
       <section className="card p-5">
-        <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><BellRing className="h-5 w-5 text-lime" /> Notifications</h2>
+        <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><BellRing className="h-5 w-5 text-accent" /> Notifications</h2>
         <div className="grid gap-2 sm:grid-cols-2">
           {(Object.keys(NOTIFY_LABELS) as (keyof Settings['notifications'])[]).map((k) => (
             <label key={k} className="flex items-center gap-3 rounded-lg border border-white/[0.06] px-3 py-2 text-sm">
               <input
                 type="checkbox"
-                className="accent-[#A6F36A]"
+                className="accent-[#00E59B]"
                 checked={state.settings.notifications[k]}
                 onChange={async (e) => {
                   const on = e.target.checked
@@ -107,7 +107,7 @@ export default function SettingsPage() {
       </section>
 
       <section className="card p-5">
-        <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><Coins className="h-5 w-5 text-lime" /> Tokens on {network.name}</h2>
+        <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><Coins className="h-5 w-5 text-accent" /> Tokens on {network.name}</h2>
         <ul className="mb-3 space-y-1 text-sm">
           {tokens.map((t) => (
             <li key={t.address} className="flex items-center justify-between rounded-lg bg-ink-900 px-3 py-2">

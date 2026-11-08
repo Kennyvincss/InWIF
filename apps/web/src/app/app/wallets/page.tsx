@@ -65,7 +65,7 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
   }
 
   return (
-    <section className={cx('card p-5', w.activeWallet?.id === wallet.id && 'border-lime/30')}>
+    <section className={cx('card p-5', w.activeWallet?.id === wallet.id && 'border-accent/30')}>
       <div className="flex flex-wrap items-center gap-2">
         <input
           className="min-w-0 bg-transparent font-display text-lg font-bold outline-none focus:underline"
@@ -134,7 +134,7 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
               <span className="font-mono text-xs text-mute">{shortAddress(a.address, 6)}</span>
               <CopyButton value={a.address} />
               {!wallet.archived && (
-                <button className={cx('ml-auto chip', active && 'border-lime/40 text-lime')} onClick={() => w.setActive(wallet.id, a.index)}>
+                <button className={cx('ml-auto chip', active && 'border-accent/40 text-accent')} onClick={() => w.setActive(wallet.id, a.index)}>
                   {active ? 'Active' : 'Use'}
                 </button>
               )}

@@ -77,7 +77,7 @@ export default function WifPage() {
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-sm text-mute">Your $WIF balance</p>
-              <p className="mt-1 font-display text-4xl font-extrabold">{wifRow ? fmtToken(wifRow.raw, wifRow.decimals, 2) : '—'} <span className="text-lime">WIF</span></p>
+              <p className="mt-1 font-display text-4xl font-extrabold">{wifRow ? fmtToken(wifRow.raw, wifRow.decimals, 2) : '—'} <span className="text-accent">WIF</span></p>
               <p className="text-sm text-mute">{fmtUsd(wifRow?.valueUsd)}</p>
             </div>
             <div className="text-right">
@@ -88,7 +88,7 @@ export default function WifPage() {
           </div>
           <div className="mt-4 flex gap-1">
             {(['24h', '7d', '30d', '90d', 'all'] as ChartRange[]).map((r) => (
-              <button key={r} className={cx('chip', range === r && 'border-lime/40 text-lime')} onClick={() => setRange(r)}>
+              <button key={r} className={cx('chip', range === r && 'border-accent/40 text-accent')} onClick={() => setRange(r)}>
                 {r.toUpperCase()}
               </button>
             ))}
@@ -132,9 +132,9 @@ export default function WifPage() {
       </div>
 
       <section className="card relative overflow-hidden p-6">
-        <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-lime/10 blur-3xl" />
+        <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
         <h2 className="flex items-center gap-2 font-display text-xl font-extrabold">
-          <Sparkles className="h-5 w-5 text-lime" /> Powered by the World Is Flat Ecosystem
+          <Sparkles className="h-5 w-5 text-accent" /> Powered by the World Is Flat Ecosystem
         </h2>
         <div className="mt-3 grid gap-4 text-sm text-mute md:grid-cols-3">
           <p>
@@ -156,7 +156,7 @@ export default function WifPage() {
         <section className="card p-5">
           <h2 className="mb-3 font-display font-bold">Your ecosystem profile</h2>
           <Row label="Address">
-            <a className="font-mono text-xs hover:text-lime" href={address && explorerAddressUrl(network, address)} target="_blank" rel="noreferrer">
+            <a className="font-mono text-xs hover:text-accent" href={address && explorerAddressUrl(network, address)} target="_blank" rel="noreferrer">
               {address}
             </a>
           </Row>
@@ -169,7 +169,7 @@ export default function WifPage() {
 
         <section className="card p-5">
           <h2 className="mb-1 flex items-center gap-2 font-display font-bold">
-            <GraduationCap className="h-5 w-5 text-lime" /> Security quests
+            <GraduationCap className="h-5 w-5 text-accent" /> Security quests
           </h2>
           <p className="mb-3 text-xs text-mute">Free learning tasks. Completing them is tracked on this device only and does not by itself earn tokens.</p>
           <ul className="space-y-2">
@@ -179,7 +179,7 @@ export default function WifPage() {
                 <li key={q.id} className="flex items-start gap-3 rounded-xl border border-white/[0.06] p-3">
                   <input
                     type="checkbox"
-                    className="mt-1 accent-[#A6F36A]"
+                    className="mt-1 accent-[#00E59B]"
                     checked={done}
                     aria-label={q.title}
                     onChange={() =>
@@ -211,7 +211,7 @@ export default function WifPage() {
         <h2 className="mb-3 font-display font-bold">Ecosystem applications</h2>
         <div className="grid gap-3 md:grid-cols-3">
           {ECOSYSTEM_APPS.map((a) => (
-            <Link key={a.id} href={a.href} className="rounded-xl border border-white/[0.06] p-4 hover:border-lime/30">
+            <Link key={a.id} href={a.href} className="rounded-xl border border-white/[0.06] p-4 hover:border-accent/30">
               <p className="font-semibold">{a.name}</p>
               <p className="mt-1 text-xs text-mute">{a.description}</p>
             </Link>

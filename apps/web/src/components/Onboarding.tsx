@@ -73,29 +73,53 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
     }
   }
 
-  const card = 'card w-full max-w-xl p-6 sm:p-8'
+  const card = 'card w-full max-w-xl bg-[#08080A]/90 p-6 sm:p-9'
 
   return (
-    <div className={cx('flex items-center justify-center', !embedded && 'min-h-[80vh]')}>
+    <div className={cx('flex items-center justify-center gap-16', !embedded && 'min-h-[80vh]')}>
+      {!embedded && step === 'welcome' && (
+        <motion.div initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} className="hidden max-w-md lg:block">
+          <p className="eyebrow">
+            <span className="live-dot" /> Free forever · 0% fees
+          </p>
+          <h2 className="mt-6 font-display text-[52px] font-semibold leading-[1.02]">
+            <span className="text-fade">Self-custody,</span>
+            <br />
+            <span className="text-gradient">made simple.</span>
+          </h2>
+          <ul className="mt-8 space-y-3 text-mute">
+            {['Your keys never leave this device', 'No account, email or sign-up', 'Send, receive and swap with 0% InWIF fees'].map((t) => (
+              <li key={t} className="flex items-center gap-3">
+                <span className="grid h-6 w-6 place-items-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                </span>
+                {t}
+              </li>
+            ))}
+          </ul>
+        </motion.div>
+      )}
       <motion.div key={step} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className={card}>
         {step === 'welcome' && (
           <div>
             <LogoMark size={44} />
-            <h1 className="mt-5 font-display text-3xl font-extrabold tracking-tight">Welcome to InWIF</h1>
-            <p className="mt-2 text-mute">Your assets. Your keys. Your control. Keys are generated and encrypted on this device and never sent anywhere.</p>
-            <div className="mt-6 grid gap-3">
-              <div className="rounded-2xl border border-white/10 p-4">
-                <div className="flex items-center gap-3">
-                  <Plus className="h-5 w-5 text-lime" />
+            <h1 className="mt-6 font-display text-[30px] font-semibold leading-tight">Welcome to InWIF</h1>
+            <p className="mt-2 text-mute">Your assets. Your keys. Your control. Everything is created and encrypted on this device.</p>
+            <div className="mt-7 grid gap-3">
+              <div className="rounded-2xl border border-accent/25 bg-accent/[0.04] p-4 shadow-[0_0_40px_-20px_rgba(0,229,155,.6)]">
+                <div className="flex items-center gap-4">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-accent/30 bg-accent/10 text-accent">
+                    <Plus className="h-5 w-5" />
+                  </span>
                   <div className="flex-1">
-                    <p className="font-semibold">Create a new wallet</p>
-                    <p className="text-xs text-mute">Generates a BIP-39 recovery phrase locally.</p>
+                    <p className="font-medium">Create a new wallet</p>
+                    <p className="text-xs text-mute">Ready in seconds. Your recovery phrase is created on this device.</p>
                   </div>
                 </div>
-                <div className="mt-3 flex items-center gap-2">
-                  <div className="flex rounded-lg border border-white/10 p-0.5 text-xs">
+                <div className="mt-4 flex items-center gap-2">
+                  <div className="flex rounded-full border border-white/[0.08] bg-black/40 p-0.5 font-mono text-[11px]">
                     {([128, 256] as const).map((s) => (
-                      <button key={s} className={cx('rounded-md px-2.5 py-1', strength === s ? 'bg-white/10 text-white' : 'text-mute')} onClick={() => setStrength(s)}>
+                      <button key={s} className={cx('rounded-full px-3 py-1 transition', strength === s ? 'bg-white text-black' : 'text-mute hover:text-white')} onClick={() => setStrength(s)}>
                         {s === 128 ? '12 words' : '24 words'}
                       </button>
                     ))}
@@ -105,36 +129,44 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                   </button>
                 </div>
               </div>
-              <button className="flex items-center gap-3 rounded-2xl border border-white/10 p-4 text-left hover:bg-white/[0.03]" onClick={() => setStep('import')}>
-                <KeyRound className="h-5 w-5 text-lime" />
+              <button className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.015] p-4 text-left transition hover:border-white/[0.16] hover:bg-white/[0.035]" onClick={() => setStep('import')}>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
+                  <KeyRound className="h-5 w-5" />
+                </span>
                 <div>
-                  <p className="font-semibold">Import an existing wallet</p>
-                  <p className="text-xs text-mute">Recovery phrase or private key, validated locally.</p>
+                  <p className="font-medium">Import an existing wallet</p>
+                  <p className="text-xs text-mute">Use your recovery phrase or private key.</p>
                 </div>
               </button>
               {HARDWARE_ENABLED ? (
-                <Link href="/app/hardware" className="flex items-center gap-3 rounded-2xl border border-white/10 p-4 hover:bg-white/[0.03]" onClick={onFinished}>
-                  <Cpu className="h-5 w-5 text-lime" />
+                <Link href="/app/hardware" className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.015] p-4 text-left transition hover:border-white/[0.16] hover:bg-white/[0.035]" onClick={onFinished}>
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
+                    <Cpu className="h-5 w-5" />
+                  </span>
                   <div>
-                    <p className="font-semibold">Connect a hardware wallet</p>
+                    <p className="font-medium">Connect a hardware wallet</p>
                     <p className="text-xs text-mute">InWIF device (USB-C) or the built-in device simulator.</p>
                   </div>
                 </Link>
               ) : (
-                <div className="flex items-center gap-3 rounded-2xl border border-white/10 p-4 opacity-70" aria-disabled="true">
-                  <Cpu className="h-5 w-5 text-lime" />
+                <div className="flex items-center gap-4 rounded-2xl border border-white/[0.06] p-4 opacity-60" aria-disabled="true">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-mute">
+                    <Cpu className="h-5 w-5" />
+                  </span>
                   <div className="flex-1">
-                    <p className="font-semibold">Connect a hardware wallet</p>
+                    <p className="font-medium">Connect a hardware wallet</p>
                     <p className="text-xs text-mute">InWIF One hardware wallet.</p>
                   </div>
                   <span className="chip">Coming soon</span>
                 </div>
               )}
-              <button className="flex items-center gap-3 rounded-2xl border border-white/10 p-4 text-left hover:bg-white/[0.03]" onClick={() => setStep('watch')}>
-                <ScanEye className="h-5 w-5 text-lime" />
+              <button className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.015] p-4 text-left transition hover:border-white/[0.16] hover:bg-white/[0.035]" onClick={() => setStep('watch')}>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
+                  <ScanEye className="h-5 w-5" />
+                </span>
                 <div>
-                  <p className="font-semibold">Watch an address</p>
-                  <p className="text-xs text-mute">Track any public address. No keys, cannot sign.</p>
+                  <p className="font-medium">Watch an address</p>
+                  <p className="text-xs text-mute">Follow any address. View only — it can&apos;t send.</p>
                 </div>
               </button>
             </div>

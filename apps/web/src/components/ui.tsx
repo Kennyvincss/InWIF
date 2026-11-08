@@ -34,7 +34,7 @@ export function Modal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 p-0 backdrop-blur-sm sm:items-center sm:p-6"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-0 backdrop-blur-md sm:items-center sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -44,13 +44,13 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={cx('card max-h-[92vh] w-full min-w-0 overflow-y-auto overflow-x-hidden rounded-b-none p-5 sm:rounded-2xl', wide ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
+            className={cx('card max-h-[92vh] w-full min-w-0 overflow-y-auto overflow-x-hidden rounded-b-none bg-[#08080A]/95 p-6 sm:rounded-2xl', wide ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 30, opacity: 0 }}
           >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-lg font-bold">{title}</h2>
+              <h2 className="font-display text-lg font-semibold">{title}</h2>
               <button onClick={onClose} className="rounded-lg p-1.5 text-mute hover:bg-white/5 hover:text-white" aria-label="Close">
                 <X className="h-5 w-5" />
               </button>
@@ -87,10 +87,10 @@ export function Badge({ tone = 'mute', children }: { tone?: 'ok' | 'bad' | 'warn
     ok: 'border-ok/30 bg-ok/10 text-ok',
     bad: 'border-bad/30 bg-bad/10 text-bad',
     warn: 'border-warn/30 bg-warn/10 text-warn',
-    lime: 'border-lime/30 bg-lime/10 text-lime',
+    lime: 'border-accent/30 bg-accent/10 text-accent',
     mute: 'border-white/10 bg-white/[0.04] text-mute',
   }
-  return <span className={cx('inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold', tones[tone])}>{children}</span>
+  return <span className={cx('inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium', tones[tone])}>{children}</span>
 }
 
 export function Findings({ findings, hideInfo }: { findings: Finding[]; hideInfo?: boolean }) {
@@ -136,7 +136,7 @@ export function Notice({ children, tone = 'mute' }: { children: React.ReactNode;
     <div
       className={cx(
         'flex gap-2 rounded-xl border p-3 text-sm',
-        tone === 'lime' && 'border-lime/25 bg-lime/[0.06] text-lime-soft',
+        tone === 'lime' && 'border-accent/25 bg-accent/[0.06] text-accent-soft',
         tone === 'warn' && 'border-warn/30 bg-warn/10 text-[#ffe7a8]',
         tone === 'mute' && 'border-white/10 bg-white/[0.03] text-mute',
       )}
@@ -149,24 +149,24 @@ export function Notice({ children, tone = 'mute' }: { children: React.ReactNode;
 
 export function Empty({ icon, title, children }: { icon: React.ReactNode; title: string; children?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 px-6 py-10 text-center">
-      <div className="mb-3 rounded-2xl bg-white/[0.04] p-3 text-mute">{icon}</div>
-      <p className="font-semibold">{title}</p>
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.09] bg-white/[0.01] px-6 py-12 text-center">
+      <div className="mb-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 text-mute shadow-[0_0_30px_-10px_rgba(255,255,255,.25)]">{icon}</div>
+      <p className="font-medium">{title}</p>
       {children && <div className="mt-1 max-w-sm text-sm text-mute">{children}</div>}
     </div>
   )
 }
 
 export function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={cx('animate-pulse rounded-lg bg-white/[0.06]', className)} />
+  return <div className={cx('animate-pulse rounded-lg bg-white/[0.05]', className)} />
 }
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
   return (
-    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <h1 className="font-display text-2xl font-extrabold tracking-tight sm:text-3xl">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-mute">{subtitle}</p>}
+    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <h1 className="font-display text-[28px] font-semibold leading-tight sm:text-[34px]">{title}</h1>
+        {subtitle && <p className="mt-1.5 max-w-2xl text-sm text-mute">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -175,7 +175,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
 
 export function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-white/[0.05] py-2.5 text-sm last:border-0">
+    <div className="flex items-start justify-between gap-4 border-b border-white/[0.05] py-3 text-sm last:border-0">
       <span className="shrink-0 text-mute">{label}</span>
       <span className="min-w-0 break-all text-right">{children}</span>
     </div>
@@ -192,7 +192,7 @@ const TOKEN_LOGOS: Record<string, string> = {
 }
 
 export function TokenIcon({ symbol, src, size = 36 }: { symbol: string; src?: string; size?: number }) {
-  const palette: Record<string, string> = { ETH: '#8EA2FF', WIF: '#A6F36A', WETH: '#B6C1FF', USDG: '#62D99A', cbBTC: '#F7A64B' }
+  const palette: Record<string, string> = { ETH: '#8EA2FF', WIF: '#00E59B', WETH: '#B6C1FF', USDG: '#62D99A', cbBTC: '#F7A64B' }
   const logo = src ?? TOKEN_LOGOS[symbol.toUpperCase()]
   if (logo)
     // eslint-disable-next-line @next/next/no-img-element
@@ -274,10 +274,22 @@ export function PercentButtons({ onPick, disabled }: { onPick: (pct: number) => 
   return (
     <div className="flex gap-1.5">
       {[25, 50, 75, 100].map((p) => (
-        <button key={p} type="button" className="chip hover:border-lime/40 hover:text-lime disabled:opacity-40" disabled={disabled} onClick={() => onPick(p)}>
+        <button key={p} type="button" className="chip hover:border-accent/40 hover:text-accent disabled:opacity-40" disabled={disabled} onClick={() => onPick(p)}>
           {p}%
         </button>
       ))}
     </div>
+  )
+}
+
+/** A deterministic gradient "avatar" for an address. */
+export function AddressAvatar({ address, size = 28 }: { address?: string; size?: number }) {
+  const h = address ? parseInt(address.slice(2, 8), 16) % 360 : 160
+  return (
+    <span
+      aria-hidden
+      className="inline-block shrink-0 rounded-full ring-1 ring-white/15"
+      style={{ width: size, height: size, background: `conic-gradient(from ${h}deg, hsl(${h} 90% 55%), hsl(${(h + 80) % 360} 90% 60%), hsl(${(h + 200) % 360} 85% 50%), hsl(${h} 90% 55%))` }}
+    />
   )
 }

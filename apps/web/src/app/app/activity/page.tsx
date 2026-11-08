@@ -19,7 +19,7 @@ export default function ActivityPage() {
       <PageHeader title="Activity" subtitle="Your transactions and token transfers." />
       <div className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map((x) => (
-          <button key={x} onClick={() => setF(x)} className={cx('chip capitalize', f === x && 'border-lime/40 text-lime')}>
+          <button key={x} onClick={() => setF(x)} className={cx('chip capitalize', f === x && 'border-accent/40 text-accent')}>
             {x === 'in' ? 'Incoming' : x === 'out' ? 'Outgoing' : x}
           </button>
         ))}
