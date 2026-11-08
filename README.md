@@ -29,6 +29,7 @@ InWIF is a free, self-custody wallet ecosystem for **Robinhood Chain**, built fo
 | Live $WIF terminal: real-time trade feed, buy/sell pressure (5m–24h), whale alerts, price/volume/liquidity/holders | ✅ |
 | $WIF holder card: tier + on-chain badges, drawn on-device to PNG; download, share, post on X | ✅ |
 | Payment requests: "Pay me 5,000 WIF" link + QR, public /pay page, Send prefilled from validated links | ✅ |
+| Pay pages: public inwif.app/@username page (verified owner, QR, copy, post on X) → Send prefilled with @username and $WIF; Activity shows @usernames instead of addresses | ✅ |
 | Usernames: pick @name at sign-up (free signed message, no transaction), send to @username; claims verified on-device, look-alike and official names blocked, known names pinned so a changed address is caught | ✅ |
 | Token safety check: copycat detection, transfer + tax simulation from real holders (owner excluded), sell liquidity, holder concentration | ✅ |
 | Installable app (PWA): manifest with shortcuts, maskable icons, service worker with offline page (no code caching), install button | ✅ |

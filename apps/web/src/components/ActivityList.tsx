@@ -3,6 +3,7 @@ import { ArrowDownLeft, ArrowUpRight, ExternalLink, FileCode2, RefreshCw, XCircl
 import { explorerTxUrl, type ActivityItem } from '@inwif/core'
 import { fmtToken, timeAgo } from '@/lib/format'
 import { useNetwork } from '@/lib/hooks'
+import { useUsernamesFor } from '@/lib/usernames'
 import { Badge, Empty, ErrorBox, Skeleton } from './ui'
 
 export function ActivityList({
@@ -19,6 +20,8 @@ export function ActivityList({
   emptyText?: string
 }) {
   const { network } = useNetwork()
+  const names = useUsernamesFor((items ?? []).slice(0, limit ?? 50).map((i) => (i.direction === 'in' ? i.from : i.to)))
+  const who = (a?: string) => (a && names.data?.[a.toLowerCase()] ? `@${names.data[a.toLowerCase()]}` : a)
   if (!network.explorer.apiV2)
     return <Empty icon={<RefreshCw className="h-5 w-5" />} title="History unavailable">Transaction history isn&apos;t available on {network.name}.</Empty>
   if (loading)
@@ -56,7 +59,7 @@ export function ActivityList({
                 {i.status === 'failed' && <Badge tone="bad">Failed</Badge>}
                 {i.status === 'pending' && <Badge tone="warn">Pending</Badge>}
               </p>
-              <p className="truncate font-mono text-xs text-mute">{i.direction === 'in' ? `from ${i.from}` : `to ${i.to ?? 'contract creation'}`}</p>
+              <p className="truncate font-mono text-xs text-mute">{i.direction === 'in' ? `from ${who(i.from)}` : `to ${i.to ? who(i.to) : 'contract creation'}`}</p>
             </div>
             <div className="text-right">
               {BigInt(i.value) > 0n && (

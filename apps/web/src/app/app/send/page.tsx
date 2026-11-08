@@ -44,12 +44,18 @@ function SendForm() {
     // Apply each link once, so later edits by the user are never overwritten.
     if (!search.get('to') || applied.current === `${network.key}?${search.toString()}`) return
     applied.current = `${network.key}?${search.toString()}`
-    const p = parsePaymentRequest({ to: search.get('to'), token: search.get('token'), amount: search.get('amount'), note: search.get('note') }, { tokens, nativeSymbol: network.nativeCurrency.symbol })
+    // A pay page link carries a username (to=@kenny); it is resolved and verified below like a typed one.
+    const toParam = search.get('to') ?? ''
+    const byUsername = looksLikeUsername(toParam)
+    const p = parsePaymentRequest(
+      { to: byUsername ? '0x000000000000000000000000000000000000dEaD' : toParam, token: search.get('token'), amount: search.get('amount'), note: search.get('note') },
+      { tokens, nativeSymbol: network.nativeCurrency.symbol },
+    )
     if (!p.ok) {
       setFromLink({ error: network.key !== 'robinhood' ? `This payment request is for Robinhood Chain. Switch network in the top bar.` : p.error })
       return
     }
-    setTo(p.request.to)
+    setTo(byUsername ? `@${toParam.replace(/^@/, '').toLowerCase()}` : p.request.to)
     setAsset(p.request.asset)
     if (p.request.amount) setAmount(p.request.amount)
     setFromLink({ note: p.request.note })

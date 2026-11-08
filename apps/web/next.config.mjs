@@ -61,6 +61,8 @@ const nextConfig = {
   transpilePackages: ['@inwif/core'],
   poweredByHeader: false,
   ...(DESKTOP ? {} : { async headers() { return [{ source: '/:path*', headers: securityHeaders }] } }),
+  // Pretty pay links: inwif.app/@kenny → the public pay page for @kenny.
+  ...(DESKTOP ? {} : { async rewrites() { return [{ source: '/@:name', destination: '/u?name=:name' }] } }),
   webpack: (config) => {
     // Optional peer deps pulled in by wallet connectors we do not use.
     config.externals.push('pino-pretty', 'lokijs', 'encoding')
