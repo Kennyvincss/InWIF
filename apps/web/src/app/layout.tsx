@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
+import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
-import '@fontsource-variable/inter'
-import '@fontsource-variable/manrope'
 import './globals.css'
 import { Providers } from '@/components/Providers'
 import { SITE_DESCRIPTION, SITE_TITLE, SITE_URL } from '@/lib/site'
@@ -16,11 +15,11 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', title: SITE_TITLE, description: SITE_DESCRIPTION },
 }
 
-export const viewport: Viewport = { themeColor: '#090B10', width: 'device-width', initialScale: 1 }
+export const viewport: Viewport = { themeColor: '#000000', width: 'device-width', initialScale: 1 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={GeistMono.variable}>
+    <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`}>
       <body className="min-h-screen font-sans">
         <Providers>{children}</Providers>
       </body>

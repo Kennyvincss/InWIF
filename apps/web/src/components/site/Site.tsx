@@ -17,7 +17,7 @@ export const SITE_NAV = [
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
   return (
-    <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-ink-950/75 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 border-b border-line bg-black/60 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center gap-6 px-5 py-3.5">
         <Link href="/" aria-label="InWIF home">
           <Logo />
@@ -98,7 +98,7 @@ export function Section({ id, eyebrow, title, children, className = '' }: { id?:
 
 export function SitePage({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-ink-950">
+    <div className="ambient min-h-screen">
       <SiteHeader />
       <main>{children}</main>
       <SiteFooter />

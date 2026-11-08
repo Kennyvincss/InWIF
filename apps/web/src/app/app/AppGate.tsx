@@ -25,7 +25,7 @@ export function AppGate({ children }: { children: React.ReactNode }) {
   // Hardware setup is reachable before any wallet exists.
   if ((onboarding || !hasWallet) && !path.startsWith('/app/hardware'))
     return (
-      <div className="min-h-screen bg-ink-950 bg-grid px-4 py-10">
+      <div className="ambient min-h-screen px-4 py-10">
         <Onboarding onFinished={() => setOnboarding(false)} />
       </div>
     )

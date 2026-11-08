@@ -146,11 +146,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             href={href}
             onClick={() => setMobileNav(false)}
             className={cx(
-              'flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition',
-              active ? 'bg-lime/10 text-lime' : 'text-mute hover:bg-white/[0.04] hover:text-white',
+              'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition',
+              active
+                ? 'bg-white/[0.05] text-white shadow-[inset_2px_0_0_0_#A6F36A,0_0_0_1px_rgba(255,255,255,0.06)]'
+                : 'text-mute hover:bg-white/[0.03] hover:text-white',
             )}
           >
-            <Icon className="h-4 w-4" /> {label}
+            <Icon className={cx('h-4 w-4 transition', active ? 'text-lime drop-shadow-[0_0_6px_rgba(166,243,106,.6)]' : 'group-hover:text-white')} /> {label}
           </Link>
         )
       })}
@@ -158,8 +160,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <div className="flex min-h-screen bg-ink-950">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-white/[0.06] bg-ink-900/60 p-4 lg:flex">
+    <div className="ambient flex min-h-screen">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-black/40 p-4 backdrop-blur-xl lg:flex">
         <Link href="/" className="mb-8 px-2">
           <Logo />
         </Link>
@@ -171,7 +173,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {mobileNav && (
         <div className="fixed inset-0 z-50 bg-black/70 lg:hidden" onClick={() => setMobileNav(false)}>
-          <div className="h-full w-64 bg-ink-900 p-4" onClick={(e) => e.stopPropagation()}>
+          <div className="h-full w-64 border-r border-line bg-black p-4" onClick={(e) => e.stopPropagation()}>
             <div className="mb-6 flex items-center justify-between">
               <Logo />
               <button onClick={() => setMobileNav(false)} aria-label="Close menu">
@@ -184,7 +186,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-30 flex items-center gap-1.5 border-b border-white/[0.06] bg-ink-950/80 px-3 py-3 backdrop-blur sm:px-6">
+        <header className="sticky top-0 z-30 flex items-center gap-1.5 border-b border-line bg-black/60 px-3 py-3 backdrop-blur-xl sm:px-6">
           <button className="rounded-lg p-2 lg:hidden" onClick={() => setMobileNav(true)} aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </button>

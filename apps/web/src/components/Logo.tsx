@@ -5,10 +5,10 @@
 export function LogoMark({ size = 28, className = '' }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} aria-hidden>
-      <rect x="1" y="1" width="62" height="62" rx="18" fill="#11151D" stroke="#A6F36A" strokeOpacity=".35" strokeWidth="2" />
+      <rect x="1" y="1" width="62" height="62" rx="18" fill="#0A0A0B" stroke="#A6F36A" strokeOpacity=".35" strokeWidth="2" />
       <path d="M12 40a20 20 0 0 1 40 0Z" fill="#A6F36A" />
-      <circle cx="32" cy="30" r="4.2" fill="#11151D" />
-      <path d="M30 32.5h4l1.2 7.5h-6.4Z" fill="#11151D" />
+      <circle cx="32" cy="30" r="4.2" fill="#0A0A0B" />
+      <path d="M30 32.5h4l1.2 7.5h-6.4Z" fill="#0A0A0B" />
       <rect x="10" y="43" width="44" height="3.5" rx="1.75" fill="#D5FFB8" />
       <rect x="18" y="49.5" width="28" height="2.5" rx="1.25" fill="#D5FFB8" fillOpacity=".45" />
     </svg>

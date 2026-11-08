@@ -137,7 +137,7 @@ export default function SwapPage() {
             <span>Balance {bal ? fmtToken(bal.raw, bal.decimals) : '—'}</span>
           </div>
           <div className="mt-2 flex items-center gap-2">
-            <input className="input min-w-0 flex-1 border-0 bg-transparent px-0 text-2xl focus:ring-0" inputMode="decimal" placeholder="0.0" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount to swap" />
+            <input className="input min-w-0 flex-1 border-0 bg-transparent px-0 text-2xl font-semibold hover:border-transparent focus:shadow-none" inputMode="decimal" placeholder="0.0" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount to swap" />
             <TokenPicker
               className="w-36 shrink-0"
               label="From token"

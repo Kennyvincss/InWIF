@@ -3,8 +3,12 @@ import { useMemo, useRef, useState } from 'react'
 import type { PricePoint } from '@inwif/core'
 import { fmtUsd } from '@/lib/format'
 
-/** Categorical slots (validated for CVD separation on the #171D27 card surface). */
-export const SERIES = ['#3987e5', '#d95926', '#199e70', '#c98500', '#d55181', '#9085e9']
+/**
+ * Categorical slots for the true-black theme: electric cyan first, then hues spaced around the
+ * wheel at similar brightness so neighbours stay distinct (including for common colour-vision
+ * deficiencies) against #000–#0A0A0B surfaces.
+ */
+export const SERIES = ['#22E5FF', '#A6F36A', '#F5C451', '#FF6B9A', '#9B8CFF', '#FF8A4C']
 
 /** Single-series area chart with crosshair tooltip and a table fallback. */
 export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; height?: number; label: string }) {
@@ -60,25 +64,26 @@ export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; h
       >
         <defs>
           <linearGradient id="area-fill" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#A6F36A" stopOpacity=".22" />
-            <stop offset="1" stopColor="#A6F36A" stopOpacity="0" />
+            <stop offset="0" stopColor="#22E5FF" stopOpacity=".24" />
+            <stop offset=".7" stopColor="#22E5FF" stopOpacity=".04" />
+            <stop offset="1" stopColor="#22E5FF" stopOpacity="0" />
           </linearGradient>
         </defs>
         {[0.25, 0.5, 0.75].map((f) => (
-          <line key={f} x1={0} x2={W} y1={pad.t + f * (H - pad.t - pad.b)} y2={pad.t + f * (H - pad.t - pad.b)} stroke="rgba(255,255,255,.05)" />
+          <line key={f} x1={0} x2={W} y1={pad.t + f * (H - pad.t - pad.b)} y2={pad.t + f * (H - pad.t - pad.b)} stroke="rgba(255,255,255,.045)" strokeDasharray="2 4" />
         ))}
         <path d={area} fill="url(#area-fill)" />
-        <path d={path} fill="none" stroke="#A6F36A" strokeWidth={2} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+        <path d={path} fill="none" stroke="#22E5FF" strokeWidth={2} strokeLinejoin="round" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px rgba(34,229,255,.55))' }} />
         {hover !== null && (
           <>
             <line x1={xs[hover]} x2={xs[hover]} y1={pad.t} y2={H - pad.b} stroke="rgba(255,255,255,.25)" vectorEffect="non-scaling-stroke" />
-            <circle cx={xs[hover]} cy={ys[hover]} r={5} fill="#A6F36A" stroke="#171D27" strokeWidth={2} />
+            <circle cx={xs[hover]} cy={ys[hover]} r={5} fill="#22E5FF" stroke="#000" strokeWidth={2} style={{ filter: 'drop-shadow(0 0 8px rgba(34,229,255,.8))' }} />
           </>
         )}
-        <text x={pad.l} y={H - 6} fill="#8993A4" fontSize={11}>
+        <text x={pad.l} y={H - 6} fill="#8A8F98" fontSize={11}>
           {new Date(data[0]!.t * 1000).toLocaleDateString()}
         </text>
-        <text x={W - pad.r} y={H - 6} fill="#8993A4" fontSize={11} textAnchor="end">
+        <text x={W - pad.r} y={H - 6} fill="#8A8F98" fontSize={11} textAnchor="end">
           {new Date(data[data.length - 1]!.t * 1000).toLocaleDateString()}
         </text>
       </svg>

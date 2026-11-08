@@ -51,8 +51,8 @@ export default function Dashboard() {
       <section className="card relative overflow-hidden p-6">
         <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-lime/10 blur-3xl" />
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 text-sm text-mute">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-mute">
               {activeWallet?.name} · {activeAccount?.label}
               {activeWallet?.kind === 'hardware' && <Badge tone="lime">Hardware</Badge>}
               {activeWallet?.kind === 'watch' && <Badge>Watch-only</Badge>}
@@ -76,15 +76,19 @@ export default function Dashboard() {
               ) : null}
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-ink-900 px-3 py-2">
-            <span className="font-mono text-xs text-mute">{address}</span>
+          <div className="flex w-full min-w-0 items-center gap-2 rounded-xl border border-line bg-black px-3 py-2 sm:w-auto">
+            <span className="min-w-0 flex-1 truncate font-mono text-xs text-mute">{address}</span>
             {address && <CopyButton value={address} />}
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-5 gap-2">
+        <div className="mt-6 grid gap-2" style={{ gridTemplateColumns: `repeat(${actions.length}, minmax(0, 1fr))` }}>
           {actions.map(({ href, label, icon: Icon }) => (
-            <Link key={href} href={href} className="group flex flex-col items-center gap-1.5 rounded-xl border border-white/[0.06] bg-white/[0.02] px-2 py-3 text-xs font-medium hover:border-lime/30 hover:bg-lime/[0.05]">
+            <Link
+              key={href}
+              href={href}
+              className="group flex flex-col items-center gap-1.5 rounded-xl border border-line bg-white/[0.02] px-2 py-3 text-xs font-medium transition hover:border-lime/30 hover:bg-lime/[0.04] hover:shadow-glow-soft"
+            >
               <Icon className="h-5 w-5 text-lime transition group-hover:scale-110" />
               <span className="text-center">{label}</span>
             </Link>

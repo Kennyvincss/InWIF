@@ -90,7 +90,7 @@ export function Badge({ tone = 'mute', children }: { tone?: 'ok' | 'bad' | 'warn
     lime: 'border-lime/30 bg-lime/10 text-lime',
     mute: 'border-white/10 bg-white/[0.04] text-mute',
   }
-  return <span className={cx('inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold', tones[tone])}>{children}</span>
+  return <span className={cx('inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-semibold', tones[tone])}>{children}</span>
 }
 
 export function Findings({ findings, hideInfo }: { findings: Finding[]; hideInfo?: boolean }) {
