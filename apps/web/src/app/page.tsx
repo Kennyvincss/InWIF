@@ -105,7 +105,7 @@ export default function Home() {
       {/* FEATURES — BENTO */}
       <Section id="features" eyebrow="The wallet" title={<>Everything you need. <span className="text-mute">Nothing you pay for.</span></>}>
         <div className="grid gap-4 md:grid-cols-6">
-          <Bento className="md:col-span-4" icon={Zap} title="Swap at the best price" body="Trade ETH and $WIF at the best available price in a couple of taps. InWIF adds no fee — you see exactly what you get before you confirm.">
+          <Bento className="md:col-span-4" icon={Zap} title="Swap at the best price" body="Trade $WIF and ETH at the best available price in a couple of taps. InWIF adds no fee — you see exactly what you get before you confirm.">
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <TokenPill symbol="ETH" amount="0.25" />
               <ArrowRight className="h-4 w-4 text-dim" />

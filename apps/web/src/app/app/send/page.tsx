@@ -25,13 +25,19 @@ function SendForm() {
   const { network } = useNetwork()
   const tokens = useTokens()
   const { rows } = usePortfolio(activeAccount?.address)
-  const [asset, setAsset] = useState('native')
+  // $WIF is preselected; networks without $WIF fall back to the native coin.
+  const wifAddress = tokens.find((t) => t.isWif)?.address
+  const [asset, setAsset] = useState<string>(wifAddress ?? 'native')
   const [to, setTo] = useState('')
   const [amount, setAmount] = useState('')
   const [req, setReq] = useState<TxRequest | null>(null)
 
   // Opened from a payment link (/pay → /app/send?to=…&token=…&amount=…): validate, then fill in.
   const search = useSearchParams()
+  const touched = useRef(false)
+  useEffect(() => {
+    if (!touched.current && !search.get('to')) setAsset(wifAddress ?? 'native')
+  }, [wifAddress]) // eslint-disable-line react-hooks/exhaustive-deps
   const [fromLink, setFromLink] = useState<{ note?: string; error?: string } | null>(null)
   const applied = useRef<string | null>(null)
   useEffect(() => {
@@ -128,6 +134,7 @@ function SendForm() {
             label="Asset"
             value={asset}
             onChange={(k) => {
+              touched.current = true
               setAsset(k)
               setAmount('')
             }}
