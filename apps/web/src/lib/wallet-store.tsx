@@ -50,6 +50,8 @@ export interface Settings {
   autoLockMinutes: number
   hideBalances: boolean
   slippageBps: number
+  /** Show balances in $WIF (default) or US dollars. */
+  displayCurrency: 'WIF' | 'USD'
   notifications: {
     incoming: boolean
     outgoing: boolean
@@ -83,6 +85,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autoLockMinutes: 15,
   hideBalances: false,
   slippageBps: 50,
+  displayCurrency: 'WIF',
   notifications: {
     incoming: true,
     outgoing: true,

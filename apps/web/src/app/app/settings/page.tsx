@@ -90,6 +90,11 @@ export default function SettingsPage() {
           <input type="checkbox" className="accent-[#00E59B]" checked={state.settings.hideBalances} onChange={(e) => set({ hideBalances: e.target.checked })} />
           Hide balances by default
         </label>
+        <label className="label mt-4" htmlFor="currency">Show balances in</label>
+        <select id="currency" className="input" value={state.settings.displayCurrency ?? 'WIF'} onChange={(e) => set({ displayCurrency: e.target.value as 'WIF' | 'USD' })}>
+          <option value="WIF">$WIF</option>
+          <option value="USD">US dollars</option>
+        </select>
       </section>
 
       <section className="card p-5">
