@@ -34,3 +34,24 @@ export function timeAgo(iso?: string): string {
 export function toNumber(raw: bigint, decimals: number): number {
   return Number(formatUnits(raw, decimals))
 }
+
+/** A $WIF amount for display: 9.36M, 12,450, 3.5, 0.0042. */
+export function fmtWif(v: number | null | undefined): string {
+  if (v === null || v === undefined || !Number.isFinite(v)) return '—'
+  const a = Math.abs(v)
+  if (a >= 1_000_000) return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(v)
+  if (a >= 1) return v.toLocaleString('en-US', { maximumFractionDigits: a >= 1000 ? 0 : 2 })
+  if (a === 0) return '0'
+  return v.toLocaleString('en-US', { maximumSignificantDigits: 3 })
+}
+
+export type DisplayCurrency = 'WIF' | 'USD'
+
+/**
+ * A USD value shown in the user's display currency. In WIF mode the value is converted at
+ * the live $WIF price; without a price it falls back to USD rather than guessing.
+ */
+export function fmtValue(usd: number | null | undefined, currency: DisplayCurrency, wifPriceUsd: number | null | undefined): string {
+  if (currency === 'WIF' && usd !== null && usd !== undefined && wifPriceUsd && wifPriceUsd > 0) return `${fmtWif(usd / wifPriceUsd)} WIF`
+  return fmtUsd(usd)
+}

@@ -6,7 +6,7 @@ import { ArrowUpRight, BadgeCheck } from 'lucide-react'
 import { checkRecipient, looksLikeUsername, parseAmount, parsePaymentRequest, type Finding } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useNetwork, usePortfolio, useTokens } from '@/lib/hooks'
-import { fmtToken, fmtUsd } from '@/lib/format'
+import { fmtToken, fmtUsd, fmtValue } from '@/lib/format'
 import { TxFlow, type TxRequest } from '@/components/TxFlow'
 import { AddressAvatar, ErrorBox, Findings, Notice, PageHeader, PercentButtons, Spinner, TokenPicker } from '@/components/ui'
 import { useNameLookup } from '@/lib/usernames'
@@ -172,7 +172,7 @@ function SendForm() {
           </div>
           <input id="amt" className="input text-lg" inputMode="decimal" placeholder="0.0" value={amount} onChange={(e) => setAmount(e.target.value)} />
           <div className="mt-1 flex justify-between text-xs text-mute">
-            <span>{usd !== null ? `≈ ${fmtUsd(usd)}` : ' '}</span>
+            <span>{usd !== null ? `≈ ${row?.token?.isWif ? fmtUsd(usd) : fmtValue(usd, state.settings.displayCurrency ?? 'WIF', rows.find((r) => r.token?.isWif)?.priceUsd)}` : ' '}</span>
             {amt && !amt.ok && <span className="text-bad">{amt.error}</span>}
           </div>
           {asset === 'native' && <p className="mt-1 text-xs text-mute">100% keeps a little ETH back for the network fee. The review shows the exact fee.</p>}

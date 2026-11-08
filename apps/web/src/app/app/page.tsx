@@ -5,7 +5,7 @@ import { ArrowDownLeft, ArrowLeftRight, ArrowRight, ArrowUpRight, Check, Cpu, Ey
 import { RANGE_QUERY, explorerAddressUrl, type ChartRange } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useActivity, usePortfolio, usePortfolioHistory, useVerification } from '@/lib/hooks'
-import { fmtPct, fmtToken, fmtUsd } from '@/lib/format'
+import { fmtPct, fmtToken, fmtUsd, fmtValue } from '@/lib/format'
 import { AllocationBar, AreaChart } from '@/components/Charts'
 import { ActivityList } from '@/components/ActivityList'
 import { BackupModal } from '@/components/BackupModal'
@@ -31,6 +31,9 @@ export default function Dashboard() {
   const mask = (s: string) => (hide ? '••••' : s)
   const wif = rows.find((r) => r.token?.isWif)
   const up = (totals.change24hPct ?? 0) >= 0
+  const currency = state.settings.displayCurrency ?? 'WIF'
+  const inWif = currency === 'WIF' && !!wif?.priceUsd
+  const value = (usd: number | null | undefined) => fmtValue(usd, currency, wif?.priceUsd)
 
   const actions = [
     { href: '/app/send', label: 'Send', icon: ArrowUpRight },
@@ -80,6 +83,18 @@ export default function Dashboard() {
               >
                 {hide ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
+              <div className="flex rounded-full border border-white/[0.08] bg-black/40 p-0.5 font-mono text-[10.5px]" role="group" aria-label="Show balance in">
+                {(['WIF', 'USD'] as const).map((c) => (
+                  <button
+                    key={c}
+                    aria-pressed={currency === c}
+                    className={cx('rounded-full px-2.5 py-0.5 transition', currency === c ? 'bg-white text-black' : 'text-mute hover:text-white')}
+                    onClick={() => update((s) => ({ ...s, settings: { ...s.settings, displayCurrency: c } }))}
+                  >
+                    {c === 'WIF' ? '$WIF' : 'USD'}
+                  </button>
+                ))}
+              </div>
             </div>
             <div className="flex w-full min-w-0 items-center gap-2 rounded-full border border-white/[0.08] bg-black/60 py-1 pl-1 pr-1 sm:w-auto sm:max-w-[22rem]">
               <AddressAvatar address={address} size={26} />
@@ -90,9 +105,19 @@ export default function Dashboard() {
 
           <div className="relative mt-6">
             <div className="font-display text-[44px] font-semibold leading-none sm:text-[64px]">
-              {balances.isLoading || prices.isLoading ? <Skeleton className="h-14 w-72" /> : mask(fmtUsd(totals.total))}
+              {balances.isLoading || prices.isLoading ? (
+                <Skeleton className="h-14 w-72" />
+              ) : inWif && totals.total !== null ? (
+                <span data-testid="total-balance">
+                  {mask(value(totals.total).replace(/ WIF$/, ''))}
+                  <span className="ml-3 align-baseline text-[0.42em] font-medium text-accent">WIF</span>
+                </span>
+              ) : (
+                <span data-testid="total-balance">{mask(fmtUsd(totals.total))}</span>
+              )}
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
+              {inWif && totals.total !== null && <span className="text-mute">≈ {mask(fmtUsd(totals.total))}</span>}
               {totals.change24hPct !== null && (
                 <span className={cx('rounded-full border px-2.5 py-0.5 font-mono text-xs', up ? 'border-accent/30 bg-accent/10 text-accent' : 'border-bad/30 bg-bad/10 text-bad')}>
                   {fmtPct(totals.change24hPct)}
@@ -259,7 +284,7 @@ export default function Dashboard() {
                 </p>
                 <div className="text-right">
                   <p className="font-medium">{mask(fmtToken(r.raw, r.decimals))}</p>
-                  <p className="text-xs text-dim">{mask(fmtUsd(r.valueUsd))}</p>
+                  <p className="text-xs text-dim">{mask(r.token?.isWif ? fmtUsd(r.valueUsd) : value(r.valueUsd))}</p>
                 </div>
               </li>
             ))}
