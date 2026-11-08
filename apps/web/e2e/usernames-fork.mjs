@@ -150,7 +150,7 @@ try {
 
   console.log('Activity shows usernames')
   await pageA.goto(`${BASE}/app/activity`)
-  await pageA.getByText(`from @${NAME_B}`).first().waitFor({ timeout: 60000 })
+  await pageA.getByText(`from @${NAME_B}`).first().waitFor({ timeout: 120000 }) // history is read from fork logs; can be slow
   assert(true, `A's activity says "Received … from @${NAME_B}"`)
   await pageA.screenshot({ path: `${OUT}/username-activity.png` })
 

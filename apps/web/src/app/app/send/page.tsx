@@ -3,7 +3,8 @@ import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { encodeFunctionData, erc20Abi, formatUnits, type Address } from 'viem'
 import { ArrowUpRight, BadgeCheck } from 'lucide-react'
-import { checkRecipient, looksLikeUsername, parseAmount, parsePaymentRequest, type Finding } from '@inwif/core'
+import { checkRecipient, findLookalike, looksLikeUsername, parseAmount, parsePaymentRequest, type Finding } from '@inwif/core'
+import { useScamShield } from '@/lib/shield'
 import { useWallet } from '@/lib/wallet-store'
 import { useNetwork, usePortfolio, useTokens } from '@/lib/hooks'
 import { fmtToken, fmtUsd, fmtValue } from '@/lib/format'
@@ -80,14 +81,19 @@ function SendForm() {
         : name.lookup && name.lookup.status !== 'taken'
           ? { code: 'name-missing', severity: 'danger', message: `No InWIF user is called @${name.name}. Check the spelling.` }
           : null
+  // Scam shield: addresses this account really pays, from its own history (on this device).
+  const shield = useScamShield(activeAccount?.address)
+  const [lookalikeOk, setLookalikeOk] = useState(false)
+  useEffect(() => setLookalikeOk(false), [to])
   const recipient = useMemo(() => {
     if (!to) return null
     if (byName && !claim) return nameFinding ? { ok: false, findings: [nameFinding] } : null
-    const r = checkRecipient(claim ? claim.address : to, {
+    const base = checkRecipient(claim ? claim.address : to, {
       self: activeAccount?.address,
       knownTokens: tokens.map((t) => t.address),
       blocklist: new Set(state.blocklist),
     })
+    const r = withShield(base, activeAccount?.address)
     if (!claim) return r
     // A username's address is checksummed by its signed claim; drop the "no checksum" hint.
     const findings = r.findings.filter((f) => f.code !== 'no-checksum')
@@ -100,7 +106,34 @@ function SendForm() {
     }
     if (!pinned) findings.push({ code: 'name-new', severity: 'info', message: `First payment to @${claim.username}. Check the address with them if this is a large amount.` })
     return { ...r, findings }
-  }, [to, byName, claim, pinned, nameFinding?.message, activeAccount, tokens, state.blocklist]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [to, byName, claim, pinned, nameFinding?.message, activeAccount, tokens, state.blocklist, shield.trusted, lookalikeOk]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  /** Block look-alikes of addresses the user has paid; note known and new addresses. */
+  function withShield(r: ReturnType<typeof checkRecipient>, self?: Address): ReturnType<typeof checkRecipient> {
+    if (!r.address || !shield.ready || (self && r.address.toLowerCase() === self.toLowerCase())) return r
+    const lower = r.address.toLowerCase()
+    if (shield.trusted.has(lower)) {
+      return { ...r, findings: [...r.findings.filter((f) => f.code !== 'no-checksum'), { code: 'sent-before', severity: 'info', message: '✓ You have paid this address before.' }] }
+    }
+    const imitates = findLookalike(r.address, shield.trusted)
+    if (imitates) {
+      return {
+        ok: r.ok && lookalikeOk,
+        address: r.address,
+        findings: [
+          {
+            code: 'lookalike',
+            severity: 'danger',
+            message: `Scam warning: this address looks like ${imitates.slice(0, 6)}…${imitates.slice(-4)}, which you have paid before, but it is a different address (${r.address.slice(0, 6)}…${r.address.slice(-4)}). Scammers create look-alike addresses and plant them in your history. Did you copy it from your activity?`,
+          },
+          ...r.findings,
+        ],
+      }
+    }
+    return { ...r, findings: [...r.findings, { code: 'new-address', severity: 'info', message: 'New address: you have not paid it before. Check it with the recipient.' }] }
+  }
+  const lookalike = recipient?.findings.some((f) => f.code === 'lookalike')
+  const imitated = lookalike && recipient?.address ? findLookalike(recipient.address, shield.trusted) : undefined
   const amt = amount ? parseAmount(amount, decimals, row?.raw) : null
   const usd = amt?.raw !== undefined && row?.priceUsd ? Number(formatUnits(amt.raw, decimals)) * row.priceUsd : null
   const ready = recipient?.ok && amt?.ok && activeWallet?.kind !== 'watch'
@@ -168,6 +201,17 @@ function SendForm() {
           {recipient && (
             <div className="mt-2">
               <Findings findings={recipient.findings} />
+            </div>
+          )}
+          {lookalike && imitated && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button type="button" className="btn-ghost px-3 py-1.5 text-xs" onClick={() => setTo(imitated)}>
+                Use {imitated.slice(0, 6)}…{imitated.slice(-4)} instead (the one you paid)
+              </button>
+              <label className="flex items-center gap-2 text-xs text-mute">
+                <input type="checkbox" className="accent-[#FF4D6A]" checked={lookalikeOk} onChange={(e) => setLookalikeOk(e.target.checked)} />
+                I checked with the recipient. This new address is correct.
+              </label>
             </div>
           )}
         </div>
