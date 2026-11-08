@@ -60,17 +60,8 @@ function NetworkStatus() {
           </option>
         ))}
       </select>
-      {v.isLoading ? (
-        <Badge>checking…</Badge>
-      ) : v.data?.ok ? (
-        <Badge tone="ok" >
-          <span className="h-1.5 w-1.5 rounded-full bg-ok" />
-          <span className="max-[380px]:sr-only">chain {v.data.chainId}</span>
-          <span className="hidden sm:inline"> · #{v.data.blockNumber.toString()}</span>
-        </Badge>
-      ) : (
-        <Badge tone="bad">unverified</Badge>
-      )}
+      {/* Only speak up when something is wrong: signing is disabled until the network checks out. */}
+      {!v.isLoading && !v.data?.ok && <Badge tone="bad">Network issue</Badge>}
     </div>
   )
 }

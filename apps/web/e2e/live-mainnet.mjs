@@ -27,8 +27,6 @@ try {
   await page.getByLabel('Address to watch').fill(WATCH)
   await page.getByRole('button', { name: 'Add watch-only wallet' }).click()
   await page.getByRole('link', { name: 'Open my wallet' }).click()
-  await page.getByText('chain 4663').first().waitFor({ timeout: 30000 })
-  ok('live mainnet RPC verified (chain 4663)')
   await page.getByText('World is Flat').first().waitFor({ timeout: 30000 })
   await page.waitForFunction(() => /\$[0-9,]+\.\d\d/.test(document.querySelector('main')?.innerText ?? ''), null, { timeout: 30000 })
   ok('portfolio value computed from live balances and prices')
@@ -38,13 +36,17 @@ try {
       ok(`${label} chart rendered from real price history`)
     } catch {
       const t = await page.locator('main').innerText()
-      console.log(/rate-limiting/.test(t) ? `  ! ${label} chart: GeckoTerminal rate-limited this IP (UI says so honestly)` : `  ✗ ${label} chart missing`)
-      if (!/rate-limiting/.test(t)) process.exitCode = 1
+      console.log(/unavailable right now/.test(t) ? `  ! ${label} chart: price data provider rate-limited this IP (UI says so)` : `  ✗ ${label} chart missing`)
+      if (!/unavailable right now/.test(t)) process.exitCode = 1
     }
   }
   await chart('portfolio')
   await page.waitForTimeout(1500)
   await page.screenshot({ path: `${OUT}/live-dashboard.png` })
+  await page.locator('aside').getByRole('link', { name: 'Security', exact: true }).click()
+  await page.getByText('✓ Network verified').waitFor({ timeout: 30000 })
+  ok('live mainnet network verified (Security Centre)')
+  if (await page.getByText('Network issue').count()) throw new Error('top bar reports a network issue')
 
   await page.locator('aside').getByRole('link', { name: '$WIF', exact: true }).click()
   await page.getByText('verified on-chain').waitFor({ timeout: 30000 })
@@ -56,19 +58,21 @@ try {
   console.log(`  · ${holders.replace(/\n/g, ' ')}`)
 
   await page.locator('aside').getByRole('link', { name: 'Swap', exact: true }).click()
-  await page.getByText('Uniswap contracts verified on-chain').waitFor({ timeout: 30000 })
   await page.getByLabel('Amount to swap').fill('0.01')
   await page.getByText('Minimum received').waitFor({ timeout: 30000 })
-  await page.getByText('Pons $WIF/ETH pool (Uniswap V4)').waitFor({ timeout: 30000 })
   const vsMarket = await page.getByText(/% (below|above)$/).first().textContent({ timeout: 30000 }).catch(() => 'no market price')
-  ok(`live quote ETH → WIF routed through the Pons pool (Uniswap V4); vs market: ${vsMarket}`)
+  // The dead V3 pool gives ~20% below market; the main $WIF market ~1% (its trading fee).
+  if (/below/.test(vsMarket ?? '') && parseFloat(vsMarket ?? '0') > 3) throw new Error(`quote is ${vsMarket} market: wrong route`)
+  ok(`live quote ETH → WIF at the main $WIF market; vs market: ${vsMarket}`)
+  for (const t of ['Uniswap', 'GeckoTerminal', 'Pons']) if ((await page.locator('main').innerText()).includes(t)) throw new Error(`swap page names a provider: ${t}`)
+  ok('swap page names no providers')
   await page.screenshot({ path: `${OUT}/live-swap.png` })
 
   await page.locator('aside').getByRole('link', { name: 'Activity', exact: true }).click()
   await page.locator('main li').first().waitFor({ timeout: 90000 })
   const act = await page.locator('main').innerText()
   const rows = await page.locator('main li').count()
-  ok(`activity shows ${rows} real transfers ${/unreachable right now/.test(act) ? '(RPC log fallback — explorer blocked here)' : '(Blockscout)'}`)
+  ok(`activity shows ${rows} real transfers ${/Showing your recent token transfers/.test(act) ? '(RPC log fallback — explorer blocked here)' : '(Blockscout)'}`)
   await page.screenshot({ path: `${OUT}/live-activity.png` })
   console.log(`  · browser RPC requests: ${rpcPaths.relay} via InWIF relay, ${rpcPaths.direct} direct to public RPCs`)
   console.log(process.exitCode ? '\nLive mainnet check FAILED' : '\nLive mainnet check passed')

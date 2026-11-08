@@ -93,12 +93,12 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
       known[t.address.toLowerCase()] = `${t.symbol} token`
     }
     if (network.uniswapV3) {
-      known[network.uniswapV3.swapRouter02.toLowerCase()] = 'Uniswap V3 SwapRouter02'
+      known[network.uniswapV3.swapRouter02.toLowerCase()] = 'Swap router'
       known[network.uniswapV3.weth9.toLowerCase()] = 'WETH'
     }
     if (network.uniswapV4) {
-      known[network.uniswapV4.universalRouter.toLowerCase()] = 'Uniswap Universal Router'
-      known[network.uniswapV4.permit2.toLowerCase()] = 'Uniswap Permit2'
+      known[network.uniswapV4.universalRouter.toLowerCase()] = 'Swap router'
+      known[network.uniswapV4.permit2.toLowerCase()] = 'Swap approvals'
     }
     return reviewTransaction(
       { to: request.to, value: request.value, data: request.data, chainId: network.chainId },
@@ -192,7 +192,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
           {error && <ErrorBox>{error}</ErrorBox>}
           {hash && explorerTxUrl(network, hash) && (
             <a className="btn-ghost w-full" href={explorerTxUrl(network, hash)} target="_blank" rel="noreferrer">
-              View on {network.explorer.name} <ExternalLink className="h-4 w-4" />
+              View on explorer <ExternalLink className="h-4 w-4" />
             </a>
           )}
           {phase !== 'pending' && (
@@ -208,7 +208,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
               <Badge>Checking network…</Badge>
             ) : verified ? (
               <Badge tone="ok">
-                <ShieldCheck className="h-3 w-3" /> {network.name} verified · chain {network.chainId}
+                <ShieldCheck className="h-3 w-3" /> {network.name} verified
               </Badge>
             ) : (
               <Badge tone="bad">Network not verified — signing disabled</Badge>
@@ -250,7 +250,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
             {sim && !sim.success && <ErrorBox>This transaction would fail: {sim.revertReason}</ErrorBox>}
             {sim?.success && (
               <div className="space-y-1 text-sm">
-                <p className="text-ok">Would succeed at the current block ({sim.method === 'simulateV1' ? 'full simulation' : 'revert check'}).</p>
+                <p className="text-ok">Would succeed at the current block.</p>
                 {sim.assetChanges.map((c, i) => (
                   <p key={i} className={c.diff < 0n ? 'text-bad' : 'text-ok'}>
                     {describeChange(c)}
@@ -288,7 +288,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
 
           {error && <ErrorBox>{error}</ErrorBox>}
 
-          <Notice>InWIF charges no fees. The only cost is the network fee shown above{request.kind === 'swap' ? ' plus the pool fee shown on the swap screen' : ''}.</Notice>
+          <Notice>InWIF charges no fees. The only cost is the network fee shown above{request.kind === 'swap' ? ' plus the trading fee shown on the swap screen' : ''}.</Notice>
 
           <div className="flex gap-2">
             <button className="btn-ghost flex-1" onClick={onClose} disabled={phase === 'signing'}>

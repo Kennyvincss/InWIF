@@ -94,9 +94,9 @@ export default function WifPage() {
             ))}
           </div>
           <div className="mt-3">
-            {history.isLoading ? <Skeleton className="h-48" /> : history.data && history.data.length > 1 ? <AreaChart data={history.data} label="$WIF price (USD)" /> : <Notice>{history.isError ? 'GeckoTerminal is busy or rate-limiting; price history will load when it responds.' : 'No price history available from GeckoTerminal.'}</Notice>}
+            {history.isLoading ? <Skeleton className="h-48" /> : history.data && history.data.length > 1 ? <AreaChart data={history.data} label="$WIF price (USD)" /> : <Notice>{history.isError ? 'Price history is unavailable right now and will load shortly.' : 'No price history available yet.'}</Notice>}
           </div>
-          <p className="mt-2 text-xs text-mute">Market data: GeckoTerminal (on-chain DEX pools). Prices of low-liquidity tokens can move sharply.</p>
+          <p className="mt-2 text-xs text-mute">Prices of low-liquidity tokens can move sharply.</p>
         </section>
 
         <section className="card p-5">
@@ -146,7 +146,7 @@ export default function WifPage() {
             portfolio feature is identical for every user.
           </p>
           <p>
-            <span className="font-semibold text-white">Utility is real and on-chain.</span> Track $WIF, trade it via Uniswap, audit its approvals, build an
+            <span className="font-semibold text-white">Utility is real and on-chain.</span> Track $WIF, trade it, audit its approvals, build an
             on-chain ecosystem profile, and discover reviewed apps built around it.
           </p>
         </div>

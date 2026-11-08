@@ -1,7 +1,7 @@
 'use client'
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertTriangle, Check, Copy, Info, Loader2, ShieldAlert, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { AlertTriangle, Check, ChevronDown, Copy, Info, Loader2, ShieldAlert, X } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
 import type { Finding } from '@inwif/core'
@@ -182,11 +182,21 @@ export function Row({ label, children }: { label: string; children: React.ReactN
   )
 }
 
+/** Bundled logos (public/tokens), so no third-party image host sees users' requests. */
+const TOKEN_LOGOS: Record<string, string> = {
+  ETH: '/tokens/eth.webp',
+  WIF: '/tokens/wif.webp',
+  WETH: '/tokens/weth.webp',
+  USDG: '/tokens/usdg.webp',
+  CBBTC: '/tokens/cbbtc.webp',
+}
+
 export function TokenIcon({ symbol, src, size = 36 }: { symbol: string; src?: string; size?: number }) {
   const palette: Record<string, string> = { ETH: '#8EA2FF', WIF: '#A6F36A', WETH: '#B6C1FF', USDG: '#62D99A', cbBTC: '#F7A64B' }
-  if (src)
+  const logo = src ?? TOKEN_LOGOS[symbol.toUpperCase()]
+  if (logo)
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt="" width={size} height={size} className="rounded-full bg-ink-700" />
+    return <img src={logo} alt="" width={size} height={size} className="shrink-0 rounded-full bg-ink-700" style={{ width: size, height: size }} />
   return (
     <span
       className="inline-flex shrink-0 items-center justify-center rounded-full font-display text-[11px] font-extrabold text-ink-950"
@@ -195,5 +205,79 @@ export function TokenIcon({ symbol, src, size = 36 }: { symbol: string; src?: st
     >
       {symbol.slice(0, 4)}
     </span>
+  )
+}
+
+export interface TokenOption {
+  key: string
+  symbol: string
+  /** Shown next to the symbol in the list, e.g. a formatted balance. */
+  detail?: string
+}
+
+/** Token picker with logos (a native <select> cannot show images). */
+export function TokenPicker({ options, value, onChange, label, className }: { options: TokenOption[]; value: string; onChange: (key: string) => void; label: string; className?: string }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  const current = options.find((o) => o.key === value) ?? options[0]
+  useEffect(() => {
+    if (!open) return
+    const close = (e: MouseEvent) => !ref.current?.contains(e.target as Node) && setOpen(false)
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('mousedown', close)
+    document.addEventListener('keydown', esc)
+    return () => {
+      document.removeEventListener('mousedown', close)
+      document.removeEventListener('keydown', esc)
+    }
+  }, [open])
+  return (
+    <div ref={ref} className={cx('relative', className)}>
+      <button
+        type="button"
+        className="input flex w-full items-center gap-2 text-left"
+        aria-label={label}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        {current && <TokenIcon symbol={current.symbol} size={24} />}
+        <span className="min-w-0 flex-1 truncate font-semibold">{current?.symbol ?? '—'}</span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-mute" />
+      </button>
+      {open && (
+        <ul role="listbox" aria-label={label} className="absolute right-0 z-30 mt-1 max-h-72 min-w-full overflow-auto rounded-xl border border-white/10 bg-ink-800 p-1 shadow-xl">
+          {options.map((o) => (
+            <li key={o.key} role="option" aria-selected={o.key === value}>
+              <button
+                type="button"
+                className={cx('flex w-full items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm hover:bg-white/[0.06]', o.key === value && 'bg-white/[0.04]')}
+                onClick={() => {
+                  onChange(o.key)
+                  setOpen(false)
+                }}
+              >
+                <TokenIcon symbol={o.symbol} size={22} />
+                <span className="font-semibold">{o.symbol}</span>
+                {o.detail && <span className="ml-auto pl-4 text-xs text-mute">{o.detail}</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+/** Quick-fill buttons for a share of the available balance. */
+export function PercentButtons({ onPick, disabled }: { onPick: (pct: number) => void; disabled?: boolean }) {
+  return (
+    <div className="flex gap-1.5">
+      {[25, 50, 75, 100].map((p) => (
+        <button key={p} type="button" className="chip hover:border-lime/40 hover:text-lime disabled:opacity-40" disabled={disabled} onClick={() => onPick(p)}>
+          {p}%
+        </button>
+      ))}
+    </div>
   )
 }

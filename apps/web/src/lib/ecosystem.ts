@@ -20,7 +20,7 @@ export const ECOSYSTEM_APPS: EcosystemApp[] = [
   {
     id: 'inwif-wif-swap',
     name: 'Swap for $WIF',
-    description: 'Swap ETH or tokens for $WIF at the best Uniswap price, with zero InWIF fee.',
+    description: 'Swap ETH or tokens for $WIF at the best available price, with zero InWIF fee.',
     category: 'built-in',
     href: '/app/swap',
     status: 'live',

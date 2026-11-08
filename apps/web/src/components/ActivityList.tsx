@@ -20,7 +20,7 @@ export function ActivityList({
 }) {
   const { network } = useNetwork()
   if (!network.explorer.apiV2)
-    return <Empty icon={<RefreshCw className="h-5 w-5" />} title="History unavailable">{network.name} has no explorer indexer configured, so InWIF cannot list past transactions here.</Empty>
+    return <Empty icon={<RefreshCw className="h-5 w-5" />} title="History unavailable">Transaction history isn&apos;t available on {network.name}.</Empty>
   if (loading)
     return (
       <div className="space-y-2">
@@ -29,14 +29,14 @@ export function ActivityList({
         ))}
       </div>
     )
-  if (error) return <ErrorBox>Could not load activity from {network.explorer.name}: {error.message}. Balances above are read directly from the chain and are unaffected.</ErrorBox>
+  if (error) return <ErrorBox>Could not load activity right now. Balances above are read directly from the chain and are unaffected.</ErrorBox>
   const viaRpc = items?.[0]?.via === 'rpc'
   if (!items?.length) return <Empty icon={<RefreshCw className="h-5 w-5" />} title="No activity yet">{emptyText}</Empty>
   return (
     <>
     {viaRpc && (
       <p className="mb-2 rounded-lg border border-warn/30 bg-warn/10 px-3 py-2 text-xs text-[#ffe7a8]">
-        {network.explorer.name} is unreachable right now. Showing recent token transfers read directly from the chain; ETH transfers and contract calls appear once the explorer responds.
+        Showing your recent token transfers. Full history, including ETH transfers, will appear shortly.
       </p>
     )}
     <ul className="divide-y divide-white/[0.05]">

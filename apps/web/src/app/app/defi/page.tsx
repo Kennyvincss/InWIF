@@ -1,8 +1,8 @@
 'use client'
 import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
-import { Coins, ExternalLink, Info, Layers, ShieldQuestion } from 'lucide-react'
-import { explorerAddressUrl, fetchLpPositions } from '@inwif/core'
+import { Coins, Info, Layers, ShieldQuestion } from 'lucide-react'
+import { fetchLpPositions } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useNetwork } from '@/lib/hooks'
 import { fmtToken } from '@/lib/format'
@@ -46,22 +46,17 @@ export default function DefiPage() {
       <section className="card p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="flex items-center gap-2 font-display font-bold">
-            <Layers className="h-5 w-5 text-lime" /> Uniswap V3 liquidity positions
+            <Layers className="h-5 w-5 text-lime" /> Liquidity positions
           </h2>
-          {cfg && (
-            <a className="text-xs text-mute hover:text-white" href={explorerAddressUrl(network, cfg.nonfungiblePositionManager)} target="_blank" rel="noreferrer">
-              Position manager <ExternalLink className="inline h-3 w-3" />
-            </a>
-          )}
         </div>
         {!cfg ? (
-          <Notice>No verified Uniswap deployment on {network.name}.</Notice>
+          <Notice>Liquidity positions aren&apos;t available on {network.name}.</Notice>
         ) : positions.isLoading ? (
           <Skeleton className="h-24" />
         ) : positions.isError ? (
           <ErrorBox>{(positions.error as Error).message}</ErrorBox>
         ) : !positions.data?.length ? (
-          <Empty icon={<Layers className="h-5 w-5" />} title="No liquidity positions">This address holds no Uniswap V3 position NFTs on {network.name}.</Empty>
+          <Empty icon={<Layers className="h-5 w-5" />} title="No liquidity positions">This wallet has no liquidity positions on {network.name}.</Empty>
         ) : (
           <ul className="space-y-2">
             {positions.data.map((p) => (
@@ -84,7 +79,7 @@ export default function DefiPage() {
             ))}
           </ul>
         )}
-        <p className="mt-3 text-xs text-mute">Liquidity provision carries impermanent-loss risk. Uniswap pool fees go to liquidity providers, not to InWIF.</p>
+        <p className="mt-3 text-xs text-mute">Providing liquidity carries impermanent-loss risk. Trading fees go to liquidity providers, not to InWIF.</p>
       </section>
 
       <section className="card p-5">
@@ -96,10 +91,10 @@ export default function DefiPage() {
         </p>
         <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-mute">
           <li>
-            The main $WIF market (the Pons pool on Uniswap V4) has a 0% liquidity-provider fee. Its swap fee, about 1% measured on-chain, goes to Pons and the token creator.
-            Liquidity there would earn nothing and still carry impermanent-loss risk.
+            The main $WIF market pays its 1% trading fee to the token&apos;s launch platform and creator, not to liquidity providers. Liquidity there would earn nothing and
+            still carry impermanent-loss risk.
           </li>
-          <li>The Uniswap V3 $WIF pool has no active liquidity or trading, and its price is far from the market.</li>
+          <li>Other $WIF pools have little or no trading.</li>
         </ul>
         <p className="mt-2 text-sm text-mute">
           InWIF will add a liquidity option when a $WIF pool pays its providers. You can still <Link href="/app/swap" className="text-lime">swap $WIF</Link> at the market price.

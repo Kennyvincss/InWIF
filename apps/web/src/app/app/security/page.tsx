@@ -53,10 +53,10 @@ export default function SecurityPage() {
   })
 
   const known: Record<string, string> = {}
-  if (network.uniswapV3) known[network.uniswapV3.swapRouter02.toLowerCase()] = 'Uniswap V3 SwapRouter02'
+  if (network.uniswapV3) known[network.uniswapV3.swapRouter02.toLowerCase()] = 'Swap router'
   if (network.uniswapV4) {
-    known[network.uniswapV4.permit2.toLowerCase()] = 'Uniswap Permit2'
-    known[network.uniswapV4.universalRouter.toLowerCase()] = 'Uniswap Universal Router'
+    known[network.uniswapV4.permit2.toLowerCase()] = 'Swap approvals'
+    known[network.uniswapV4.universalRouter.toLowerCase()] = 'Swap router'
   }
 
   const flagCheck = flag ? checkRecipient(flag) : null
@@ -84,7 +84,7 @@ export default function SecurityPage() {
               <ShieldAlert className="h-5 w-5" /> Not verified
             </p>
           )}
-          <p className="mt-1 text-xs text-mute">{verification.data?.ok ? `RPC chain ID ${verification.data.chainId} matches config.` : verification.data?.reason}</p>
+          <p className="mt-1 text-xs text-mute">{verification.data?.ok ? `Connected to ${network.name}.` : 'Could not confirm the network. Signing is paused until it checks out.'}</p>
         </section>
         <section className="card p-5">
           <p className="text-sm text-mute">Security checklist</p>

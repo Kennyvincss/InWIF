@@ -97,7 +97,7 @@ export default function Dashboard() {
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-display font-bold">Portfolio value</h2>
-              <p className="text-xs text-mute">Current holdings valued at historical prices (GeckoTerminal).</p>
+              <p className="text-xs text-mute">Your current holdings at past prices.</p>
             </div>
             <div className="flex rounded-lg border border-white/10 p-0.5 text-xs">
               {RANGES.map((r) => (
@@ -116,10 +116,10 @@ export default function Dashboard() {
               {hide
                 ? 'Balances hidden.'
                 : history.isError
-                  ? 'The market data provider (GeckoTerminal) is busy or rate-limiting. Price history will load when it responds; balances above are unaffected.'
+                  ? 'Price history is unavailable right now and will load shortly. Your balances are unaffected.'
                 : network.geckoTerminalNetwork
                   ? 'No price history available for the assets you hold. InWIF only charts real market data.'
-                  : `${network.name} has no market data source.`}
+                  : `Price history isn't available on ${network.name}.`}
             </Notice>
           )}
         </section>

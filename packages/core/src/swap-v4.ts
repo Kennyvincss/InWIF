@@ -211,7 +211,7 @@ export async function swapApprovalSteps(
   if (quote.protocol !== 'v4') {
     if (!opts.v3) throw new Error('Uniswap V3 is not configured on this network.')
     const router = getAddress(opts.v3.swapRouter02)
-    return (await allowanceTo(router)) >= amount ? [] : [{ to: token, data: erc20Approve(router), summary: `Approve ${sym} for Uniswap` }]
+    return (await allowanceTo(router)) >= amount ? [] : [{ to: token, data: erc20Approve(router), summary: `Approve ${sym} for swapping` }]
   }
 
   if (!opts.v4 || !quote.v4) throw new Error('Uniswap V4 is not configured on this network.')
@@ -224,13 +224,13 @@ export async function swapApprovalSteps(
     client.readContract({ address: permit2, abi: permit2Abi, functionName: 'allowance', args: [owner, token, router] }),
   ])
   const steps: ApprovalStep[] = []
-  if (erc20Allowance < amount) steps.push({ to: token, data: erc20Approve(permit2), summary: `Approve ${sym} for Permit2 (Uniswap)` })
+  if (erc20Allowance < amount) steps.push({ to: token, data: erc20Approve(permit2), summary: `Approve ${sym} for swapping` })
   const [p2Amount, p2Expiry] = p2
   if (p2Amount < amount || p2Expiry < now + 120) {
     steps.push({
       to: permit2,
       data: encodeFunctionData({ abi: permit2Abi, functionName: 'approve', args: [token, router, amount, now + PERMIT2_EXPIRY_SECONDS] }),
-      summary: `Allow the Uniswap router to use ${sym} via Permit2`,
+      summary: `Confirm the ${sym} swap allowance`,
     })
   }
   return steps
@@ -275,7 +275,7 @@ export async function getBestRouteQuote(
   if (v3q && v4) return v4.amountOut > v3q.amountOut ? v4 : v3q
   if (v4) return v4
   if (v3q) return v3q
-  throw v3 instanceof Error ? v3 : new Error('No Uniswap pool with sufficient liquidity was found for this pair.')
+  throw v3 instanceof Error ? v3 : new Error('Not enough liquidity to swap this pair right now.')
 }
 
 /** Transaction for either protocol. */

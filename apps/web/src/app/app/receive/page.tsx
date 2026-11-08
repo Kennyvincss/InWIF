@@ -37,7 +37,7 @@ export default function ReceivePage() {
             <select id="rnet" className="input" value={state.network} onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))}>
               {SELECTABLE_NETWORKS.map((k) => (
                 <option key={k} value={k}>
-                  {NETWORKS[k].name} (chain {NETWORKS[k].chainId})
+                  {NETWORKS[k].name}
                 </option>
               ))}
             </select>

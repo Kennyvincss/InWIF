@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { formatUnits } from 'viem'
-import { ArrowDownUp, ShieldCheck } from 'lucide-react'
+import { ArrowDownUp } from 'lucide-react'
 import {
   MARKET_BLOCK_FRACTION,
   NATIVE,
@@ -21,7 +21,8 @@ import { useWallet } from '@/lib/wallet-store'
 import { useNetwork, usePortfolio, useTokens } from '@/lib/hooks'
 import { fmtToken, fmtUsd } from '@/lib/format'
 import { TxFlow, type TxRequest } from '@/components/TxFlow'
-import { Badge, ErrorBox, Notice, PageHeader, Row, Spinner, cx } from '@/components/ui'
+import { ErrorBox, Notice, PageHeader, PercentButtons, Row, Spinner, TokenPicker, cx } from '@/components/ui'
+import { percentOf, useGasReserve } from '@/lib/amount'
 
 const SLIPPAGES = [10, 50, 100, 300]
 
@@ -52,6 +53,14 @@ export default function SwapPage() {
   const from = options.find((o) => o.key === fromKey)!
   const to = options.find((o) => o.key === toKey)!
   const bal = rows.find((r) => r.key === (fromKey === NATIVE ? 'native' : fromKey))
+  const balOf = (k: SwapToken) => rows.find((r) => r.key === (k === NATIVE ? 'native' : k))
+  const pickerOptions = options.map((o) => {
+    const b = balOf(o.key)
+    return { key: o.key as string, symbol: o.symbol, detail: b ? fmtToken(b.raw, b.decimals) : undefined }
+  })
+  // Keep the network fee back when filling from ETH (a swap uses up to ~300,000 gas).
+  const reserve = useGasReserve(300_000n)
+  const available = bal ? (fromKey === NATIVE ? (reserve === undefined ? undefined : bal.raw > reserve ? bal.raw - reserve : 0n) : bal.raw) : undefined
   const parsed = debounced ? parseAmount(debounced, from.decimals, bal?.raw) : null
 
   // Only route through contracts confirmed to exist on this chain.
@@ -77,7 +86,10 @@ export default function SwapPage() {
     retry: false,
   })
 
-  const q: SwapQuote | undefined = quote.data
+  // While the typed amount is still settling, the quote and approvals belong to the old amount:
+  // hold the buttons so nobody approves or swaps an amount they no longer see.
+  const settling = amount !== debounced || (!!parsed?.raw && !!quote.data && quote.data.amountIn !== parsed.raw)
+  const q: SwapQuote | undefined = settling ? undefined : quote.data
   const approvals = useQuery({
     queryKey: ['swap-approvals', network.key, fromKey, q?.protocol, q?.amountIn.toString(), activeAccount?.address, unlimited],
     enabled: !!q && fromKey !== NATIVE && !!activeAccount,
@@ -97,7 +109,7 @@ export default function SwapPage() {
     return (
       <div className="mx-auto max-w-xl">
         <PageHeader title="Swap" />
-        <Notice>Swaps are not available on {network.name}: no verified DEX deployment is configured for this network.</Notice>
+        <Notice>Swaps are not available on {network.name}.</Notice>
       </div>
     )
 
@@ -115,41 +127,33 @@ export default function SwapPage() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <PageHeader title="Swap" subtitle="Best price across Uniswap on Robinhood Chain, including the main $WIF market (Pons pool). InWIF adds no fee." />
+      <PageHeader title="Swap" subtitle="Swap at the best available price. InWIF adds no fee." />
       <div className="card space-y-4 p-6">
-        <div className="flex flex-wrap items-center gap-2">
-          {deployment.isLoading && <Badge>Verifying Uniswap contracts…</Badge>}
-          {deployment.data?.ok && (
-            <Badge tone="ok">
-              <ShieldCheck className="h-3 w-3" /> Uniswap contracts verified on-chain
-            </Badge>
-          )}
-          {deployment.data?.ok && deployment.data.partial && <Badge tone="warn">Some Uniswap contracts not found; those routes are off</Badge>}
-          {deployment.data && !deployment.data.ok && <Badge tone="bad">Uniswap contracts not found — swaps disabled</Badge>}
-        </div>
+        {deployment.data && !deployment.data.ok && <ErrorBox>Swaps are unavailable right now. Please try again later.</ErrorBox>}
 
         <div className="rounded-2xl bg-ink-900 p-4">
           <div className="flex items-center justify-between text-xs text-mute">
             <span>You pay</span>
-            <span>
-              Balance {bal ? fmtToken(bal.raw, bal.decimals) : '—'}{' '}
-              {bal && fromKey !== NATIVE && (
-                <button className="ml-1 text-lime" onClick={() => setAmount(formatUnits(bal.raw, bal.decimals))}>
-                  Max
-                </button>
-              )}
-            </span>
+            <span>Balance {bal ? fmtToken(bal.raw, bal.decimals) : '—'}</span>
           </div>
-          <div className="mt-2 flex gap-2">
-            <input className="input border-0 bg-transparent px-0 text-2xl focus:ring-0" inputMode="decimal" placeholder="0.0" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount to swap" />
-            <select className="input w-32" value={fromKey} onChange={(e) => setFrom(e.target.value as SwapToken)} aria-label="From token">
-              {options.map((o) => (
-                <option key={o.key} value={o.key}>
-                  {o.symbol}
-                </option>
-              ))}
-            </select>
+          <div className="mt-2 flex items-center gap-2">
+            <input className="input min-w-0 flex-1 border-0 bg-transparent px-0 text-2xl focus:ring-0" inputMode="decimal" placeholder="0.0" value={amount} onChange={(e) => setAmount(e.target.value)} aria-label="Amount to swap" />
+            <TokenPicker
+              className="w-36 shrink-0"
+              label="From token"
+              value={fromKey}
+              options={pickerOptions}
+              onChange={(k) => {
+                if (k === toKey) setTo(fromKey)
+                setFrom(k as SwapToken)
+                setAmount('')
+              }}
+            />
           </div>
+          <div className="mt-2">
+            <PercentButtons disabled={available === undefined || available === 0n} onPick={(p) => available !== undefined && setAmount(percentOf(available, from.decimals, p, fromKey !== NATIVE))} />
+          </div>
+          {fromKey === NATIVE && <p className="mt-1 text-xs text-mute">100% keeps a little ETH back for the network fee.</p>}
           {parsed && !parsed.ok && <p className="text-xs text-bad">{parsed.error}</p>}
         </div>
 
@@ -168,15 +172,18 @@ export default function SwapPage() {
 
         <div className="rounded-2xl bg-ink-900 p-4">
           <div className="text-xs text-mute">You receive (estimated)</div>
-          <div className="mt-2 flex gap-2">
-            <div className="flex-1 text-2xl">{quote.isFetching && !q ? <Spinner /> : q ? fmtToken(q.amountOut, to.decimals) : '0.0'}</div>
-            <select className="input w-32" value={toKey} onChange={(e) => setTo(e.target.value as SwapToken)} aria-label="To token">
-              {options.map((o) => (
-                <option key={o.key} value={o.key}>
-                  {o.symbol}
-                </option>
-              ))}
-            </select>
+          <div className="mt-2 flex items-center gap-2">
+            <div className="min-w-0 flex-1 truncate text-2xl">{(quote.isFetching || (settling && !!amount)) && !q ? <Spinner /> : q ? fmtToken(q.amountOut, to.decimals) : '0.0'}</div>
+            <TokenPicker
+              className="w-36 shrink-0"
+              label="To token"
+              value={toKey}
+              options={pickerOptions}
+              onChange={(k) => {
+                if (k === fromKey) setFrom(toKey)
+                setTo(k as SwapToken)
+              }}
+            />
           </div>
           {q && toPrice !== null && <p className="text-xs text-mute">≈ {fmtUsd(Number(formatUnits(q.amountOut, to.decimals)) * toPrice)}</p>}
         </div>
@@ -212,12 +219,8 @@ export default function SwapPage() {
             <Row label="Minimum received">
               {fmtToken(minimumReceived(q.amountOut, slippageBps), to.decimals)} {to.symbol}
             </Row>
-            <Row label="Route">{q.route}</Row>
-            <Row label="Pool fee">
-              {q.poolFeeFraction !== null && q.poolFeeFraction !== undefined ? `${(q.poolFeeFraction * 100).toFixed(2)}%` : 'unknown'}
-              {q.feeNote ? <span className="block text-right text-xs text-mute">{q.feeNote}</span> : null}
-            </Row>
-            <Row label="Compared with market price">
+            <Row label="Trading fee">{q.poolFeeFraction !== null && q.poolFeeFraction !== undefined ? `${(q.poolFeeFraction * 100).toFixed(2)}%` : 'unknown'}</Row>
+            <Row label="Vs. market price">
               {market?.loss === null || market?.loss === undefined ? (
                 <span className="text-mute">no market price to compare</span>
               ) : (
@@ -230,14 +233,14 @@ export default function SwapPage() {
             <Row label="Network fee">Shown on the next screen</Row>
           </div>
         )}
-        {impactPct !== null && impactPct > 5 && <ErrorBox>Price impact above 5%: this pool has little liquidity for this size. Consider a smaller amount.</ErrorBox>}
+        {impactPct !== null && impactPct > 5 && <ErrorBox>Price impact above 5%: there is little liquidity for this size. Consider a smaller amount.</ErrorBox>}
         {blocked && (
           <ErrorBox>
-            Swap blocked: you would get {((market!.loss ?? 0) * 100).toFixed(1)}% less than the market price (limit {MARKET_BLOCK_FRACTION * 100}%). The pool&apos;s price is far from the
-            market or it has too little liquidity for this size. Try a smaller amount, or try again later.
+            Swap blocked: you would get {((market!.loss ?? 0) * 100).toFixed(1)}% less than the market price (limit {MARKET_BLOCK_FRACTION * 100}%). The price available is far from the
+            market, or there is too little liquidity for this size. Try a smaller amount, or try again later.
           </ErrorBox>
         )}
-        {market?.level === 'warn' && <Notice tone="warn">You would get {((market.loss ?? 0) * 100).toFixed(1)}% less than the market price, including pool fees and price impact.</Notice>}
+        {market?.level === 'warn' && <Notice tone="warn">You would get {((market.loss ?? 0) * 100).toFixed(1)}% less than the market price, including the trading fee and price impact.</Notice>}
         {q && market?.level === 'unknown' && <Notice>No market price is available to double-check this quote. Compare the rate yourself before you continue.</Notice>}
 
         {needsApproval && !blocked && (
@@ -249,8 +252,7 @@ export default function SwapPage() {
             ) : (
               <>
                 <p>
-                  Uniswap needs permission to spend your {from.symbol}
-                  {steps.length > 1 ? ` (${steps.length} steps; the Pons pool uses Uniswap's Permit2)` : ''}. Exact amounts are approved by default.
+                  Before swapping {from.symbol}, approve it for trading{steps.length > 1 ? ` (${steps.length} quick steps)` : ''}. By default only the exact amount is approved.
                 </p>
                 <label className="flex items-center gap-2 text-xs">
                   <input type="checkbox" className="accent-[#FF5C68]" checked={unlimited} onChange={(e) => setUnlimited(e.target.checked)} />
@@ -268,7 +270,7 @@ export default function SwapPage() {
         <button className="btn-primary w-full" disabled={!q || needsApproval || !parsed?.ok || blocked} onClick={swap}>
           Review swap
         </button>
-        <p className="text-center text-xs text-mute">Quotes come from Uniswap&apos;s on-chain quoters and refresh every 20s. Market prices: GeckoTerminal.</p>
+        <p className="text-center text-xs text-mute">Prices update every 20 seconds.</p>
       </div>
       <TxFlow
         request={req}
