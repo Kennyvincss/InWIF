@@ -14,7 +14,7 @@ const PATTERNS = [
 const QUERY_KEYS = new Set(['type', 'token', 'block_number', 'index', 'items_count', 'value', 'fee', 'hash', 'filter', 'address_hash'])
 
 export async function GET(req: Request, ctx: { params: Promise<{ network: string; path: string[] }> }) {
-  const limited = rateLimit(req, 300)
+  const limited = await rateLimit(req, 300)
   if (limited) return limited
   const { network, path } = await ctx.params
   const cfg = NETWORKS[network as NetworkKey]

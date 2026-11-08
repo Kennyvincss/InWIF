@@ -22,14 +22,14 @@ describe('relay rate limit', () => {
   it('charges each call in a batch and evicts old clients instead of resetting everyone', async () => {
     const { rateLimit } = await import('@/server/guard')
     const req = (ip: string) => new Request('http://localhost/', { headers: { 'x-forwarded-for': ip } })
-    expect(rateLimit(req('1.1.1.1'), 30, 20)).toBeNull()
-    expect(rateLimit(req('1.1.1.1'), 30, 20)?.status).toBe(429)
+    expect(await rateLimit(req('1.1.1.1'), 30, 20)).toBeNull()
+    expect((await rateLimit(req('1.1.1.1'), 30, 20))?.status).toBe(429)
     // Flooding from 12 000 other addresses must not reset a client that is still active
     // (the old limiter cleared every bucket once it tracked 10 000 addresses).
     for (let i = 0; i < 12_000; i++) {
-      rateLimit(req(`10.${i >> 16}.${(i >> 8) & 255}.${i & 255}`), 30)
-      if (i % 1000 === 0) rateLimit(req('1.1.1.1'), 30, 0)
+      await rateLimit(req(`10.${i >> 16}.${(i >> 8) & 255}.${i & 255}`), 30)
+      if (i % 1000 === 0) await rateLimit(req('1.1.1.1'), 30, 0)
     }
-    expect(rateLimit(req('1.1.1.1'), 30, 20)?.status).toBe(429)
+    expect((await rateLimit(req('1.1.1.1'), 30, 20))?.status).toBe(429)
   })
 })

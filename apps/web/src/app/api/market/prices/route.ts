@@ -5,7 +5,7 @@ import { ADDRESS_RE, cached, geckoFetch, logError, rateLimit } from '@/server/gu
 const NETWORKS = new Set(['robinhood'])
 
 export async function GET(req: Request) {
-  const limited = rateLimit(req)
+  const limited = await rateLimit(req)
   if (limited) return limited
   const u = new URL(req.url)
   const network = u.searchParams.get('network') ?? ''
