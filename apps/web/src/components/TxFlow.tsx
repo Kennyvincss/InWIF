@@ -36,6 +36,8 @@ export interface TxRequest {
   /** Short label for notifications, e.g. "Send 10 WIF". */
   summary: string
   kind?: 'send' | 'swap' | 'approve' | 'revoke' | 'other'
+  /** Verified InWIF username of the recipient, shown next to its address in the review. */
+  recipient?: { username: string; address: Address }
 }
 
 type Phase = 'review' | 'signing' | 'pending' | 'done' | 'failed'
@@ -229,7 +231,12 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
             </Row>
             {review?.lines.map((l) => (
               <Row key={l.label} label={l.label}>
-                <span className={cx(l.value.startsWith('0x') && 'mono text-xs', l.value === 'UNLIMITED' && 'font-bold text-bad')}>{l.value}</span>
+                <span className="text-right">
+                  {l.label === 'To' && request?.recipient && l.value.toLowerCase() === request.recipient.address.toLowerCase() && (
+                    <span className="block font-medium text-accent">to @{request.recipient.username}</span>
+                  )}
+                  <span className={cx(l.value.startsWith('0x') && 'mono text-xs', l.value === 'UNLIMITED' && 'font-bold text-bad')}>{l.value}</span>
+                </span>
               </Row>
             ))}
             {fees && (

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { BellRing, Coins, Network, ShieldCheck, Trash2, Smartphone } from 'lucide-react'
 import { NETWORKS, normaliseTokenAddress, readTokenMetadata, INWIF_POLICY } from '@inwif/core'
 import { InstallButton } from '@/components/InstallButton'
+import { MyUsernameCard } from '@/components/Username'
 import { useWallet, type Settings } from '@/lib/wallet-store'
 import { useNetwork, useTokens } from '@/lib/hooks'
 import { SELECTABLE_NETWORKS } from '@/lib/net'
@@ -54,6 +55,8 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title="Settings" />
+
+      <MyUsernameCard />
 
       <section className="card p-5">
         <h2 className="mb-1 flex items-center gap-2 font-display font-bold"><Smartphone className="h-5 w-5 text-accent" /> Install InWIF</h2>

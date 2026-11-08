@@ -9,6 +9,7 @@ import { SELECTABLE_NETWORKS } from '@/lib/net'
 import { ActivityList } from '@/components/ActivityList'
 import { CopyButton, Notice, PageHeader } from '@/components/ui'
 import { PaymentRequestCreator } from '@/components/PaymentRequest'
+import { MyUsernameCard } from '@/components/Username'
 
 export default function ReceivePage() {
   const { activeAccount, state, update } = useWallet()
@@ -59,6 +60,7 @@ export default function ReceivePage() {
           <Notice tone="warn">Only send assets on {network.name}. Sending from another chain to this address may require a bridge and can result in loss.</Notice>
         </div>
       </div>
+      <MyUsernameCard compact />
       <PaymentRequestCreator to={address} tokens={tokens} nativeSymbol={network.nativeCurrency.symbol} />
       <div className="card p-5">
         <h2 className="mb-2 font-display font-bold">Incoming transactions</h2>
