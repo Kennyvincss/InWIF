@@ -11,6 +11,7 @@ import { SimulatorScreen } from '@/components/DevicePanel'
 import { Badge, ErrorBox, Notice, PageHeader, Row, Spinner } from '@/components/ui'
 import { timeAgo } from '@/lib/format'
 import { TauriSerialTransport, isTauri, listSerialPorts } from '@/lib/tauri-transport'
+import { HARDWARE_ENABLED } from '@/lib/features'
 
 const FLOW = [
   'Companion app constructs the transaction',
@@ -24,6 +25,34 @@ const FLOW = [
 ]
 
 export default function HardwarePage() {
+  return HARDWARE_ENABLED ? <HardwareConsole /> : <HardwareComingSoon />
+}
+
+function HardwareComingSoon() {
+  return (
+    <div className="space-y-6">
+      <PageHeader title="Hardware wallet" subtitle="Keys kept on a dedicated device, every signature confirmed with a physical button." />
+      <section className="card relative overflow-hidden p-6">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-lime/10 blur-3xl" />
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="flex items-center gap-2 font-display text-lg font-bold">
+            <Cpu className="h-5 w-5 text-lime" /> InWIF One
+          </h2>
+          <Badge tone="ok">Coming soon</Badge>
+        </div>
+        <p className="mt-2 text-sm text-mute">
+          The InWIF One hardware wallet is in development and not available yet. Until then, your InWIF wallet keeps your keys encrypted on this device, and you approve
+          every transaction yourself.
+        </p>
+        <Link href="/hardware" className="btn-ghost mt-4">
+          About InWIF One
+        </Link>
+      </section>
+    </div>
+  )
+}
+
+function HardwareConsole() {
   const h = useHardware()
   const wallet = useWallet()
   const notify = useNotify()

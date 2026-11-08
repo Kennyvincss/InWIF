@@ -1,7 +1,7 @@
 /**
  * End-to-end smoke test against a running InWIF web build and a local Anvil node.
  *   anvil --chain-id 31337 &
- *   NEXT_PUBLIC_ENABLE_LOCAL_NETWORK=true pnpm build && pnpm start &
+ *   NEXT_PUBLIC_ENABLE_LOCAL_NETWORK=true NEXT_PUBLIC_ENABLE_HARDWARE=true pnpm build && pnpm start &
  *   node e2e/smoke.mjs
  * Performs real transactions on the local chain (software wallet + hardware simulator)
  * and verifies them via the RPC.

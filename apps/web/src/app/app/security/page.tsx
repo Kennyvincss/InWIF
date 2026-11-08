@@ -12,6 +12,7 @@ import { useNotify } from '@/lib/notifications'
 import { fmtToken } from '@/lib/format'
 import { ActivityList } from '@/components/ActivityList'
 import { TxFlow, type TxRequest } from '@/components/TxFlow'
+import { HARDWARE_ENABLED } from '@/lib/features'
 import { Badge, Empty, ErrorBox, Notice, PageHeader, Row, Skeleton } from '@/components/ui'
 
 export default function SecurityPage() {
@@ -64,7 +65,7 @@ export default function SecurityPage() {
     activeWallet?.backedUp,
     state.settings.autoLockMinutes <= 15,
     approvals.data ? approvals.data.approvals.every((a) => !a.unlimited) : undefined,
-    activeWallet?.kind === 'hardware',
+    ...(HARDWARE_ENABLED ? [activeWallet?.kind === 'hardware'] : []),
   ]
 
   return (
@@ -95,12 +96,16 @@ export default function SecurityPage() {
             <li>{activeWallet?.backedUp ? '✓' : '○'} Recovery phrase verified</li>
             <li>{state.settings.autoLockMinutes <= 15 ? '✓' : '○'} Auto-lock ≤ 15 min</li>
             <li>{score[3] ? '✓' : '○'} No unlimited approvals</li>
-            <li>{activeWallet?.kind === 'hardware' ? '✓' : '○'} Hardware signing</li>
+            {HARDWARE_ENABLED && <li>{activeWallet?.kind === 'hardware' ? '✓' : '○'} Hardware signing</li>}
           </ul>
         </section>
         <section className="card p-5">
           <p className="text-sm text-mute">Connected devices</p>
-          {hw.info ? (
+          {!HARDWARE_ENABLED ? (
+            <p className="mt-1 text-sm">
+              Hardware wallet <span className="chip ml-1">Coming soon</span>
+            </p>
+          ) : hw.info ? (
             <>
               <p className="mt-1 flex items-center gap-2 font-semibold">
                 <Cpu className="h-4 w-4 text-lime" /> {state.deviceNames[hw.info.serial] ?? hw.info.model}
@@ -112,9 +117,11 @@ export default function SecurityPage() {
           ) : (
             <p className="mt-1 text-sm">None connected</p>
           )}
-          <Link href="/app/hardware" className="mt-2 inline-block text-xs text-lime">
-            Manage devices →
-          </Link>
+          {HARDWARE_ENABLED && (
+            <Link href="/app/hardware" className="mt-2 inline-block text-xs text-lime">
+              Manage devices →
+            </Link>
+          )}
         </section>
       </div>
 

@@ -28,6 +28,7 @@ Optional env vars (see `apps/web/.env.example`):
 |---|---|
 | `NEXT_PUBLIC_ROBINHOOD_RPC_URL` | default: public RPC |
 | `NEXT_PUBLIC_ENABLE_LOCAL_NETWORK=true` | adds the Anvil network for development |
+| `NEXT_PUBLIC_ENABLE_HARDWARE=true` | shows the hardware wallet (device simulator, USB). Leave unset in production: no device exists yet, so users see "Coming soon" |
 | `UPSTASH_REDIS_REST_URL` + `UPSTASH_REDIS_REST_TOKEN` (or `KV_REST_API_URL` + `KV_REST_API_TOKEN`) | server-only; shared rate limits and relay cache across instances (set by the Vercel ↔ Upstash integration). Check `/api/health` |
 
 Security headers and CSP are set in `next.config.mjs`. Behind a load balancer, replace the in-memory rate limiter

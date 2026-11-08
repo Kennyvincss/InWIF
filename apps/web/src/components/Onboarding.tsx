@@ -15,6 +15,7 @@ import {
 import { useWallet } from '@/lib/wallet-store'
 import { LogoMark } from './Logo'
 import { BackupModal } from './BackupModal'
+import { HARDWARE_ENABLED } from '@/lib/features'
 import { ErrorBox, Notice, Spinner, cx } from './ui'
 
 type Step = 'welcome' | 'import' | 'watch' | 'password' | 'done'
@@ -111,13 +112,24 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                   <p className="text-xs text-mute">Recovery phrase or private key, validated locally.</p>
                 </div>
               </button>
-              <Link href="/app/hardware" className="flex items-center gap-3 rounded-2xl border border-white/10 p-4 hover:bg-white/[0.03]" onClick={onFinished}>
-                <Cpu className="h-5 w-5 text-lime" />
-                <div>
-                  <p className="font-semibold">Connect a hardware wallet</p>
-                  <p className="text-xs text-mute">InWIF device (USB-C) or the built-in device simulator.</p>
+              {HARDWARE_ENABLED ? (
+                <Link href="/app/hardware" className="flex items-center gap-3 rounded-2xl border border-white/10 p-4 hover:bg-white/[0.03]" onClick={onFinished}>
+                  <Cpu className="h-5 w-5 text-lime" />
+                  <div>
+                    <p className="font-semibold">Connect a hardware wallet</p>
+                    <p className="text-xs text-mute">InWIF device (USB-C) or the built-in device simulator.</p>
+                  </div>
+                </Link>
+              ) : (
+                <div className="flex items-center gap-3 rounded-2xl border border-white/10 p-4 opacity-70" aria-disabled="true">
+                  <Cpu className="h-5 w-5 text-lime" />
+                  <div className="flex-1">
+                    <p className="font-semibold">Connect a hardware wallet</p>
+                    <p className="text-xs text-mute">InWIF One hardware wallet.</p>
+                  </div>
+                  <span className="chip">Coming soon</span>
                 </div>
-              </Link>
+              )}
               <button className="flex items-center gap-3 rounded-2xl border border-white/10 p-4 text-left hover:bg-white/[0.03]" onClick={() => setStep('watch')}>
                 <ScanEye className="h-5 w-5 text-lime" />
                 <div>

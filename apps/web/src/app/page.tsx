@@ -25,6 +25,7 @@ import { ROBINHOOD_MAINNET, WIF_ADDRESS } from '@inwif/core'
 import { Section, SitePage } from '@/components/site/Site'
 import { DeviceRender, PhoneRender } from '@/components/site/DeviceRender'
 import { LogoMark } from '@/components/Logo'
+import { HARDWARE_ENABLED } from '@/lib/features'
 
 const fade = { initial: { opacity: 0, y: 18 }, whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-60px' }, transition: { duration: 0.5 } }
 
@@ -42,7 +43,7 @@ const FAQ = [
   { q: 'Do I need $WIF to use InWIF?', a: 'No. Every feature works identically whether you hold zero $WIF or a million. $WIF integrations are optional ways to take part in the World Is Flat ecosystem.' },
   { q: 'Where are my keys stored?', a: 'On your device only, encrypted with AES-256-GCM under a key derived from your password. InWIF servers never receive recovery phrases or private keys, and no InWIF API accepts them.' },
   { q: 'Can InWIF recover my wallet if I lose my phrase?', a: 'No. That is what self-custody means: only your recovery phrase can restore your wallet. Write it down and store it offline.' },
-  { q: 'Can I buy the hardware wallet?', a: 'Not yet. InWIF One is a prototype in development. You can try the full hardware signing flow today with the built-in device simulator or a development board.' },
+  { q: 'Can I buy the hardware wallet?', a: 'Not yet. The InWIF One hardware wallet is in development and coming soon.' },
   { q: 'Has InWIF been audited?', a: 'Not yet. The code is open and tested, but no independent audit has been completed.' },
 ]
 
@@ -131,7 +132,7 @@ export default function Home() {
               </ul>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link href="/hardware" className="btn-primary">Hardware details</Link>
-                <Link href="/app/hardware" className="btn-ghost">Try the simulator</Link>
+                {HARDWARE_ENABLED ? <Link href="/app/hardware" className="btn-ghost">Try the simulator</Link> : <span className="chip self-center">Coming soon</span>}
               </div>
               <p className="mt-4 text-xs text-mute">InWIF One has not been manufactured or independently tested. Renders are illustrations of the proposed design.</p>
             </div>
