@@ -1,7 +1,8 @@
 'use client'
 import { useState } from 'react'
-import { BellRing, Coins, Network, ShieldCheck, Trash2 } from 'lucide-react'
+import { BellRing, Coins, Network, ShieldCheck, Trash2, Smartphone } from 'lucide-react'
 import { NETWORKS, normaliseTokenAddress, readTokenMetadata, INWIF_POLICY } from '@inwif/core'
+import { InstallButton } from '@/components/InstallButton'
 import { useWallet, type Settings } from '@/lib/wallet-store'
 import { useNetwork, useTokens } from '@/lib/hooks'
 import { SELECTABLE_NETWORKS } from '@/lib/net'
@@ -53,6 +54,13 @@ export default function SettingsPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <PageHeader title="Settings" />
+
+      <section className="card p-5">
+        <h2 className="mb-1 flex items-center gap-2 font-display font-bold"><Smartphone className="h-5 w-5 text-accent" /> Install InWIF</h2>
+        <p className="mb-4 text-sm text-mute">Add InWIF to your home screen or desktop. It opens full-screen like an app, with shortcuts to Send, Receive, Swap and Live $WIF.</p>
+        <InstallButton />
+        <p className="mt-3 text-xs text-dim">Don&apos;t see a button? Use your browser&apos;s menu and choose &ldquo;Install app&rdquo; or &ldquo;Add to Home Screen&rdquo;. Already installed? You&apos;re all set.</p>
+      </section>
 
       <section className="card p-5">
         <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><Network className="h-5 w-5 text-accent" /> Network</h2>

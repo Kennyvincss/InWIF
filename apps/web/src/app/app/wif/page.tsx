@@ -66,6 +66,8 @@ export default function WifPage() {
           <>
             <Link href="/app/swap" className="btn-primary">Get $WIF</Link>
             <Link href="/app/send" className="btn-ghost">Send $WIF</Link>
+            <Link href="/app/wif/live" className="btn-ghost"><span className="live-dot" /> Live market</Link>
+            <Link href="/app/wif/card" className="btn-ghost">My $WIF card</Link>
           </>
         }
       />

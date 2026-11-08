@@ -11,6 +11,9 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   applicationName: 'InWIF',
   icons: { icon: '/icon.svg' },
+  // iPhone/iPad: open full-screen from the home screen, like an app.
+  appleWebApp: { capable: true, title: 'InWIF', statusBarStyle: 'black-translucent' },
+  formatDetection: { telephone: false },
   openGraph: { type: 'website', siteName: 'InWIF', title: SITE_TITLE, description: SITE_DESCRIPTION, url: SITE_URL },
   twitter: { card: 'summary_large_image', title: SITE_TITLE, description: SITE_DESCRIPTION },
 }

@@ -1,8 +1,9 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { encodeFunctionData, erc20Abi, formatUnits, type Address } from 'viem'
 import { ArrowUpRight } from 'lucide-react'
-import { checkRecipient, parseAmount } from '@inwif/core'
+import { checkRecipient, parseAmount, parsePaymentRequest } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useNetwork, usePortfolio, useTokens } from '@/lib/hooks'
 import { fmtToken, fmtUsd } from '@/lib/format'
@@ -11,6 +12,14 @@ import { ErrorBox, Findings, Notice, PageHeader, PercentButtons, TokenPicker } f
 import { percentOf, useGasReserve } from '@/lib/amount'
 
 export default function SendPage() {
+  return (
+    <Suspense fallback={null}>
+      <SendForm />
+    </Suspense>
+  )
+}
+
+function SendForm() {
   const { activeAccount, activeWallet, state } = useWallet()
   const { network } = useNetwork()
   const tokens = useTokens()
@@ -19,6 +28,25 @@ export default function SendPage() {
   const [to, setTo] = useState('')
   const [amount, setAmount] = useState('')
   const [req, setReq] = useState<TxRequest | null>(null)
+
+  // Opened from a payment link (/pay → /app/send?to=…&token=…&amount=…): validate, then fill in.
+  const search = useSearchParams()
+  const [fromLink, setFromLink] = useState<{ note?: string; error?: string } | null>(null)
+  const applied = useRef<string | null>(null)
+  useEffect(() => {
+    // Apply each link once, so later edits by the user are never overwritten.
+    if (!search.get('to') || applied.current === `${network.key}?${search.toString()}`) return
+    applied.current = `${network.key}?${search.toString()}`
+    const p = parsePaymentRequest({ to: search.get('to'), token: search.get('token'), amount: search.get('amount'), note: search.get('note') }, { tokens, nativeSymbol: network.nativeCurrency.symbol })
+    if (!p.ok) {
+      setFromLink({ error: network.key !== 'robinhood' ? `This payment request is for Robinhood Chain. Switch network in the top bar.` : p.error })
+      return
+    }
+    setTo(p.request.to)
+    setAsset(p.request.asset)
+    if (p.request.amount) setAmount(p.request.amount)
+    setFromLink({ note: p.request.note })
+  }, [search, tokens, network])
 
   const row = rows.find((r) => r.key === asset)
   // A plain ETH transfer uses 21,000 gas; keep its fee back when filling from the ETH balance.
@@ -56,6 +84,14 @@ export default function SendPage() {
   return (
     <div className="mx-auto max-w-xl">
       <PageHeader title="Send" subtitle={`On ${network.name}. You will review every detail and the network fee before signing.`} />
+      {fromLink?.error && <div className="mb-4"><ErrorBox>{fromLink.error}</ErrorBox></div>}
+      {fromLink && !fromLink.error && (
+        <div className="mb-4">
+          <Notice tone="lime">
+            Filled in from a payment request{fromLink.note ? <> — &ldquo;{fromLink.note}&rdquo;</> : ''}. Check the recipient before you send.
+          </Notice>
+        </div>
+      )}
       <div className="card space-y-5 p-6">
         <div>
           <label className="label" htmlFor="asset">Asset</label>

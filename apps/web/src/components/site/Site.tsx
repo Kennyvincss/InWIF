@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { ArrowUpRight, Menu, X } from 'lucide-react'
 import { Logo } from '../Logo'
 import { cx } from '../ui'
+import { InstallButton } from '../InstallButton'
 
 export const SITE_NAV = [
   { href: '/', label: 'Home' },
@@ -53,6 +54,7 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
+          <InstallButton compact />
           <Link href="/app" className="btn-primary py-2">
             Launch wallet <ArrowUpRight className="h-4 w-4" />
           </Link>
