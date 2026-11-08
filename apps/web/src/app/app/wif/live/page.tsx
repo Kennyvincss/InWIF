@@ -57,7 +57,8 @@ export default function LiveWifPage() {
     enabled: onMainnet && !!pool,
     queryFn: () => marketApi.pool(network.geckoTerminalNetwork!, pool!),
     refetchInterval: 20_000,
-    retry: 1,
+    retry: 3,
+    retryDelay: (n) => 2_000 * 2 ** n,
   })
   const holders = useQuery({
     queryKey: ['wif-explorer'],
@@ -105,7 +106,7 @@ export default function LiveWifPage() {
   const h24 = stats.data?.windows.h24
   const whales = (trades.data ?? []).filter((t) => t.volumeUsd >= whaleUsd)
   const feed = (whalesOnly ? whales : trades.data ?? []).slice(0, 60)
-  const updatedAgo = trades.dataUpdatedAt ? Math.round((now - trades.dataUpdatedAt) / 1000) : null
+  const updatedAgo = trades.dataUpdatedAt ? Math.max(0, Math.round((now - trades.dataUpdatedAt) / 1000)) : null
   const price = stats.data?.priceUsd ?? market.data?.priceUsd ?? null
   const buyPct = flow.buyShare === null ? null : Math.round(flow.buyShare * 100)
 
