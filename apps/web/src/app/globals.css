@@ -3,15 +3,13 @@
 @tailwind utilities;
 
 :root {
-  --bg: #090b10;
-  --bg-2: #11151d;
-  --card: #171d27;
+  --bg: #000000;
+  --surface: #0a0a0b;
+  --line: rgba(255, 255, 255, 0.06);
   --accent: #a6f36a;
-  --accent-2: #d5ffb8;
+  --data: #22e5ff;
   --text: #ffffff;
-  --text-2: #8993a4;
-  --ok: #62d99a;
-  --bad: #ff5c68;
+  --text-2: #8a8f98;
   color-scheme: dark;
 }
 
@@ -22,40 +20,68 @@ body {
 }
 
 body {
-  font-feature-settings: 'cv11', 'ss01';
+  /* Tabular figures everywhere: numbers never shift width as they update. */
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: rgba(166, 243, 106, 0.3);
+  background: rgba(166, 243, 106, 0.28);
+}
+
+/* Quiet scrollbars that disappear into the black. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 @layer components {
-  .card {
-    @apply rounded-2xl border border-white/[0.06] bg-ink-800 shadow-card;
+  /* Ambient light: two faint glows that fade into pure black. */
+  .ambient {
+    background:
+      radial-gradient(1100px 520px at 12% -12%, rgba(166, 243, 106, 0.075), transparent 62%),
+      radial-gradient(900px 480px at 100% -8%, rgba(34, 229, 255, 0.06), transparent 60%),
+      #000;
+    background-attachment: fixed;
   }
+
+  .card {
+    @apply rounded-2xl border border-line bg-ink-800 shadow-card transition-[border-color,box-shadow,background-color];
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0) 38%);
+  }
+  /* Clickable cards light up at the edge. */
+  a.card:hover,
+  button.card:hover {
+    @apply border-line-strong shadow-glow-soft;
+  }
+
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition
-      disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime/60;
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-[background-color,border-color,box-shadow,color,transform,opacity] duration-150
+      active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
   .btn-primary {
-    @apply btn bg-lime text-ink-950 hover:bg-lime-soft;
+    @apply btn bg-lime text-black hover:bg-lime-soft hover:shadow-glow disabled:hover:bg-lime disabled:hover:shadow-none;
   }
   .btn-ghost {
-    @apply btn border border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.07];
+    @apply btn border border-white/[0.08] bg-white/[0.02] text-white hover:border-white/[0.16] hover:bg-white/[0.05];
   }
   .btn-danger {
-    @apply btn bg-bad/90 text-white hover:bg-bad;
+    @apply btn bg-bad/90 text-white hover:bg-bad hover:shadow-[0_0_28px_-6px_rgba(255,92,104,.55)];
   }
+
   .input {
-    @apply w-full rounded-xl border border-white/10 bg-ink-900 px-3.5 py-2.5 text-sm text-white placeholder:text-mute/70
-      outline-none transition focus:border-lime/50 focus:ring-2 focus:ring-lime/20;
+    @apply w-full rounded-xl border border-white/[0.08] bg-black px-3.5 py-2.5 text-sm text-white outline-none transition-[border-color,box-shadow]
+      placeholder:text-mute/60 hover:border-white/[0.14] focus:border-lime/50 focus:shadow-[0_0_0_3px_rgba(166,243,106,.12),0_0_24px_-8px_rgba(166,243,106,.35)];
   }
   .label {
-    @apply mb-1.5 block text-xs font-medium uppercase tracking-wider text-mute;
+    @apply mb-1.5 block text-[11px] font-medium uppercase tracking-[0.12em] text-mute;
   }
   .chip {
-    @apply inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-0.5 text-[11px] font-medium text-mute;
+    @apply inline-flex items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-[11px] font-medium text-mute transition-[border-color,color,background-color,box-shadow];
   }
   .mono {
     @apply font-mono;
@@ -63,14 +89,23 @@ body {
 }
 
 .bg-grid {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 48px 48px;
 }
 
 .text-gradient {
-  background: linear-gradient(120deg, #ffffff 0%, #d5ffb8 45%, #a6f36a 100%);
+  background: linear-gradient(120deg, #ffffff 0%, #d5ffb8 45%, #a6f36a 75%, #22e5ff 120%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
