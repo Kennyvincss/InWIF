@@ -11,7 +11,7 @@ import { fmtUsd } from '@/lib/format'
 export const SERIES = ['#22E5FF', '#00E59B', '#F5C451', '#FF6B9A', '#9B8CFF', '#FF8A4C']
 
 /** Single-series area chart with crosshair tooltip and a table fallback. */
-export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; height?: number; label: string }) {
+export function AreaChart({ data, height = 200, label, format = fmtUsd }: { data: PricePoint[]; height?: number; label: string; format?: (v: number) => string }) {
   const ref = useRef<SVGSVGElement>(null)
   const [hover, setHover] = useState<number | null>(null)
   const fillId = `area-fill-${useId().replace(/:/g, '')}`
@@ -23,15 +23,20 @@ export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; h
     const t0 = data[0]!.t
     const t1 = data[data.length - 1]!.t
     const vals = data.map((d) => d.close)
-    const mn = Math.min(...vals)
-    const mx = Math.max(...vals)
+    const lo = Math.min(...vals)
+    const hi = Math.max(...vals)
+    // Keep at least a 5% vertical range so tiny moves (e.g. a 0.1% wobble) look tiny, not dramatic.
+    const minSpan = Math.abs(hi) * 0.05
+    const mid = (lo + hi) / 2
+    const mn = hi - lo < minSpan ? mid - minSpan / 2 : lo
+    const mx = hi - lo < minSpan ? mid + minSpan / 2 : hi
     const span = mx - mn || mx || 1
     const x = (t: number) => pad.l + ((t - t0) / (t1 - t0 || 1)) * (W - pad.l - pad.r)
     const y = (v: number) => pad.t + (1 - (v - mn) / span) * (H - pad.t - pad.b)
     const xs = data.map((d) => x(d.t))
     const ys = data.map((d) => y(d.close))
     const p = xs.map((xx, i) => `${i ? 'L' : 'M'}${xx.toFixed(1)},${ys[i]!.toFixed(1)}`).join('')
-    return { path: p, area: `${p}L${xs[xs.length - 1]},${H - pad.b}L${xs[0]},${H - pad.b}Z`, xs, ys, min: mn, max: mx }
+    return { path: p, area: `${p}L${xs[xs.length - 1]},${H - pad.b}L${xs[0]},${H - pad.b}Z`, xs, ys, min: lo, max: hi }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data, H])
 
@@ -54,7 +59,7 @@ export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; h
         viewBox={`0 0 ${W} ${H}`}
         className="h-auto w-full touch-none"
         role="img"
-        aria-label={`${label}: from ${fmtUsd(data[0]!.close)} to ${fmtUsd(data[data.length - 1]!.close)}`}
+        aria-label={`${label}: from ${format(data[0]!.close)} to ${format(data[data.length - 1]!.close)}`}
         onPointerMove={(e) => onMove(e.clientX)}
         onPointerLeave={() => setHover(null)}
         tabIndex={0}
@@ -90,19 +95,19 @@ export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; h
       </svg>
       {h && (
         <div className="pointer-events-none absolute top-0 rounded-lg border border-white/10 bg-ink-900/95 px-2.5 py-1.5 text-xs shadow-lg" style={{ left: `min(calc(${(xs[hover!]! / W) * 100}% + 8px), calc(100% - 150px))` }}>
-          <div className="font-semibold text-white">{fmtUsd(h.close)}</div>
+          <div className="font-semibold text-white">{format(h.close)}</div>
           <div className="text-mute">{new Date(h.t * 1000).toLocaleString()}</div>
         </div>
       )}
       <details className="mt-1 text-xs text-mute">
-        <summary className="cursor-pointer select-none">View as table (min {fmtUsd(min)} · max {fmtUsd(max)})</summary>
+        <summary className="cursor-pointer select-none">View as table (min {format(min)} · max {format(max)})</summary>
         <div className="mt-2 max-h-40 overflow-y-auto">
           <table className="w-full">
             <tbody>
               {data.map((d) => (
                 <tr key={d.t} className="border-b border-white/5">
                   <td className="py-0.5">{new Date(d.t * 1000).toLocaleString()}</td>
-                  <td className="py-0.5 text-right text-white">{fmtUsd(d.close)}</td>
+                  <td className="py-0.5 text-right text-white">{format(d.close)}</td>
                 </tr>
               ))}
             </tbody>

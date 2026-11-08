@@ -189,15 +189,24 @@ export function usePortfolioHistory(rows: PricedBalance[], range: string) {
   const { network } = useNetwork()
   const weth = network.uniswapV3?.weth9
   const held = rows.filter((r) => r.amount > 0 && r.priceUsd !== null)
+  const wifAddr = rows.find((r) => r.token?.isWif)?.key as Address | undefined
   return useQuery({
-    queryKey: ['history', network.key, range, held.map((r) => `${r.key}:${r.amount}`).join(',')],
+    queryKey: ['history', network.key, range, wifAddr, held.map((r) => `${r.key}:${r.amount}`).join(',')],
     enabled: held.length > 0 && !!network.geckoTerminalNetwork,
     queryFn: async () => {
-      const { holdingsValueSeries } = await import('@inwif/core')
+      const { holdingsValueSeries, denominateSeries } = await import('@inwif/core')
       const series = await Promise.all(
-        held.map(async (r) => ({ amount: r.amount, prices: await fetchHistory(network, (r.key === 'native' ? weth : r.key) as Address, range) })),
+        held.map(async (r) => ({ key: r.key, amount: r.amount, prices: await fetchHistory(network, (r.key === 'native' ? weth : r.key) as Address, range) })),
       )
-      return holdingsValueSeries(series.filter((s) => s.prices.length > 0))
+      const usd = holdingsValueSeries(series.filter((s) => s.prices.length > 0))
+      // The same history in $WIF: each point divided by the $WIF price at that moment.
+      let wif: typeof usd | null = null
+      if (wifAddr) {
+        const wifPrices = series.find((s) => s.key === wifAddr)?.prices ?? (await fetchHistory(network, wifAddr, range).catch(() => []))
+        const d = denominateSeries(usd, wifPrices)
+        wif = d.length > 1 ? d : null
+      }
+      return { usd, wif }
     },
     staleTime: 300_000,
     retry: 2,
