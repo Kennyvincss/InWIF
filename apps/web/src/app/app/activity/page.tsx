@@ -16,7 +16,7 @@ export default function ActivityPage() {
   )
   return (
     <div>
-      <PageHeader title="Activity" subtitle="Transactions and token transfers indexed by the network's Blockscout explorer." />
+      <PageHeader title="Activity" subtitle="Your transactions and token transfers." />
       <div className="mb-4 flex flex-wrap gap-2">
         {FILTERS.map((x) => (
           <button key={x} onClick={() => setF(x)} className={cx('chip capitalize', f === x && 'border-lime/40 text-lime')}>

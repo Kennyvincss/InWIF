@@ -64,9 +64,6 @@ export default function SettingsPage() {
         <div className="mt-3">
           <Row label="Chain ID">{network.chainId}</Row>
           <Row label="Native currency">{network.nativeCurrency.symbol}</Row>
-          <Row label="RPC endpoints"><span className="text-xs">{network.rpcUrls.join(' · ')}</span></Row>
-          <Row label="Explorer">{network.explorer.url || '—'}</Row>
-          <Row label="Sources"><span className="text-xs">{network.sources.join(' · ')}</span></Row>
         </div>
       </section>
 

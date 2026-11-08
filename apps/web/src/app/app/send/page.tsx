@@ -7,7 +7,8 @@ import { useWallet } from '@/lib/wallet-store'
 import { useNetwork, usePortfolio, useTokens } from '@/lib/hooks'
 import { fmtToken, fmtUsd } from '@/lib/format'
 import { TxFlow, type TxRequest } from '@/components/TxFlow'
-import { ErrorBox, Findings, Notice, PageHeader, TokenIcon } from '@/components/ui'
+import { ErrorBox, Findings, Notice, PageHeader, PercentButtons, TokenPicker } from '@/components/ui'
+import { percentOf, useGasReserve } from '@/lib/amount'
 
 export default function SendPage() {
   const { activeAccount, activeWallet, state } = useWallet()
@@ -20,6 +21,9 @@ export default function SendPage() {
   const [req, setReq] = useState<TxRequest | null>(null)
 
   const row = rows.find((r) => r.key === asset)
+  // A plain ETH transfer uses 21,000 gas; keep its fee back when filling from the ETH balance.
+  const reserve = useGasReserve(21_000n)
+  const available = row ? (asset === 'native' ? (reserve === undefined ? undefined : row.raw > reserve ? row.raw - reserve : 0n) : row.raw) : undefined
   const decimals = row?.decimals ?? 18
   const recipient = useMemo(
     () =>
@@ -55,16 +59,16 @@ export default function SendPage() {
       <div className="card space-y-5 p-6">
         <div>
           <label className="label" htmlFor="asset">Asset</label>
-          <div className="flex items-center gap-3">
-            {row && <TokenIcon symbol={row.symbol} />}
-            <select id="asset" className="input" value={asset} onChange={(e) => setAsset(e.target.value)}>
-              {rows.map((r) => (
-                <option key={r.key} value={r.key}>
-                  {r.symbol} — balance {fmtToken(r.raw, r.decimals)}
-                </option>
-              ))}
-            </select>
-          </div>
+          <TokenPicker
+            label="Asset"
+            value={asset}
+            onChange={(k) => {
+              setAsset(k)
+              setAmount('')
+            }}
+            options={rows.map((r) => ({ key: r.key, symbol: r.symbol, detail: fmtToken(r.raw, r.decimals) }))}
+          />
+          {row && <p className="mt-1 text-xs text-mute">Balance {fmtToken(row.raw, row.decimals)} {row.symbol}</p>}
         </div>
         <div>
           <label className="label" htmlFor="to">Recipient address</label>
@@ -76,20 +80,16 @@ export default function SendPage() {
           )}
         </div>
         <div>
-          <div className="flex items-center justify-between">
-            <label className="label" htmlFor="amt">Amount</label>
-            {row && asset !== 'native' && (
-              <button className="text-xs text-lime" onClick={() => setAmount(formatUnits(row.raw, row.decimals))}>
-                Max
-              </button>
-            )}
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <label className="label mb-0" htmlFor="amt">Amount</label>
+            <PercentButtons disabled={!row || available === undefined || available === 0n} onPick={(p) => row && available !== undefined && setAmount(percentOf(available, row.decimals, p, asset !== 'native'))} />
           </div>
           <input id="amt" className="input text-lg" inputMode="decimal" placeholder="0.0" value={amount} onChange={(e) => setAmount(e.target.value)} />
           <div className="mt-1 flex justify-between text-xs text-mute">
             <span>{usd !== null ? `≈ ${fmtUsd(usd)}` : ' '}</span>
             {amt && !amt.ok && <span className="text-bad">{amt.error}</span>}
           </div>
-          {asset === 'native' && <p className="mt-1 text-xs text-mute">Keep some ETH for network fees. The review shows the exact maximum fee.</p>}
+          {asset === 'native' && <p className="mt-1 text-xs text-mute">100% keeps a little ETH back for the network fee. The review shows the exact fee.</p>}
         </div>
         {activeWallet?.kind === 'watch' && <ErrorBox>Watch-only wallets cannot send.</ErrorBox>}
         <Notice>Sending is free in InWIF. You only pay the {network.name} network fee, shown before you confirm.</Notice>

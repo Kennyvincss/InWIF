@@ -141,7 +141,7 @@ describe('review of V4 swap transactions', () => {
     const tx = buildV4SwapTx(v4Quote(), 50, 2_000_000_000n)
     const r = reviewTransaction({ to: tx.to, data: tx.data, value: tx.value, chainId: 4663 }, ctx)
     expect(r.title).toBe('Interact with Uniswap Universal Router')
-    expect(r.lines.find((l) => l.label === 'Function')?.value).toMatch(/Universal Router swap/)
+    expect(r.lines.find((l) => l.label === 'Function')?.value).toBe('swap')
     expect(r.risk).toBe('low')
   })
 })

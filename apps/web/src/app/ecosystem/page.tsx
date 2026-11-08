@@ -50,7 +50,7 @@ export default function EcosystemPage() {
         <div className="grid gap-4 md:grid-cols-3">
           {[
             ['Track', 'Balance, verified contract metadata, holders, liquidity, price history and your full transfer history.'],
-            ['Trade', 'Swap to and from $WIF at the best Uniswap price, including the main Pons pool. Zero InWIF fee; pool fee measured on-chain and disclosed.'],
+            ['Trade', 'Swap to and from $WIF at the best available price. Zero InWIF fee; pool fee measured on-chain and disclosed.'],
             ['Send & receive', 'Validated addresses, decoded reviews and simulation for every $WIF transfer.'],
             ['Protect', 'See and revoke every contract allowed to spend your $WIF.'],
             ['Participate', 'Ecosystem profile from public on-chain activity, plus free security quests.'],

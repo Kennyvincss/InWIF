@@ -30,9 +30,9 @@ const UINT160_MAX = 2n ** 160n - 1n
 
 /** Function names shown for calls InWIF builds itself (selector → name). */
 export const KNOWN_FUNCTIONS: Record<string, string> = {
-  '0x3593564c': 'execute (Uniswap Universal Router swap)',
+  '0x3593564c': 'swap',
   '0xac9650d8': 'multicall',
-  '0x5ae401dc': 'multicall (Uniswap SwapRouter02 swap)',
+  '0x5ae401dc': 'swap',
 }
 
 /** Treat anything ≥ 2^255 as effectively unlimited (common "infinite approval" values). */
@@ -185,7 +185,7 @@ export function reviewTransaction(tx: TxLike, ctx: ReviewContext): TxReview {
       if (flagged(action.spender)) findings.push({ code: 'flagged-spender', severity: 'danger', message: 'Spender is on your flagged list.' })
       break
     case 'permit2-approve':
-      title = 'Approve token spending via Permit2'
+      title = 'Approve token for swapping'
       lines.push(
         { label: 'Token', value: label(action.token) ?? action.token },
         { label: 'Spender', value: label(action.spender) ? `${label(action.spender)} (${action.spender})` : action.spender },

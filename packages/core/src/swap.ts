@@ -135,7 +135,7 @@ export async function getBestQuote(
   const best = candidates
     .filter((c): c is NonNullable<typeof c> => c !== null && c.amountOut > 0n)
     .sort((x, y) => (y.amountOut > x.amountOut ? 1 : y.amountOut < x.amountOut ? -1 : 0))[0]
-  if (!best) throw new Error('No Uniswap V3 pool with sufficient liquidity was found for this pair.')
+  if (!best) throw new Error('Not enough liquidity to swap this pair right now.')
 
   // Estimate price impact by comparing against a quote for 1/1000th of the size.
   let priceImpact: number | null = null
