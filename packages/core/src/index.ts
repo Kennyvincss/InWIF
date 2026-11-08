@@ -29,3 +29,5 @@ export const INWIF_POLICY = {
 } as const
 export * from './defi'
 export * from './server-rpc'
+export * from './payments'
+export * from './token-check'

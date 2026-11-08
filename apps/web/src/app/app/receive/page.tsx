@@ -4,10 +4,11 @@ import QRCode from 'qrcode'
 import { Share2 } from 'lucide-react'
 import { NETWORKS } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
-import { useActivity, useNetwork } from '@/lib/hooks'
+import { useActivity, useNetwork, useTokens } from '@/lib/hooks'
 import { SELECTABLE_NETWORKS } from '@/lib/net'
 import { ActivityList } from '@/components/ActivityList'
 import { CopyButton, Notice, PageHeader } from '@/components/ui'
+import { PaymentRequestCreator } from '@/components/PaymentRequest'
 
 export default function ReceivePage() {
   const { activeAccount, state, update } = useWallet()
@@ -15,11 +16,12 @@ export default function ReceivePage() {
   const [qr, setQr] = useState<string>('')
   const address = activeAccount?.address
   const activity = useActivity(address)
+  const tokens = useTokens()
 
   useEffect(() => {
     if (!address) return
     // EIP-681 URI so wallets that scan it pick the right chain.
-    QRCode.toDataURL(`ethereum:${address}@${network.chainId}`, { margin: 1, width: 560, color: { dark: '#090B10', light: '#FFFFFF' } }).then(setQr)
+    QRCode.toDataURL(`ethereum:${address}@${network.chainId}`, { margin: 1, width: 560, color: { dark: '#000000', light: '#FFFFFF' } }).then(setQr)
   }, [address, network.chainId])
 
   if (!address) return null
@@ -44,7 +46,7 @@ export default function ReceivePage() {
           </div>
           <div>
             <p className="label">Your address</p>
-            <p className="break-all rounded-xl bg-ink-900 p-3 font-mono text-sm">{address}</p>
+            <p className="break-all rounded-xl border border-white/[0.08] bg-black/60 p-3 font-mono text-sm">{address}</p>
           </div>
           <div className="flex gap-2">
             <CopyButton value={address} label="Copy address" />
@@ -57,6 +59,7 @@ export default function ReceivePage() {
           <Notice tone="warn">Only send assets on {network.name}. Sending from another chain to this address may require a bridge and can result in loss.</Notice>
         </div>
       </div>
+      <PaymentRequestCreator to={address} tokens={tokens} nativeSymbol={network.nativeCurrency.symbol} />
       <div className="card p-5">
         <h2 className="mb-2 font-display font-bold">Incoming transactions</h2>
         <ActivityList items={activity.data?.filter((i) => i.direction === 'in')} loading={activity.isLoading} error={activity.error as Error | null} emptyText="Nothing received on this network yet." />

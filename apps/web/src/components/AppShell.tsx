@@ -9,6 +9,8 @@ import {
   Bell,
   Cpu,
   History,
+  Radio,
+  ScanSearch,
   Landmark,
   LayoutDashboard,
   Lock,
@@ -27,6 +29,7 @@ import { useVerification } from '@/lib/hooks'
 import { useNotify } from '@/lib/notifications'
 import { SELECTABLE_NETWORKS } from '@/lib/net'
 import { DevicePanel } from './DevicePanel'
+import { InstallButton } from './InstallButton'
 import { timeAgo } from '@/lib/format'
 
 const NAV_GROUPS = [
@@ -44,6 +47,8 @@ const NAV_GROUPS = [
     label: 'Markets',
     items: [
       { href: '/app/wif', label: '$WIF', icon: Sparkles },
+      { href: '/app/wif/live', label: 'Live $WIF', icon: Radio },
+      { href: '/app/check', label: 'Token check', icon: ScanSearch },
       { href: '/app/defi', label: 'DeFi', icon: Landmark },
     ],
   },
@@ -154,7 +159,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname()
   const { lock, unlocked, activeWallet, activeAccount } = useWallet()
   const [mobileNav, setMobileNav] = useState(false)
-  const isActive = (href: string) => (href === '/app' ? path === '/app' : path.startsWith(href))
+  // The most specific matching item is active (so /app/wif/live does not also light up $WIF).
+  const activeHref = NAV.map((n) => n.href)
+    .filter((h) => (h === '/app' ? path === '/app' : path === h || path.startsWith(`${h}/`)))
+    .sort((a, b) => b.length - a.length)[0]
+  const isActive = (href: string) => href === activeHref
   const current = NAV.find((n) => isActive(n.href))
 
   const nav = (
@@ -237,6 +246,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="hidden sm:block">
               <WalletSwitcher />
             </div>
+            <InstallButton compact />
             <Bellbox />
             {unlocked.size > 0 && (
               <button className="rounded-full border border-white/[0.08] bg-white/[0.03] p-2 transition hover:border-white/[0.16] hover:bg-white/[0.06]" onClick={lock} aria-label="Lock wallet" title="Lock now">

@@ -150,3 +150,123 @@ export function holdingsValueSeries(series: { amount: number; prices: PricePoint
     return { t, close: v }
   })
 }
+
+// ---------------------------------------------------------------- live market (pool trades + stats)
+
+export interface PoolTrade {
+  txHash: string
+  blockNumber: number
+  timestamp: number
+  kind: 'buy' | 'sell'
+  /** Amount of the pool's base token (e.g. WIF) bought or sold. */
+  baseAmount: number
+  /** Amount of the quote token (e.g. ETH) paid or received. */
+  quoteAmount: number
+  volumeUsd: number
+  trader: string
+}
+
+export interface PoolWindowStats {
+  buys: number
+  sells: number
+  buyers: number | null
+  sellers: number | null
+  volumeUsd: number | null
+  priceChangePct: number | null
+}
+
+export interface PoolStats {
+  source: 'geckoterminal'
+  name: string
+  priceUsd: number | null
+  liquidityUsd: number | null
+  fdvUsd: number | null
+  windows: Record<'m5' | 'h1' | 'h6' | 'h24', PoolWindowStats>
+  fetchedAt: number
+}
+
+/** Recent trades in a pool, newest first (GeckoTerminal keeps roughly the last 24 hours). */
+export async function fetchPoolTrades(network: string, pool: string, f: Fetch = fetch, base = GECKOTERMINAL_API): Promise<PoolTrade[]> {
+  const r = await f(`${base}/networks/${network}/pools/${pool.toLowerCase()}/trades`, { headers: { accept: 'application/json' } })
+  if (r.status === 404) return []
+  if (!r.ok) throw new Error(`GeckoTerminal ${r.status}`)
+  const j = (await r.json()) as { data?: { attributes?: Record<string, unknown> }[] }
+  return parsePoolTrades(j)
+}
+
+export function parsePoolTrades(j: { data?: { attributes?: Record<string, unknown> }[] }): PoolTrade[] {
+  const out: PoolTrade[] = []
+  for (const d of j.data ?? []) {
+    const a = d.attributes ?? {}
+    const kind = a.kind === 'buy' || a.kind === 'sell' ? a.kind : null
+    const ts = Date.parse(String(a.block_timestamp ?? ''))
+    const from = num(a.from_token_amount)
+    const to = num(a.to_token_amount)
+    const vol = num(a.volume_in_usd)
+    if (!kind || !Number.isFinite(ts) || from === null || to === null || vol === null) continue
+    out.push({
+      txHash: String(a.tx_hash ?? ''),
+      blockNumber: Number(a.block_number ?? 0),
+      timestamp: ts,
+      kind,
+      baseAmount: kind === 'buy' ? to : from,
+      quoteAmount: kind === 'buy' ? from : to,
+      volumeUsd: vol,
+      trader: String(a.tx_from_address ?? ''),
+    })
+  }
+  return out.sort((x, y) => y.timestamp - x.timestamp)
+}
+
+export async function fetchPoolStats(network: string, pool: string, f: Fetch = fetch, base = GECKOTERMINAL_API): Promise<PoolStats | null> {
+  const r = await f(`${base}/networks/${network}/pools/${pool.toLowerCase()}`, { headers: { accept: 'application/json' } })
+  if (r.status === 404) return null
+  if (!r.ok) throw new Error(`GeckoTerminal ${r.status}`)
+  const j = (await r.json()) as { data?: { attributes?: Record<string, unknown> } }
+  return parsePoolStats(j)
+}
+
+export function parsePoolStats(j: { data?: { attributes?: Record<string, unknown> } }): PoolStats | null {
+  const a = j.data?.attributes
+  if (!a) return null
+  const tx = (a.transactions ?? {}) as Record<string, Record<string, unknown> | undefined>
+  const vol = (a.volume_usd ?? {}) as Record<string, unknown>
+  const chg = (a.price_change_percentage ?? {}) as Record<string, unknown>
+  const win = (k: 'm5' | 'h1' | 'h6' | 'h24'): PoolWindowStats => ({
+    buys: num(tx[k]?.buys) ?? 0,
+    sells: num(tx[k]?.sells) ?? 0,
+    buyers: num(tx[k]?.buyers),
+    sellers: num(tx[k]?.sellers),
+    volumeUsd: num(vol[k]),
+    priceChangePct: num(chg[k]),
+  })
+  return {
+    source: 'geckoterminal',
+    name: String(a.name ?? ''),
+    priceUsd: num(a.base_token_price_usd),
+    liquidityUsd: num(a.reserve_in_usd),
+    fdvUsd: num(a.fdv_usd),
+    windows: { m5: win('m5'), h1: win('h1'), h6: win('h6'), h24: win('h24') },
+    fetchedAt: Date.now(),
+  }
+}
+
+/** Buy vs sell flow over trades newer than `sinceMs`. `buyShare` is null when there is no volume. */
+export function tradeFlow(trades: PoolTrade[], sinceMs: number) {
+  let buyUsd = 0
+  let sellUsd = 0
+  let buys = 0
+  let sells = 0
+  for (const t of trades) {
+    if (t.timestamp < sinceMs) continue
+    if (t.kind === 'buy') {
+      buyUsd += t.volumeUsd
+      buys++
+    } else {
+      sellUsd += t.volumeUsd
+      sells++
+    }
+  }
+  const total = buyUsd + sellUsd
+  return { buyUsd, sellUsd, buys, sells, buyShare: total > 0 ? buyUsd / total : null }
+}

@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, ArrowUpRight, Check, Eye, KeyRound, Layers, Lock, ShieldCheck, Sparkles, Wallet, Zap } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Check, Eye, HandCoins, IdCard, KeyRound, Layers, Lock, Radio, ScanSearch, ShieldCheck, Smartphone, Sparkles, Wallet, Zap } from 'lucide-react'
 import { WIF_ADDRESS } from '@inwif/core'
 import { Section, SitePage } from '@/components/site/Site'
 import { DeviceRender } from '@/components/site/DeviceRender'
@@ -140,6 +140,36 @@ export default function Home() {
           <Bento className="md:col-span-3" icon={Layers} title="Free. Forever." body="No subscriptions, no premium tier, no paywalls. Every feature, for every user.">
             <p className="mt-4 font-display text-6xl font-semibold text-accent drop-shadow-[0_0_24px_rgba(0,229,155,.45)]">0%</p>
           </Bento>
+        </div>
+      </Section>
+
+      {/* COMMUNITY FEATURES */}
+      <Section eyebrow="For the $WIF community" title={<>Built for $WIF. <span className="text-mute">Free for everyone.</span></>}>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { icon: Radio, t: 'Live $WIF terminal', b: 'Every buy and sell as it happens, buy-vs-sell pressure and whale alerts.', h: '/app/wif/live', tag: 'Live' },
+            { icon: ScanSearch, t: 'Token safety check', b: 'Paste any token and InWIF tests it for copycats, hidden taxes and tokens you can’t sell.', h: '/app/check', tag: 'Protect' },
+            { icon: HandCoins, t: 'Pay me in $WIF', b: 'Send a link or QR code. Whoever opens it gets the amount filled in and just confirms.', h: '/app/receive', tag: 'Pay' },
+            { icon: IdCard, t: 'Your $WIF card', b: 'A shareable holder card with your tier and badges, built from your own on-chain history.', h: '/app/wif/card', tag: 'Share' },
+            { icon: Smartphone, t: 'Install it like an app', b: 'Add InWIF to your home screen on any phone or desktop. No app store needed.', h: '/app/settings', tag: 'Install' },
+            { icon: Zap, t: 'Best-price $WIF swaps', b: 'Routed to the real $WIF market, with a guard that blocks swaps far below the market price.', h: '/app/swap', tag: 'Trade' },
+          ].map((f) => (
+            <motion.div key={f.t} {...rise}>
+              <Link href={f.h} className="card card-hover group flex h-full flex-col p-6">
+                <div className="flex items-center justify-between">
+                  <span className="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] transition group-hover:border-accent/40 group-hover:text-accent group-hover:shadow-glow-soft">
+                    <f.icon className="h-5 w-5" />
+                  </span>
+                  <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">{f.tag}</span>
+                </div>
+                <h3 className="mt-5 text-lg font-semibold">{f.t}</h3>
+                <p className="mt-1.5 flex-1 text-sm leading-relaxed text-mute">{f.b}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-sm text-accent">
+                  Open <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            </motion.div>
+          ))}
         </div>
       </Section>
 

@@ -3,7 +3,7 @@
  * Market data access. The web build goes through the InWIF relay (cached,
  * rate-limited); the desktop build has no server and calls GeckoTerminal directly.
  */
-import { fetchPriceHistory, fetchTokenMarket, fetchTokenPrices, type ChartRange } from '@inwif/core'
+import { fetchPoolStats, fetchPoolTrades, fetchPriceHistory, fetchTokenMarket, fetchTokenPrices, type ChartRange } from '@inwif/core'
 import type { Address } from 'viem'
 import { DESKTOP } from './net'
 
@@ -23,4 +23,8 @@ export const market = {
     DESKTOP
       ? fetchPriceHistory(network, pool, token, range)
       : relay<Awaited<ReturnType<typeof fetchPriceHistory>>>(`/api/market/ohlcv?network=${network}&pool=${pool}&token=${token}&range=${range}`).then((r) => r ?? []),
+  trades: (network: string, pool: string) =>
+    DESKTOP ? fetchPoolTrades(network, pool) : relay<Awaited<ReturnType<typeof fetchPoolTrades>>>(`/api/market/trades?network=${network}&pool=${pool}`).then((r) => r ?? []),
+  pool: (network: string, pool: string) =>
+    DESKTOP ? fetchPoolStats(network, pool) : relay<Awaited<ReturnType<typeof fetchPoolStats>>>(`/api/market/pool?network=${network}&pool=${pool}`),
 }
