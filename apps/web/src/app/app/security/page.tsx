@@ -108,7 +108,7 @@ export default function SecurityPage() {
           ) : hw.info ? (
             <>
               <p className="mt-1 flex items-center gap-2 font-semibold">
-                <Cpu className="h-4 w-4 text-lime" /> {state.deviceNames[hw.info.serial] ?? hw.info.model}
+                <Cpu className="h-4 w-4 text-accent" /> {state.deviceNames[hw.info.serial] ?? hw.info.model}
               </p>
               <p className="text-xs text-mute">
                 Firmware {hw.info.firmware} · {hw.authenticity ? (hw.authenticity.production ? 'genuine' : 'development device') : 'authenticity not checked'}
@@ -118,7 +118,7 @@ export default function SecurityPage() {
             <p className="mt-1 text-sm">None connected</p>
           )}
           {HARDWARE_ENABLED && (
-            <Link href="/app/hardware" className="mt-2 inline-block text-xs text-lime">
+            <Link href="/app/hardware" className="mt-2 inline-block text-xs text-accent">
               Manage devices →
             </Link>
           )}
@@ -128,7 +128,7 @@ export default function SecurityPage() {
       <section className="card p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="flex items-center gap-2 font-display font-bold">
-            <KeyRound className="h-5 w-5 text-lime" /> Token approvals
+            <KeyRound className="h-5 w-5 text-accent" /> Token approvals
           </h2>
           <button className="btn-ghost px-3 py-1.5 text-xs" onClick={() => approvals.refetch()}>
             Rescan
@@ -209,14 +209,14 @@ export default function SecurityPage() {
 
         <section className="card p-5">
           <h2 className="mb-1 flex items-center gap-2 font-display font-bold">
-            <AppWindow className="h-5 w-5 text-lime" /> Connected applications
+            <AppWindow className="h-5 w-5 text-accent" /> Connected applications
           </h2>
           <Notice>InWIF does not connect to other websites or apps. Your wallet lives only in InWIF, and nothing outside it can request signatures.</Notice>
           <h3 className="mb-1 mt-4 text-sm font-semibold">Settings</h3>
           <Row label="Auto-lock">{state.settings.autoLockMinutes} minutes</Row>
-          <Row label="Key storage">AES-256-GCM, per-wallet, this device only</Row>
+          <Row label="Key storage">Encrypted, on this device only</Row>
           <Row label="Transaction simulation">Before every signature</Row>
-          <Link href="/app/settings" className="mt-2 inline-block text-xs text-lime">
+          <Link href="/app/settings" className="mt-2 inline-block text-xs text-accent">
             Change security settings →
           </Link>
         </section>

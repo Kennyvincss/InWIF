@@ -1,17 +1,18 @@
+import { Cpu, Eye, Globe, KeyRound, Layers, Lock, ServerOff, ShieldCheck, TriangleAlert } from 'lucide-react'
 import { SitePage, Section } from '@/components/site/Site'
 
 export const metadata = { title: 'InWIF security model' }
 
-const LAYERS = [
-  ['Key generation', 'BIP-39 phrases and BIP-32/44 derivation use the audited @scure libraries. Randomness from the platform CSPRNG (crypto.getRandomValues). No custom cryptography.'],
-  ['Key storage', 'Per-wallet vaults: PBKDF2-HMAC-SHA256 (600,000 iterations) → AES-256-GCM via WebCrypto. Unique salt and IV per vault. Decrypted keys live only in memory and are cleared on lock or auto-lock.'],
-  ['Isolation between wallets', 'Each wallet has its own vault and password. Unlocking one never decrypts another.'],
-  ['Network verification', 'Before any signature the RPC must report the expected chain ID. A mismatch or unreachable RPC disables signing.'],
-  ['Transaction review', 'Every request is decoded (transfers, approvals, contract calls), simulated against the latest block, and annotated with risk findings.'],
-  ['Approval hygiene', 'Exact-amount approvals by default; unlimited approvals require an explicit opt-in and are flagged high risk. Live allowances can be revoked from the Security Centre.'],
-  ['No secrets on servers', 'The InWIF backend stores only public data. Its APIs reject any payload containing secret-shaped values, and logs are redacted.'],
-  ['Hardware path', 'Device decodes and displays transactions itself, PIN on-device, physical confirmation, on-device chain allow-list, attestation and signed firmware.'],
-  ['Web hardening', 'Strict Content-Security-Policy, no third-party scripts, frame-ancestors none, no-referrer.'],
+const LAYERS: [string, string, typeof KeyRound][] = [
+  ['Keys made on your device', 'Your recovery phrase is created on your own device using proven, widely used libraries. InWIF never makes or sees it.', KeyRound],
+  ['Locked with your password', 'Each wallet is encrypted with your password and stays on your device. Unlocked keys live only in memory and are wiped when you lock or step away.', Lock],
+  ['Wallets kept separate', 'Every wallet has its own lock. Opening one never opens another.', Layers],
+  ['Right network, every time', 'Before anything is signed, InWIF checks it is really talking to Robinhood Chain. If it can\'t confirm that, signing stops.', Globe],
+  ['See before you sign', 'Every transaction is checked first and explained in plain words, with clear warnings for anything risky.', Eye],
+  ['Safe approvals', 'Apps only get permission for the exact amount by default. You can see and remove every permission in the Security Centre.', ShieldCheck],
+  ['Nothing secret on our servers', 'InWIF\'s servers never receive your recovery phrase or keys, and refuse anything that looks like one.', ServerOff],
+  ['Hardware wallet (coming soon)', 'InWIF One will show every transaction on its own screen and wait for a physical button press.', Cpu],
+  ['A hardened website', 'No third-party scripts, and the site cannot be embedded or talk to unknown servers.', Globe],
 ]
 
 const LIMITS = [
@@ -24,20 +25,32 @@ const LIMITS = [
 export default function SecurityPage() {
   return (
     <SitePage>
-      <Section eyebrow="Security model" title="How InWIF protects you — and what it can't.">
+      <Section eyebrow="Security" title={<>How InWIF protects you. <span className="text-mute">And what it can&apos;t.</span></>}>
         <div className="grid gap-4 md:grid-cols-3">
-          {LAYERS.map(([t, b]) => (
-            <div key={t} className="card p-5">
-              <p className="font-semibold">{t}</p>
-              <p className="mt-1.5 text-sm text-mute">{b}</p>
+          {LAYERS.map(([t, b, Icon]) => (
+            <div key={t} className="card card-hover group p-6">
+              <span className="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] transition group-hover:border-accent/40 group-hover:text-accent">
+                <Icon className="h-5 w-5" />
+              </span>
+              <p className="mt-5 font-medium">{t}</p>
+              <p className="mt-1.5 text-sm leading-relaxed text-mute">{b}</p>
             </div>
           ))}
         </div>
-        <div className="card mt-10 border-warn/30 p-6">
-          <p className="font-display text-lg font-bold">Limits we want you to know</p>
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-mute">{LIMITS.map((l) => <li key={l}>{l}</li>)}</ul>
+        <div className="card mt-10 border-warn/25 p-7">
+          <p className="flex items-center gap-2 font-medium text-warn">
+            <TriangleAlert className="h-4 w-4" /> Limits we want you to know
+          </p>
+          <ul className="mt-4 space-y-2.5 text-sm leading-relaxed text-mute">
+            {LIMITS.map((l) => (
+              <li key={l} className="flex gap-3">
+                <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-warn/70" />
+                {l}
+              </li>
+            ))}
+          </ul>
         </div>
-        <p className="mt-8 text-sm text-mute">Found a vulnerability? Please report it privately to the maintainers via the repository&apos;s security policy (SECURITY.md) rather than opening a public issue.</p>
+        <p className="mt-8 text-sm text-dim">Found a vulnerability? Please report it privately to the InWIF team rather than posting it publicly.</p>
       </Section>
     </SitePage>
   )

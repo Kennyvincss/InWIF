@@ -33,10 +33,10 @@ function HardwareComingSoon() {
     <div className="space-y-6">
       <PageHeader title="Hardware wallet" subtitle="Keys kept on a dedicated device, every signature confirmed with a physical button." />
       <section className="card relative overflow-hidden p-6">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-lime/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="flex items-center gap-2 font-display text-lg font-bold">
-            <Cpu className="h-5 w-5 text-lime" /> InWIF One
+            <Cpu className="h-5 w-5 text-accent" /> InWIF One
           </h2>
           <Badge tone="ok">Coming soon</Badge>
         </div>
@@ -90,14 +90,14 @@ function HardwareConsole() {
 
       {!h.hw ? (
         <div className="grid gap-4 md:grid-cols-2">
-          <button className="card p-6 text-left transition hover:border-lime/30" onClick={() => h.startSimulator()}>
-            <Cpu className="h-8 w-8 text-lime" />
+          <button className="card p-6 text-left transition hover:border-accent/30" onClick={() => h.startSimulator()}>
+            <Cpu className="h-8 w-8 text-accent" />
             <p className="mt-3 font-display text-lg font-bold">Start device simulator</p>
             <p className="mt-1 text-sm text-mute">Runs the same IWDP protocol as the firmware, in this tab. Not secure hardware — for demonstration and development.</p>
           </button>
           {isTauri() ? (
           <button
-            className="card p-6 text-left transition hover:border-lime/30"
+            className="card p-6 text-left transition hover:border-accent/30"
             onClick={() =>
               run('usb', async () => {
                 const ports = await listSerialPorts()
@@ -108,13 +108,13 @@ function HardwareConsole() {
               })
             }
           >
-            <Usb className="h-8 w-8 text-lime" />
+            <Usb className="h-8 w-8 text-accent" />
             <p className="mt-3 font-display text-lg font-bold">Connect over USB-C (native)</p>
             <p className="mt-1 text-sm text-mute">Desktop app: direct USB serial access to your InWIF device or development board.</p>
           </button>
           ) : (
           <button
-            className="card p-6 text-left transition hover:border-lime/30 disabled:opacity-50"
+            className="card p-6 text-left transition hover:border-accent/30 disabled:opacity-50"
             disabled={!webSerialSupported()}
             onClick={() =>
               run('usb', async () => {
@@ -123,7 +123,7 @@ function HardwareConsole() {
               })
             }
           >
-            <Usb className="h-8 w-8 text-lime" />
+            <Usb className="h-8 w-8 text-accent" />
             <p className="mt-3 font-display text-lg font-bold">Connect over USB-C</p>
             <p className="mt-1 text-sm text-mute">
               {webSerialSupported() ? 'WebSerial: pick your InWIF device or development board.' : 'Requires a Chromium-based desktop browser (WebSerial), or the InWIF desktop app.'}
@@ -255,18 +255,18 @@ function HardwareConsole() {
                   Sign test message
                 </button>
               </div>
-              {busy && !['verify', 'sync'].includes(busy) && h.pending && <p className="mt-2 text-sm text-lime">Confirm on the device…</p>}
+              {busy && !['verify', 'sync'].includes(busy) && h.pending && <p className="mt-2 text-sm text-accent">Confirm on the device…</p>}
             </section>
 
             <section className="card p-5">
               <h2 className="mb-1 font-display font-bold">Offline signing flow</h2>
               <p className="mb-3 text-xs text-mute">
-                Steps light up as they happen when you send from the hardware wallet (<Link className="text-lime" href="/app/send">Send</Link>). The private key never leaves the
+                Steps light up as they happen when you send from the hardware wallet (<Link className="text-accent" href="/app/send">Send</Link>). The private key never leaves the
                 device; the companion only receives the signature and checks it recovers to your address before broadcasting.
               </p>
               <ol className="space-y-1.5">
                 {FLOW.map((f, i) => (
-                  <li key={f} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm ${reached.has(i + 1) ? 'bg-lime/10 text-lime' : 'text-mute'}`}>
+                  <li key={f} className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm ${reached.has(i + 1) ? 'bg-accent/10 text-accent' : 'text-mute'}`}>
                     <span className="flex h-5 w-5 items-center justify-center rounded-full border border-current text-[10px]">{i + 1}</span>
                     {f}
                   </li>
@@ -282,7 +282,7 @@ function HardwareConsole() {
 
       <section className="card p-5">
         <h2 className="mb-2 flex items-center gap-2 font-display font-bold">
-          <ShieldAlert className="h-5 w-5 text-lime" /> Security model
+          <ShieldAlert className="h-5 w-5 text-accent" /> Security model
         </h2>
         <ul className="grid gap-2 text-sm text-mute md:grid-cols-2">
           <li>• Seed generated on-device and shown only on the device screen</li>

@@ -52,7 +52,7 @@ export default function HardwarePage() {
         <ol className="grid gap-3 md:grid-cols-4">
           {['App builds the transaction', 'Sent to the device', 'Device decodes & displays', 'You verify on the device', 'You press confirm', 'Device signs internally', 'Signature returns', 'App broadcasts'].map((s, i) => (
             <li key={s} className="card p-4 text-sm">
-              <span className="font-display text-2xl font-extrabold text-lime">{i + 1}</span>
+              <span className="font-display text-2xl font-extrabold text-accent">{i + 1}</span>
               <p className="mt-1">{s}</p>
             </li>
           ))}
@@ -62,7 +62,7 @@ export default function HardwarePage() {
         <ol className="space-y-3">
           {STAGES.map((s) => (
             <li key={s.n} className="card flex flex-wrap items-center gap-4 p-5">
-              <span className="font-display text-2xl font-extrabold text-lime">{s.n}</span>
+              <span className="font-display text-2xl font-extrabold text-accent">{s.n}</span>
               <div className="flex-1">
                 <p className="font-semibold">{s.t}</p>
                 <p className="text-sm text-mute">{s.b}</p>

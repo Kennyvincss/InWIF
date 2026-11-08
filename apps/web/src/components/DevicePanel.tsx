@@ -14,9 +14,9 @@ export function DeviceFrame({ children, onReject, onApprove, label = 'InWIF One'
       <div className="rounded-[28px] bg-gradient-to-b from-[#2b313b] to-[#1a1e25] p-4">
         <div className="mb-3 flex items-center justify-between px-1">
           <span className="font-display text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">{label}</span>
-          <span className="h-1.5 w-1.5 rounded-full bg-lime shadow-[0_0_8px_#A6F36A]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_#00E59B]" />
         </div>
-        <div className="min-h-[220px] rounded-2xl border border-black/60 bg-[#05070a] p-3 font-mono text-[12px] leading-relaxed text-lime-soft shadow-inner">
+        <div className="min-h-[220px] rounded-2xl border border-black/60 bg-[#05070a] p-3 font-mono text-[12px] leading-relaxed text-accent-soft shadow-inner">
           {children}
         </div>
         <div className="mt-4 flex items-center justify-between px-2">
@@ -33,7 +33,7 @@ export function DeviceFrame({ children, onReject, onApprove, label = 'InWIF One'
             aria-label="Approve on device"
             onClick={onApprove}
             disabled={!onApprove}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[#3b424e] to-[#22272f] text-lime shadow-md ring-1 ring-black/50 transition active:scale-95 disabled:opacity-30"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[#3b424e] to-[#22272f] text-accent shadow-md ring-1 ring-black/50 transition active:scale-95 disabled:opacity-30"
           >
             <Check className="h-5 w-5" />
           </button>
@@ -58,7 +58,7 @@ export function SimulatorScreen() {
     const p = h.pending.prompt
     return (
       <DeviceFrame onReject={() => h.pending!.resolve(false)} onApprove={() => h.pending!.resolve(true)}>
-        <p className="mb-2 font-bold uppercase text-lime">{p.title}</p>
+        <p className="mb-2 font-bold uppercase text-accent">{p.title}</p>
         <div className="max-h-[230px] space-y-1.5 overflow-y-auto pr-1">
           {p.lines.map((l) => (
             <div key={l.label}>
@@ -80,7 +80,7 @@ export function SimulatorScreen() {
   if (h.recoveryWords) {
     return (
       <DeviceFrame onApprove={() => h.clearRecoveryWords()}>
-        <p className="mb-2 font-bold text-lime">WRITE DOWN THESE WORDS</p>
+        <p className="mb-2 font-bold text-accent">WRITE DOWN THESE WORDS</p>
         <ol className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-white">
           {h.recoveryWords.map((w, i) => (
             <li key={i}>
@@ -99,11 +99,11 @@ export function SimulatorScreen() {
         {st.wiped && <p className="mb-2 text-bad">Device wiped after too many wrong PINs.</p>}
         {mode === 'menu' && (
           <div className="space-y-2">
-            <p className="text-lime">Welcome. Set up this device:</p>
-            <button className="w-full rounded border border-lime/30 px-2 py-1.5 text-left hover:bg-lime/10" onClick={() => setMode('new')}>
+            <p className="text-accent">Welcome. Set up this device:</p>
+            <button className="w-full rounded border border-accent/30 px-2 py-1.5 text-left hover:bg-accent/10" onClick={() => setMode('new')}>
               ▸ Create new wallet on device
             </button>
-            <button className="w-full rounded border border-lime/30 px-2 py-1.5 text-left hover:bg-lime/10" onClick={() => setMode('restore')}>
+            <button className="w-full rounded border border-accent/30 px-2 py-1.5 text-left hover:bg-accent/10" onClick={() => setMode('restore')}>
               ▸ Restore from recovery phrase
             </button>
           </div>
@@ -149,7 +149,7 @@ export function SimulatorScreen() {
               <button type="button" className="flex-1 rounded border border-white/10 py-1" onClick={() => setMode('menu')}>
                 Back
               </button>
-              <button className="flex-1 rounded bg-lime py-1 font-bold text-black">OK</button>
+              <button className="flex-1 rounded bg-accent py-1 font-bold text-black">OK</button>
             </div>
           </form>
         )}
@@ -169,7 +169,7 @@ export function SimulatorScreen() {
             setPin('')
           }}
         >
-          <p className="text-lime">LOCKED · enter PIN</p>
+          <p className="text-accent">LOCKED · enter PIN</p>
           <input
             className="w-full rounded border border-white/10 bg-black p-1.5 text-center tracking-[0.5em] text-white outline-none"
             type="password"
@@ -179,7 +179,7 @@ export function SimulatorScreen() {
             aria-label="Device PIN"
           />
           {err && <p className="text-bad">{err}</p>}
-          <button className="w-full rounded bg-lime py-1 font-bold text-black">Unlock</button>
+          <button className="w-full rounded bg-accent py-1 font-bold text-black">Unlock</button>
         </form>
       </DeviceFrame>
     )
@@ -187,7 +187,7 @@ export function SimulatorScreen() {
 
   return (
     <DeviceFrame>
-      <p className="text-lime">READY</p>
+      <p className="text-accent">READY</p>
       <p className="mt-2 text-white/70">Firmware {st.firmware}</p>
       <p className="text-white/70">Serial {sim.serial}</p>
       <p className="mt-3 text-white/50">Waiting for a request from the companion app…</p>
@@ -224,7 +224,7 @@ export function DevicePanel() {
       ) : (
         <button
           onClick={() => h.setPanelOpen(true)}
-          className={cx('fixed bottom-4 right-4 z-[60] rounded-full border border-lime/30 bg-ink-900 px-4 py-2 text-sm font-semibold shadow-glow', h.pending && 'animate-pulse text-lime')}
+          className={cx('fixed bottom-4 right-4 z-[60] rounded-full border border-accent/30 bg-ink-900 px-4 py-2 text-sm font-semibold shadow-glow', h.pending && 'animate-pulse text-accent')}
         >
           {h.pending ? 'Device needs confirmation' : 'Show device'}
         </button>

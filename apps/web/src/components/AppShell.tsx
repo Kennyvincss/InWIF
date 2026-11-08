@@ -21,7 +21,7 @@ import {
 } from 'lucide-react'
 import { NETWORKS, shortAddress } from '@inwif/core'
 import { Logo } from './Logo'
-import { Badge, cx } from './ui'
+import { AddressAvatar, Badge, cx } from './ui'
 import { useWallet } from '@/lib/wallet-store'
 import { useVerification } from '@/lib/hooks'
 import { useNotify } from '@/lib/notifications'
@@ -29,28 +29,46 @@ import { SELECTABLE_NETWORKS } from '@/lib/net'
 import { DevicePanel } from './DevicePanel'
 import { timeAgo } from '@/lib/format'
 
-const NAV = [
-  { href: '/app', label: 'Portfolio', icon: LayoutDashboard },
-  { href: '/app/send', label: 'Send', icon: ArrowUpRight },
-  { href: '/app/receive', label: 'Receive', icon: ArrowDownLeft },
-  { href: '/app/swap', label: 'Swap', icon: ArrowLeftRight },
-  { href: '/app/activity', label: 'Activity', icon: History },
-  { href: '/app/wif', label: '$WIF', icon: Sparkles },
-  { href: '/app/defi', label: 'DeFi', icon: Landmark },
-  { href: '/app/security', label: 'Security', icon: ShieldCheck },
-  { href: '/app/hardware', label: 'Hardware', icon: Cpu },
-  { href: '/app/wallets', label: 'Wallets', icon: Wallet },
-  { href: '/app/settings', label: 'Settings', icon: Settings },
+const NAV_GROUPS = [
+  {
+    label: 'Wallet',
+    items: [
+      { href: '/app', label: 'Portfolio', icon: LayoutDashboard },
+      { href: '/app/send', label: 'Send', icon: ArrowUpRight },
+      { href: '/app/receive', label: 'Receive', icon: ArrowDownLeft },
+      { href: '/app/swap', label: 'Swap', icon: ArrowLeftRight },
+      { href: '/app/activity', label: 'Activity', icon: History },
+    ],
+  },
+  {
+    label: 'Markets',
+    items: [
+      { href: '/app/wif', label: '$WIF', icon: Sparkles },
+      { href: '/app/defi', label: 'DeFi', icon: Landmark },
+    ],
+  },
+  {
+    label: 'Account',
+    items: [
+      { href: '/app/security', label: 'Security', icon: ShieldCheck },
+      { href: '/app/hardware', label: 'Hardware', icon: Cpu },
+      { href: '/app/wallets', label: 'Wallets', icon: Wallet },
+      { href: '/app/settings', label: 'Settings', icon: Settings },
+    ],
+  },
 ]
+const NAV = NAV_GROUPS.flatMap((g) => g.items)
 
 function NetworkStatus() {
   const { state, update } = useWallet()
   const v = useVerification()
   return (
     <div className="flex items-center gap-2">
+      <span className="relative inline-flex items-center">
+        <span className={cx('pointer-events-none absolute left-3 h-1.5 w-1.5 rounded-full', v.data?.ok ? 'bg-accent shadow-[0_0_8px_rgba(0,229,155,.9)]' : 'bg-dim')} />
       <select
         aria-label="Network"
-        className="max-w-[7rem] truncate rounded-lg min-[381px]:max-w-[8.5rem] border border-white/10 bg-ink-900 px-2 py-1.5 text-xs font-semibold outline-none sm:max-w-none"
+        className="max-w-[8rem] cursor-pointer appearance-none truncate rounded-full border border-white/[0.08] bg-white/[0.03] py-1.5 pl-7 pr-3 text-xs font-medium outline-none transition hover:border-white/[0.16] min-[381px]:max-w-[9.5rem] sm:max-w-none"
         value={state.network}
         onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))}
       >
@@ -60,6 +78,7 @@ function NetworkStatus() {
           </option>
         ))}
       </select>
+      </span>
       {/* Only speak up when something is wrong: signing is disabled until the network checks out. */}
       {!v.isLoading && !v.data?.ok && <Badge tone="bad">Network issue</Badge>}
     </div>
@@ -72,7 +91,7 @@ function Bellbox() {
   return (
     <div className="relative">
       <button
-        className="relative rounded-lg border border-white/10 p-2 hover:bg-white/5"
+        className="relative rounded-full border border-white/[0.08] bg-white/[0.03] p-2 transition hover:border-white/[0.16] hover:bg-white/[0.06]"
         aria-label="Notifications"
         onClick={() => {
           setOpen(!open)
@@ -80,10 +99,10 @@ function Bellbox() {
         }}
       >
         <Bell className="h-4 w-4" />
-        {n.unread > 0 && <span className="absolute -right-1 -top-1 h-4 min-w-4 rounded-full bg-lime px-1 text-[10px] font-bold text-ink-950">{n.unread}</span>}
+        {n.unread > 0 && <span className="absolute -right-1 -top-1 h-4 min-w-4 rounded-full bg-accent px-1 text-[10px] font-bold text-black shadow-[0_0_10px_rgba(0,229,155,.8)]">{n.unread}</span>}
       </button>
       {open && (
-        <div className="card absolute right-0 z-40 mt-2 w-80 p-2">
+        <div className="card absolute right-0 z-40 mt-2 w-80 bg-[#08080A]/95 p-2">
           <div className="flex items-center justify-between px-2 py-1">
             <span className="text-sm font-semibold">Notifications</span>
             <button className="text-xs text-mute hover:text-white" onClick={n.clear}>
@@ -111,7 +130,7 @@ function WalletSwitcher() {
   return (
     <select
       aria-label="Active account"
-      className="max-w-[220px] rounded-lg border border-white/10 bg-ink-900 px-2 py-1.5 text-xs font-semibold outline-none"
+      className="max-w-[240px] cursor-pointer truncate rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-medium outline-none transition hover:border-white/[0.16]"
       value={`${activeWallet?.id}:${activeAccount?.index}`}
       onChange={(e) => {
         const [id, idx] = e.target.value.split(':')
@@ -133,63 +152,86 @@ function WalletSwitcher() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const path = usePathname()
-  const { lock, unlocked } = useWallet()
+  const { lock, unlocked, activeWallet, activeAccount } = useWallet()
   const [mobileNav, setMobileNav] = useState(false)
+  const isActive = (href: string) => (href === '/app' ? path === '/app' : path.startsWith(href))
+  const current = NAV.find((n) => isActive(n.href))
 
   const nav = (
-    <nav className="space-y-0.5">
-      {NAV.map(({ href, label, icon: Icon }) => {
-        const active = href === '/app' ? path === '/app' : path.startsWith(href)
-        return (
-          <Link
-            key={href}
-            href={href}
-            onClick={() => setMobileNav(false)}
-            className={cx(
-              'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition',
-              active
-                ? 'bg-white/[0.05] text-white shadow-[inset_2px_0_0_0_#A6F36A,0_0_0_1px_rgba(255,255,255,0.06)]'
-                : 'text-mute hover:bg-white/[0.03] hover:text-white',
-            )}
-          >
-            <Icon className={cx('h-4 w-4 transition', active ? 'text-lime drop-shadow-[0_0_6px_rgba(166,243,106,.6)]' : 'group-hover:text-white')} /> {label}
-          </Link>
-        )
-      })}
+    <nav className="space-y-6">
+      {NAV_GROUPS.map((g) => (
+        <div key={g.label}>
+          <p className="mb-2 px-3 font-mono text-[10px] uppercase tracking-[0.18em] text-dim">{g.label}</p>
+          <div className="space-y-0.5">
+            {g.items.map(({ href, label, icon: Icon }) => {
+              const active = isActive(href)
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setMobileNav(false)}
+                  className={cx(
+                    'group relative flex items-center gap-3 rounded-xl px-3 py-2 text-[13.5px] transition',
+                    active ? 'bg-white/[0.06] text-white shadow-[0_0_0_1px_rgba(255,255,255,0.07)]' : 'text-mute hover:bg-white/[0.03] hover:text-white',
+                  )}
+                >
+                  {active && <span className="absolute -left-4 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-r-full bg-accent shadow-[0_0_12px_rgba(0,229,155,.9)]" />}
+                  <Icon className={cx('h-[17px] w-[17px] transition', active ? 'text-accent' : 'text-dim group-hover:text-white')} />
+                  {label}
+                </Link>
+              )
+            })}
+          </div>
+        </div>
+      ))}
     </nav>
+  )
+
+  const account = activeAccount && (
+    <div className="flex items-center gap-3 rounded-2xl border border-white/[0.07] bg-white/[0.02] p-3">
+      <AddressAvatar address={activeAccount.address} size={32} />
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[13px] font-medium">{activeWallet?.name}</p>
+        <p className="truncate font-mono text-[11px] text-dim">{shortAddress(activeAccount.address)}</p>
+      </div>
+      <span className="live-dot" title="Connected" />
+    </div>
   )
 
   return (
     <div className="ambient flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-line bg-black/40 p-4 backdrop-blur-xl lg:flex">
-        <Link href="/" className="mb-8 px-2">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-line bg-black/50 px-4 py-5 backdrop-blur-xl lg:flex">
+        <Link href="/" className="mb-9 px-3">
           <Logo />
         </Link>
-        {nav}
-        <div className="mt-auto rounded-xl border border-lime/20 bg-lime/[0.05] p-3 text-xs text-lime-soft">
-          InWIF is free. No subscriptions, no paywalls, no InWIF fees.
+        <div className="min-h-0 flex-1 overflow-y-auto">{nav}</div>
+        <div className="mt-6 space-y-3">
+          {account}
+          <p className="px-3 font-mono text-[10px] uppercase tracking-[0.16em] text-dim">Free forever · 0% fees</p>
         </div>
       </aside>
 
       {mobileNav && (
-        <div className="fixed inset-0 z-50 bg-black/70 lg:hidden" onClick={() => setMobileNav(false)}>
-          <div className="h-full w-64 border-r border-line bg-black p-4" onClick={(e) => e.stopPropagation()}>
-            <div className="mb-6 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm lg:hidden" onClick={() => setMobileNav(false)}>
+          <div className="flex h-full w-72 flex-col border-r border-line bg-black px-4 py-5" onClick={(e) => e.stopPropagation()}>
+            <div className="mb-8 flex items-center justify-between px-3">
               <Logo />
-              <button onClick={() => setMobileNav(false)} aria-label="Close menu">
-                <X className="h-5 w-5" />
+              <button className="rounded-full border border-white/[0.08] p-1.5" onClick={() => setMobileNav(false)} aria-label="Close menu">
+                <X className="h-4 w-4" />
               </button>
             </div>
-            {nav}
+            <div className="min-h-0 flex-1 overflow-y-auto">{nav}</div>
+            <div className="mt-6">{account}</div>
           </div>
         </div>
       )}
 
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-30 flex items-center gap-1.5 border-b border-line bg-black/60 px-3 py-3 backdrop-blur-xl sm:px-6">
-          <button className="rounded-lg p-2 lg:hidden" onClick={() => setMobileNav(true)} aria-label="Open menu">
-            <Menu className="h-5 w-5" />
+        <header className="sticky top-0 z-30 flex items-center gap-2 border-b border-line bg-black/60 px-3 py-3 backdrop-blur-xl sm:px-6">
+          <button className="rounded-full border border-white/[0.08] p-2 lg:hidden" onClick={() => setMobileNav(true)} aria-label="Open menu">
+            <Menu className="h-4 w-4" />
           </button>
+          <p className="mr-2 hidden font-mono text-[11px] uppercase tracking-[0.18em] text-dim lg:block">{current?.label ?? 'Wallet'}</p>
           <NetworkStatus />
           <div className="ml-auto flex shrink-0 items-center gap-1.5 sm:gap-2">
             <div className="hidden sm:block">
@@ -197,13 +239,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <Bellbox />
             {unlocked.size > 0 && (
-              <button className="rounded-lg border border-white/10 p-2 hover:bg-white/5" onClick={lock} aria-label="Lock wallet" title="Lock now">
+              <button className="rounded-full border border-white/[0.08] bg-white/[0.03] p-2 transition hover:border-white/[0.16] hover:bg-white/[0.06]" onClick={lock} aria-label="Lock wallet" title="Lock now">
                 <Lock className="h-4 w-4" />
               </button>
             )}
           </div>
         </header>
-        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-8 sm:py-10">{children}</main>
       </div>
       <DevicePanel />
     </div>

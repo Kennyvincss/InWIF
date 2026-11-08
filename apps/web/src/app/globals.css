@@ -4,12 +4,11 @@
 
 :root {
   --bg: #000000;
-  --surface: #0a0a0b;
-  --line: rgba(255, 255, 255, 0.06);
-  --accent: #a6f36a;
+  --line: rgba(255, 255, 255, 0.07);
+  --accent: #00e59b;
   --data: #22e5ff;
   --text: #ffffff;
-  --text-2: #8a8f98;
+  --text-2: #8b8d98;
   color-scheme: dark;
 }
 
@@ -26,76 +25,117 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  letter-spacing: -0.011em;
 }
 
 ::selection {
-  background: rgba(166, 243, 106, 0.28);
+  background: rgba(0, 229, 155, 0.28);
 }
 
-/* Quiet scrollbars that disappear into the black. */
 * {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
+/* Headings: Geist, tight and confident rather than heavy. */
+.font-display {
+  letter-spacing: -0.035em;
+}
+.font-display.font-extrabold {
+  font-weight: 650;
+}
+
 @layer components {
-  /* Ambient light: two faint glows that fade into pure black. */
+  /* Ambient light: faint emerald and cyan that fade into pure black. */
   .ambient {
     background:
-      radial-gradient(1100px 520px at 12% -12%, rgba(166, 243, 106, 0.075), transparent 62%),
-      radial-gradient(900px 480px at 100% -8%, rgba(34, 229, 255, 0.06), transparent 60%),
+      radial-gradient(1000px 480px at 10% -14%, rgba(0, 229, 155, 0.07), transparent 62%),
+      radial-gradient(900px 460px at 100% -10%, rgba(34, 229, 255, 0.055), transparent 60%),
       #000;
     background-attachment: fixed;
   }
 
+  /* Frosted glass surface with a hairline border and a lit top edge. */
   .card {
-    @apply rounded-2xl border border-line bg-ink-800 shadow-card transition-[border-color,box-shadow,background-color];
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.022), rgba(255, 255, 255, 0) 38%);
+    @apply relative rounded-2xl border border-line bg-[#070709]/80 shadow-card backdrop-blur-xl transition-[border-color,box-shadow,background-color,transform];
   }
-  /* Clickable cards light up at the edge. */
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
   a.card:hover,
-  button.card:hover {
+  button.card:hover,
+  .card-hover:hover {
     @apply border-line-strong shadow-glow-soft;
   }
 
   .btn {
-    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-[background-color,border-color,box-shadow,color,transform,opacity] duration-150
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-[background-color,border-color,box-shadow,color,transform,opacity] duration-150
       active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-lime/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
+  /* Primary: stark white. */
   .btn-primary {
-    @apply btn bg-lime text-black hover:bg-lime-soft hover:shadow-glow disabled:hover:bg-lime disabled:hover:shadow-none;
+    @apply btn bg-white text-black hover:bg-white hover:shadow-glow-white disabled:hover:shadow-none;
+  }
+  /* Accent: vivid emerald, for the one action that should glow. */
+  .btn-accent {
+    @apply btn bg-accent text-black hover:shadow-glow disabled:hover:shadow-none;
   }
   .btn-ghost {
-    @apply btn border border-white/[0.08] bg-white/[0.02] text-white hover:border-white/[0.16] hover:bg-white/[0.05];
+    @apply btn border border-white/[0.09] bg-white/[0.03] text-white backdrop-blur hover:border-white/[0.18] hover:bg-white/[0.06];
   }
   .btn-danger {
-    @apply btn bg-bad/90 text-white hover:bg-bad hover:shadow-[0_0_28px_-6px_rgba(255,92,104,.55)];
+    @apply btn bg-bad text-white hover:shadow-[0_0_30px_-6px_rgba(255,77,106,.6)];
   }
 
   .input {
-    @apply w-full rounded-xl border border-white/[0.08] bg-black px-3.5 py-2.5 text-sm text-white outline-none transition-[border-color,box-shadow]
-      placeholder:text-mute/60 hover:border-white/[0.14] focus:border-lime/50 focus:shadow-[0_0_0_3px_rgba(166,243,106,.12),0_0_24px_-8px_rgba(166,243,106,.35)];
+    @apply w-full rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5 text-sm text-white outline-none transition-[border-color,box-shadow,background-color]
+      placeholder:text-dim hover:border-white/[0.14] focus:border-accent/50 focus:bg-black focus:shadow-[0_0_0_3px_rgba(0,229,155,.12),0_0_26px_-8px_rgba(0,229,155,.4)];
   }
+  /* Terminal micro-label. */
   .label {
-    @apply mb-1.5 block text-[11px] font-medium uppercase tracking-[0.12em] text-mute;
+    @apply mb-2 block font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-dim;
   }
   .chip {
-    @apply inline-flex items-center gap-1 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-[11px] font-medium text-mute transition-[border-color,color,background-color,box-shadow];
+    @apply inline-flex items-center gap-1 rounded-full border border-white/[0.09] bg-white/[0.03] px-2.5 py-0.5 text-[11px] font-medium text-mute transition-[border-color,color,background-color,box-shadow];
+  }
+  .eyebrow {
+    @apply inline-flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-accent;
   }
   .mono {
     @apply font-mono;
   }
+  .live-dot {
+    @apply inline-block h-1.5 w-1.5 animate-pulsedot rounded-full bg-accent shadow-[0_0_10px_rgba(0,229,155,.9)];
+  }
 }
 
 .bg-grid {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
 }
 
 .text-gradient {
-  background: linear-gradient(120deg, #ffffff 0%, #d5ffb8 45%, #a6f36a 75%, #22e5ff 120%);
+  background: linear-gradient(110deg, #ffffff 10%, #7cffcf 55%, #22e5ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.text-fade {
+  background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.55) 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

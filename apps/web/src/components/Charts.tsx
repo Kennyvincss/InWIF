@@ -1,5 +1,5 @@
 'use client'
-import { useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useRef, useState } from 'react'
 import type { PricePoint } from '@inwif/core'
 import { fmtUsd } from '@/lib/format'
 
@@ -8,12 +8,13 @@ import { fmtUsd } from '@/lib/format'
  * wheel at similar brightness so neighbours stay distinct (including for common colour-vision
  * deficiencies) against #000–#0A0A0B surfaces.
  */
-export const SERIES = ['#22E5FF', '#A6F36A', '#F5C451', '#FF6B9A', '#9B8CFF', '#FF8A4C']
+export const SERIES = ['#22E5FF', '#00E59B', '#F5C451', '#FF6B9A', '#9B8CFF', '#FF8A4C']
 
 /** Single-series area chart with crosshair tooltip and a table fallback. */
 export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; height?: number; label: string }) {
   const ref = useRef<SVGSVGElement>(null)
   const [hover, setHover] = useState<number | null>(null)
+  const fillId = `area-fill-${useId().replace(/:/g, '')}`
   const W = 800
   const H = height
   const pad = { t: 12, r: 8, b: 22, l: 8 }
@@ -63,7 +64,7 @@ export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; h
         }}
       >
         <defs>
-          <linearGradient id="area-fill" x1="0" x2="0" y1="0" y2="1">
+          <linearGradient id={fillId} x1="0" x2="0" y1="0" y2="1">
             <stop offset="0" stopColor="#22E5FF" stopOpacity=".24" />
             <stop offset=".7" stopColor="#22E5FF" stopOpacity=".04" />
             <stop offset="1" stopColor="#22E5FF" stopOpacity="0" />
@@ -72,7 +73,7 @@ export function AreaChart({ data, height = 200, label }: { data: PricePoint[]; h
         {[0.25, 0.5, 0.75].map((f) => (
           <line key={f} x1={0} x2={W} y1={pad.t + f * (H - pad.t - pad.b)} y2={pad.t + f * (H - pad.t - pad.b)} stroke="rgba(255,255,255,.045)" strokeDasharray="2 4" />
         ))}
-        <path d={area} fill="url(#area-fill)" />
+        <path d={area} fill={`url(#${fillId})`} />
         <path d={path} fill="none" stroke="#22E5FF" strokeWidth={2} strokeLinejoin="round" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px rgba(34,229,255,.55))' }} />
         {hover !== null && (
           <>

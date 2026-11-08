@@ -19,7 +19,7 @@ export function AppGate({ children }: { children: React.ReactNode }) {
   if (!ready || onboarding === null)
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <Spinner className="h-6 w-6 text-lime" />
+        <Spinner className="h-6 w-6 text-accent" />
       </div>
     )
   // Hardware setup is reachable before any wallet exists.
