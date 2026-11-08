@@ -1,9 +1,12 @@
 'use client'
-import { ArrowDownLeft, ArrowUpRight, ExternalLink, FileCode2, RefreshCw, XCircle } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowDownLeft, ArrowUpRight, ExternalLink, FileCode2, RefreshCw, ShieldAlert, XCircle } from 'lucide-react'
 import { explorerTxUrl, type ActivityItem } from '@inwif/core'
 import { fmtToken, timeAgo } from '@/lib/format'
 import { useNetwork } from '@/lib/hooks'
 import { useUsernamesFor } from '@/lib/usernames'
+import { activityKey, useScamShield } from '@/lib/shield'
+import { useWallet } from '@/lib/wallet-store'
 import { Badge, Empty, ErrorBox, Skeleton } from './ui'
 
 export function ActivityList({
@@ -20,6 +23,11 @@ export function ActivityList({
   emptyText?: string
 }) {
   const { network } = useNetwork()
+  const { activeAccount } = useWallet()
+  const shield = useScamShield(activeAccount?.address)
+  const [showHidden, setShowHidden] = useState(false)
+  const flagged = (items ?? []).filter((i) => shield.flags.has(activityKey(i)))
+  const clean = (items ?? []).filter((i) => !shield.flags.has(activityKey(i)))
   const names = useUsernamesFor((items ?? []).slice(0, limit ?? 50).map((i) => (i.direction === 'in' ? i.from : i.to)))
   const who = (a?: string) => (a && names.data?.[a.toLowerCase()] ? `@${names.data[a.toLowerCase()]}` : a)
   if (!network.explorer.apiV2)
@@ -35,6 +43,7 @@ export function ActivityList({
   if (error) return <ErrorBox>Could not load activity right now. Balances above are read directly from the chain and are unaffected.</ErrorBox>
   const viaRpc = items?.[0]?.via === 'rpc'
   if (!items?.length) return <Empty icon={<RefreshCw className="h-5 w-5" />} title="No activity yet">{emptyText}</Empty>
+  const visible = [...clean.slice(0, limit), ...(showHidden ? flagged : [])]
   return (
     <>
     {viaRpc && (
@@ -43,7 +52,8 @@ export function ActivityList({
       </p>
     )}
     <ul className="divide-y divide-white/[0.05]">
-      {items.slice(0, limit).map((i) => {
+      {visible.map((i) => {
+        const flag = shield.flags.get(activityKey(i))
         const Icon = i.status === 'failed' ? XCircle : i.kind === 'contract' ? FileCode2 : i.direction === 'in' ? ArrowDownLeft : ArrowUpRight
         const label =
           i.kind === 'contract' ? (i.method ? `Called ${i.method}` : 'Contract interaction') : i.direction === 'in' ? 'Received' : i.direction === 'self' ? 'Self-transfer' : 'Sent'
@@ -58,7 +68,9 @@ export function ActivityList({
                 {label}
                 {i.status === 'failed' && <Badge tone="bad">Failed</Badge>}
                 {i.status === 'pending' && <Badge tone="warn">Pending</Badge>}
+                {flag && <Badge tone="bad">Possible scam</Badge>}
               </p>
+              {flag && <p className="text-xs text-[#ffc2c7]">{flag.message}</p>}
               <p className="truncate font-mono text-xs text-mute">{i.direction === 'in' ? `from ${who(i.from)}` : `to ${i.to ? who(i.to) : 'contract creation'}`}</p>
             </div>
             <div className="text-right">
@@ -79,6 +91,20 @@ export function ActivityList({
         )
       })}
     </ul>
+    {flagged.length > 0 && (
+      <button
+        type="button"
+        onClick={() => setShowHidden((v) => !v)}
+        className="mt-2 flex w-full items-center gap-3 rounded-xl border border-bad/20 bg-bad/[0.05] px-3 py-2.5 text-left text-xs text-[#ffc2c7] transition hover:bg-bad/[0.09]"
+        data-testid="scam-hidden"
+      >
+        <ShieldAlert className="h-4 w-4 shrink-0 text-bad" />
+        <span className="flex-1">
+          <b>{flagged.length} suspicious {flagged.length === 1 ? 'transfer' : 'transfers'} hidden.</b> Fake tokens, $0 transfers and look-alike addresses are planted by scammers so you copy the wrong address.
+        </span>
+        <span className="shrink-0 underline">{showHidden ? 'Hide' : 'Show'}</span>
+      </button>
+    )}
     </>
   )
 }
