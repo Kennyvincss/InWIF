@@ -87,7 +87,7 @@ export function usePortfolio(address?: Address) {
 
   const rows: PricedBalance[] = useMemo(() => {
     if (!balances.data) return []
-    return balances.data.balances.map((b) => {
+    const list = balances.data.balances.map((b) => {
       const isNative = b.token === 'native'
       const tok = isNative ? undefined : (b.token as TokenInfo)
       // Native ETH is priced from the WETH market (1:1 wrapped).
@@ -108,6 +108,8 @@ export function usePortfolio(address?: Address) {
         valueUsd: priceUsd !== null ? amount * priceUsd : null,
       }
     })
+    // $WIF is InWIF's home coin: always list it first.
+    return [...list.filter((r) => r.token?.isWif), ...list.filter((r) => !r.token?.isWif)]
   }, [balances.data, prices.data, weth, network.nativeCurrency.name])
 
   const totals = useMemo(() => {

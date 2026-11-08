@@ -28,7 +28,7 @@ export default function ReceivePage() {
   if (!address) return null
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <PageHeader title="Receive" subtitle="Share this address to receive ETH, $WIF or any token on the selected network." />
+      <PageHeader title="Receive" subtitle="Share this address to receive $WIF, ETH or any token on the selected network." />
       <div className="card grid gap-6 p-6 sm:grid-cols-[220px,1fr]">
         <div className="rounded-2xl bg-white p-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
