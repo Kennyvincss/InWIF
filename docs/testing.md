@@ -25,7 +25,7 @@ Prerequisites for the E2E test:
 
 ```bash
 anvil --chain-id 31337 &
-cd apps/web && NEXT_PUBLIC_ENABLE_LOCAL_NETWORK=true pnpm build && pnpm start &
+cd apps/web && NEXT_PUBLIC_ENABLE_LOCAL_NETWORK=true NEXT_PUBLIC_ENABLE_HARDWARE=true pnpm build && pnpm start &
 node e2e/smoke.mjs
 ```
 

@@ -9,6 +9,7 @@ import { fmtPct, fmtToken, fmtUsd } from '@/lib/format'
 import { AllocationBar, AreaChart } from '@/components/Charts'
 import { ActivityList } from '@/components/ActivityList'
 import { BackupModal } from '@/components/BackupModal'
+import { HARDWARE_ENABLED } from '@/lib/features'
 import { Badge, CopyButton, ErrorBox, Notice, Skeleton, TokenIcon, cx } from '@/components/ui'
 
 const RANGES = Object.keys(RANGE_QUERY) as ChartRange[]
@@ -29,7 +30,7 @@ export default function Dashboard() {
     { href: '/app/receive', label: 'Receive', icon: ArrowDownLeft },
     { href: '/app/swap', label: 'Swap', icon: ArrowLeftRight },
     { href: '/app/defi', label: 'Stake / DeFi', icon: Landmark },
-    { href: '/app/hardware', label: 'Hardware', icon: Cpu },
+    ...(HARDWARE_ENABLED ? [{ href: '/app/hardware', label: 'Hardware', icon: Cpu }] : []),
   ]
 
   return (

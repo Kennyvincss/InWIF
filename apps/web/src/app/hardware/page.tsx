@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { SitePage, Section } from '@/components/site/Site'
 import { DeviceRender } from '@/components/site/DeviceRender'
+import { HARDWARE_ENABLED } from '@/lib/features'
 
 export const metadata = { title: 'InWIF One hardware wallet (prototype)' }
 
@@ -24,7 +25,7 @@ export default function HardwarePage() {
               Status: prototype. No InWIF One device has been manufactured or independently tested, and none is for sale. Images on this page are concept renders.
             </p>
             <div className="flex gap-3">
-              <Link href="/app/hardware" className="btn-primary">Try the device simulator</Link>
+              {HARDWARE_ENABLED ? <Link href="/app/hardware" className="btn-primary">Try the device simulator</Link> : <span className="chip self-center">Coming soon</span>}
               <Link href="/docs#hardware" className="btn-ghost">Protocol docs</Link>
             </div>
           </div>
