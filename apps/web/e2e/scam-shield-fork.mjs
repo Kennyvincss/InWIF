@@ -91,7 +91,7 @@ try {
   await page.screenshot({ path: `${OUT}/shield-send.png` })
   await page.getByRole('button', { name: /instead \(the one you paid\)/ }).click()
   assert((await page.getByLabel('Recipient address').inputValue()).toLowerCase() === friend.toLowerCase(), 'one tap switches to the real address')
-  await page.getByText('✓ You have paid this address before.').waitFor()
+  await page.getByText('You have paid this address before.').waitFor()
   assert(await page.getByRole('button', { name: 'Review transaction' }).isEnabled(), 'the real address is marked as paid before and can be sent to')
 
   await page.getByLabel('Recipient address').fill(fake)

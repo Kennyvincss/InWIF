@@ -1,6 +1,6 @@
 'use client'
 import { AnimatePresence, motion } from 'framer-motion'
-import { AlertTriangle, Check, ChevronDown, Copy, Info, Loader2, ShieldAlert, X } from 'lucide-react'
+import { AlertTriangle, Check, CheckCircle2, ChevronDown, Copy, Info, Loader2, ShieldAlert, X, XCircle } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import clsx from 'clsx'
@@ -93,29 +93,63 @@ export function Badge({ tone = 'mute', children }: { tone?: 'ok' | 'bad' | 'warn
   return <span className={cx('inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium', tones[tone])}>{children}</span>
 }
 
+export type CalloutTone = 'neutral' | 'info' | 'ok' | 'warn' | 'danger'
+
+const CALLOUT_ICON = { neutral: Info, info: Info, ok: CheckCircle2, warn: AlertTriangle, danger: ShieldAlert }
+
+/** Notice / warning / error panel in the site's glass style. */
+export function Callout({
+  tone = 'neutral',
+  title,
+  icon,
+  action,
+  size = 'md',
+  className,
+  children,
+  ...rest
+}: {
+  tone?: CalloutTone
+  title?: React.ReactNode
+  icon?: React.ReactNode
+  action?: React.ReactNode
+  size?: 'sm' | 'md'
+  className?: string
+  children?: React.ReactNode
+} & Omit<React.HTMLAttributes<HTMLDivElement>, 'title'>) {
+  const Icon = CALLOUT_ICON[tone]
+  return (
+    <div className={cx('callout', size === 'sm' && 'callout-sm', action && 'flex-wrap sm:flex-nowrap', className)} data-tone={tone} {...rest}>
+      <span className="callout-icon">{icon ?? <Icon className={size === 'sm' ? 'h-3.5 w-3.5' : 'h-4 w-4'} />}</span>
+      <div className={cx('min-w-0 flex-1 self-center break-words', action && 'basis-[calc(100%-2.5rem)] sm:basis-auto')}>
+        {title && <p className="callout-title">{title}</p>}
+        {children && <div className={cx(title && 'mt-0.5')}>{children}</div>}
+      </div>
+      {action && <div className="ml-10 w-[calc(100%-2.5rem)] shrink-0 self-center sm:ml-0 sm:w-auto [&>*]:w-full sm:[&>*]:w-auto">{action}</div>}
+    </div>
+  )
+}
+
+/** Inline feedback under a form field. */
+export function FieldHint({ tone = 'neutral', children, className }: { tone?: 'neutral' | 'ok' | 'warn' | 'danger'; children: React.ReactNode; className?: string }) {
+  const Icon = tone === 'ok' ? CheckCircle2 : tone === 'danger' ? XCircle : tone === 'warn' ? AlertTriangle : Info
+  return (
+    <p className={cx('field-hint', className)} data-tone={tone}>
+      <Icon className="h-3.5 w-3.5" />
+      <span className="min-w-0">{children}</span>
+    </p>
+  )
+}
+
 export function Findings({ findings, hideInfo }: { findings: Finding[]; hideInfo?: boolean }) {
   const list = hideInfo ? findings.filter((f) => f.severity !== 'info') : findings
   if (!list.length) return null
   return (
     <ul className="space-y-2">
       {list.map((f) => (
-        <li
-          key={f.code + f.message}
-          className={cx(
-            'flex gap-2 rounded-xl border p-3 text-sm',
-            f.severity === 'danger' && 'border-bad/30 bg-bad/10 text-[#ffc2c7]',
-            f.severity === 'warning' && 'border-warn/30 bg-warn/10 text-[#ffe7a8]',
-            f.severity === 'info' && 'border-white/10 bg-white/[0.03] text-mute',
-          )}
-        >
-          {f.severity === 'danger' ? (
-            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
-          ) : f.severity === 'warning' ? (
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-          ) : (
-            <Info className="mt-0.5 h-4 w-4 shrink-0" />
-          )}
-          <span>{f.message}</span>
+        <li key={f.code + f.message}>
+          <Callout size="sm" tone={f.severity === 'danger' ? 'danger' : f.severity === 'warning' ? 'warn' : f.message.startsWith('✓') ? 'ok' : 'neutral'}>
+            {f.message.replace(/^✓\s*/, '')}
+          </Callout>
         </li>
       ))}
     </ul>
@@ -123,28 +157,11 @@ export function Findings({ findings, hideInfo }: { findings: Finding[]; hideInfo
 }
 
 export function ErrorBox({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="flex gap-2 rounded-xl border border-bad/30 bg-bad/10 p-3 text-sm text-[#ffc2c7]">
-      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-      <div className="min-w-0 break-words">{children}</div>
-    </div>
-  )
+  return <Callout tone="danger">{children}</Callout>
 }
 
-export function Notice({ children, tone = 'mute' }: { children: React.ReactNode; tone?: 'mute' | 'lime' | 'warn' }) {
-  return (
-    <div
-      className={cx(
-        'flex gap-2 rounded-xl border p-3 text-sm',
-        tone === 'lime' && 'border-accent/25 bg-accent/[0.06] text-accent-soft',
-        tone === 'warn' && 'border-warn/30 bg-warn/10 text-[#ffe7a8]',
-        tone === 'mute' && 'border-white/10 bg-white/[0.03] text-mute',
-      )}
-    >
-      <Info className="mt-0.5 h-4 w-4 shrink-0" />
-      <div className="min-w-0">{children}</div>
-    </div>
-  )
+export function Notice({ children, tone = 'mute' }: { children: React.ReactNode; tone?: 'mute' | 'lime' | 'warn' | 'info' }) {
+  return <Callout tone={tone === 'lime' ? 'ok' : tone === 'warn' ? 'warn' : tone === 'info' ? 'info' : 'neutral'}>{children}</Callout>
 }
 
 export function Empty({ icon, title, children }: { icon: React.ReactNode; title: string; children?: React.ReactNode }) {

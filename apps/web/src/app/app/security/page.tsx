@@ -13,7 +13,7 @@ import { fmtToken } from '@/lib/format'
 import { ActivityList } from '@/components/ActivityList'
 import { TxFlow, type TxRequest } from '@/components/TxFlow'
 import { HARDWARE_ENABLED } from '@/lib/features'
-import { Badge, Empty, ErrorBox, Notice, PageHeader, Row, Skeleton } from '@/components/ui'
+import { Badge, Empty, ErrorBox, FieldHint, Notice, PageHeader, Row, Skeleton } from '@/components/ui'
 
 export default function SecurityPage() {
   const { activeAccount, activeWallet, state, update } = useWallet()
@@ -172,7 +172,7 @@ export default function SecurityPage() {
             })}
           </ul>
         )}
-        {approvals.data?.errors.length ? <p className="mt-2 text-xs text-warn">Some tokens could not be scanned: the RPC limited the log query.</p> : null}
+        {approvals.data?.errors.length ? <FieldHint tone="warn" className="mt-2">Some tokens could not be scanned right now. Try again later.</FieldHint> : null}
       </section>
 
       <div className="grid gap-6 lg:grid-cols-2">

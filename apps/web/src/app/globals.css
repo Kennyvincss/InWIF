@@ -46,6 +46,99 @@ body {
 }
 
 @layer components {
+  /*
+   * Callouts (notices, warnings, errors): dark glass with a thin glowing tone bar on the
+   * left and a small tinted icon tile. Body text stays white/grey; only the bar, the tile and
+   * a faint wash carry the tone, so every callout reads as part of the same surface.
+   */
+  .callout {
+    --tone: 138 143 152;
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    background:
+      linear-gradient(90deg, rgb(var(--tone) / 0.09), rgb(var(--tone) / 0) 42%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+    padding: 0.875rem 1rem 0.875rem 1.125rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .callout::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.85rem;
+    bottom: 0.85rem;
+    width: 2px;
+    border-radius: 0 2px 2px 0;
+    background: rgb(var(--tone));
+    box-shadow: 0 0 14px rgb(var(--tone) / 0.85);
+  }
+  .callout-icon {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    border-radius: 0.6rem;
+    border: 1px solid rgb(var(--tone) / 0.28);
+    background: rgb(var(--tone) / 0.12);
+    color: rgb(var(--tone));
+  }
+  .callout-title {
+    color: #fff;
+    font-weight: 500;
+  }
+  .callout-sm {
+    padding: 0.625rem 0.875rem 0.625rem 1rem;
+    font-size: 0.8125rem;
+  }
+  .callout-sm .callout-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 0.5rem;
+  }
+  [data-tone='ok'] { --tone: 0 229 155; }
+  [data-tone='info'] { --tone: 34 229 255; }
+  [data-tone='warn'] { --tone: 255 194 75; }
+  [data-tone='danger'] { --tone: 255 77 106; }
+  [data-tone='neutral'] { --tone: 138 143 152; }
+  .callout[data-tone='neutral']::before { display: none; }
+  .callout[data-tone='neutral'] { background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012)); }
+  .callout[data-tone='neutral'] .callout-icon { border-color: rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.55); }
+
+  /* Inline field feedback under inputs: tone icon + calm text. */
+  .field-hint {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .field-hint > svg {
+    margin-top: 0.15rem;
+    flex-shrink: 0;
+    color: rgb(var(--tone));
+  }
+  .mono-chip {
+    display: inline-block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 0.05rem 0.4rem;
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
   /* Ambient light: faint emerald and cyan that fade into pure black. */
   .ambient {
     background:

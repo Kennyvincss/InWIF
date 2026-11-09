@@ -7,7 +7,7 @@ import { useNetwork } from '@/lib/hooks'
 import { useUsernamesFor } from '@/lib/usernames'
 import { activityKey, useScamShield } from '@/lib/shield'
 import { useWallet } from '@/lib/wallet-store'
-import { Badge, Empty, ErrorBox, Skeleton } from './ui'
+import { Badge, Callout, Empty, ErrorBox, Skeleton } from './ui'
 
 export function ActivityList({
   items,
@@ -47,9 +47,9 @@ export function ActivityList({
   return (
     <>
     {viaRpc && (
-      <p className="mb-2 rounded-lg border border-warn/30 bg-warn/10 px-3 py-2 text-xs text-[#ffe7a8]">
+      <Callout size="sm" tone="info" className="mb-2">
         Showing your recent token transfers. Full history, including ETH transfers, will appear shortly.
-      </p>
+      </Callout>
     )}
     <ul className="divide-y divide-white/[0.05]">
       {visible.map((i) => {
@@ -70,7 +70,7 @@ export function ActivityList({
                 {i.status === 'pending' && <Badge tone="warn">Pending</Badge>}
                 {flag && <Badge tone="bad">Possible scam</Badge>}
               </p>
-              {flag && <p className="text-xs text-[#ffc2c7]">{flag.message}</p>}
+              {flag && <p className="text-xs text-white/55">{flag.message}</p>}
               <p className="truncate font-mono text-xs text-mute">{i.direction === 'in' ? `from ${who(i.from)}` : `to ${i.to ? who(i.to) : 'contract creation'}`}</p>
             </div>
             <div className="text-right">
@@ -95,14 +95,17 @@ export function ActivityList({
       <button
         type="button"
         onClick={() => setShowHidden((v) => !v)}
-        className="mt-2 flex w-full items-center gap-3 rounded-xl border border-bad/20 bg-bad/[0.05] px-3 py-2.5 text-left text-xs text-[#ffc2c7] transition hover:bg-bad/[0.09]"
+        className="callout callout-sm mt-2 w-full text-left transition hover:border-white/[0.14]"
+        data-tone="danger"
         data-testid="scam-hidden"
       >
-        <ShieldAlert className="h-4 w-4 shrink-0 text-bad" />
-        <span className="flex-1">
-          <b>{flagged.length} suspicious {flagged.length === 1 ? 'transfer' : 'transfers'} hidden.</b> Fake tokens, $0 transfers and look-alike addresses are planted by scammers so you copy the wrong address.
+        <span className="callout-icon">
+          <ShieldAlert className="h-3.5 w-3.5" />
         </span>
-        <span className="shrink-0 underline">{showHidden ? 'Hide' : 'Show'}</span>
+        <span className="flex-1 self-center">
+          <b className="text-white">{flagged.length} suspicious {flagged.length === 1 ? 'transfer' : 'transfers'} hidden.</b> Fake tokens, $0 transfers and look-alike addresses are planted by scammers so you copy the wrong address.
+        </span>
+        <span className="chip shrink-0 self-center">{showHidden ? 'Hide' : 'Show'}</span>
       </button>
     )}
     </>

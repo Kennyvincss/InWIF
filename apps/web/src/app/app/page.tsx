@@ -10,7 +10,7 @@ import { AllocationBar, AreaChart } from '@/components/Charts'
 import { ActivityList } from '@/components/ActivityList'
 import { BackupModal } from '@/components/BackupModal'
 import { HARDWARE_ENABLED } from '@/lib/features'
-import { AddressAvatar, Badge, CopyButton, ErrorBox, Notice, Skeleton, TokenIcon, cx } from '@/components/ui'
+import { AddressAvatar, Badge, Callout, CopyButton, ErrorBox, Notice, Skeleton, TokenIcon, cx } from '@/components/ui'
 
 const RANGES = Object.keys(RANGE_QUERY) as ChartRange[]
 
@@ -55,18 +55,21 @@ export default function Dashboard() {
   return (
     <div className="space-y-4">
       {activeWallet && !activeWallet.backedUp && activeWallet.kind === 'mnemonic' && (
-        <div className="flex flex-col gap-3 rounded-2xl border border-warn/30 bg-warn/[0.07] p-4 sm:flex-row sm:items-center">
-          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-warn/15 text-warn">
-            <KeyRound className="h-4 w-4" />
-          </span>
-          <p className="flex-1 text-sm text-[#ffe7a8]">
-            <b>Back up your recovery phrase.</b> It is the only way to restore this wallet if you lose this device or clear your browser. Do it before adding funds.
-          </p>
-          <button className="btn-primary shrink-0" onClick={() => setBackupOpen(true)}>
-            Back up now
-          </button>
+        <>
+          <Callout
+            tone="warn"
+            icon={<KeyRound className="h-4 w-4" />}
+            title="Back up your recovery phrase"
+            action={
+              <button className="btn-primary" onClick={() => setBackupOpen(true)}>
+                Back up now
+              </button>
+            }
+          >
+            It is the only way to restore this wallet if you lose this device or clear your browser. Do it before adding funds.
+          </Callout>
           <BackupModal walletId={activeWallet.id} open={backupOpen} onClose={() => setBackupOpen(false)} />
-        </div>
+        </>
       )}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">

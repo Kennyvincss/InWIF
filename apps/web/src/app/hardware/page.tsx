@@ -1,3 +1,4 @@
+import { Callout } from '@/components/ui'
 import Link from 'next/link'
 import { SitePage, Section } from '@/components/site/Site'
 import { DeviceRender } from '@/components/site/DeviceRender'
@@ -21,9 +22,9 @@ export default function HardwarePage() {
           <DeviceRender />
           <div className="space-y-4 text-mute">
             <p>InWIF One is a dedicated signing device: your keys are generated inside it and never leave it. The companion app prepares transactions; the device shows you exactly what you are signing and waits for your physical confirmation.</p>
-            <p className="rounded-xl border border-warn/30 bg-warn/10 p-4 text-sm text-[#ffe7a8]">
-              Status: prototype. No InWIF One device has been manufactured or independently tested, and none is for sale. Images on this page are concept renders.
-            </p>
+            <Callout tone="warn" title="Status: prototype">
+              No InWIF One device has been manufactured or independently tested, and none is for sale. Images on this page are concept renders.
+            </Callout>
             <div className="flex gap-3">
               {HARDWARE_ENABLED ? <Link href="/app/hardware" className="btn-primary">Try the device simulator</Link> : <span className="chip self-center">Coming soon</span>}
               <Link href="/docs#hardware" className="btn-ghost">Protocol docs</Link>

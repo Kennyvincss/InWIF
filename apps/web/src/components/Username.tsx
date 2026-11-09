@@ -4,7 +4,7 @@ import { AtSign, CheckCircle2, XCircle } from 'lucide-react'
 import type { Address } from 'viem'
 import { USERNAME_MAX, type UsernameClaim } from '@inwif/core'
 import { claimUsername, useNameLookup, useSetUsername, useUsername } from '@/lib/usernames'
-import { CopyButton, ErrorBox, Spinner, cx } from './ui'
+import { CopyButton, ErrorBox, FieldHint, Spinner, cx } from './ui'
 import { useWallet } from '@/lib/wallet-store'
 
 /** Pick and claim a username for `address`. Signing is free and sends no transaction. */
@@ -83,7 +83,7 @@ export function UsernameClaimForm({
         {status?.text ?? '3–20 letters, numbers or _'}
       </p>
       {err && <div className="mt-2"><ErrorBox>{err}</ErrorBox></div>}
-      {!sign && <p className="mt-2 text-xs text-warn">Unlock this wallet to claim a username.</p>}
+      {!sign && <FieldHint tone="warn" className="mt-2">Unlock this wallet to claim a username.</FieldHint>}
       <button className="btn-primary mt-4 w-full" disabled={!canClaim}>
         {busy ? <Spinner /> : <AtSign className="h-4 w-4" />} {busy ? 'Saving…' : name && status?.tone === 'ok' ? `Claim @${name}` : submitLabel}
       </button>

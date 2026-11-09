@@ -21,7 +21,7 @@ import { useWallet } from '@/lib/wallet-store'
 import { useNetwork, usePortfolio, useTokens } from '@/lib/hooks'
 import { fmtToken, fmtUsd } from '@/lib/format'
 import { TxFlow, type TxRequest } from '@/components/TxFlow'
-import { ErrorBox, Notice, PageHeader, PercentButtons, Row, Spinner, TokenPicker, cx } from '@/components/ui'
+import { ErrorBox, FieldHint, Notice, PageHeader, PercentButtons, Row, Spinner, TokenPicker, cx } from '@/components/ui'
 import { percentOf, useGasReserve } from '@/lib/amount'
 
 const SLIPPAGES = [10, 50, 100, 300]
@@ -154,7 +154,7 @@ export default function SwapPage() {
             <PercentButtons disabled={available === undefined || available === 0n} onPick={(p) => available !== undefined && setAmount(percentOf(available, from.decimals, p, fromKey !== NATIVE))} />
           </div>
           {fromKey === NATIVE && <p className="mt-1 text-xs text-mute">100% keeps a little ETH back for the network fee.</p>}
-          {parsed && !parsed.ok && <p className="text-xs text-bad">{parsed.error}</p>}
+          {parsed && !parsed.ok && <FieldHint tone="danger">{parsed.error}</FieldHint>}
         </div>
 
         <div className="-my-2 flex justify-center">
@@ -203,7 +203,7 @@ export default function SwapPage() {
               </button>
             ))}
           </div>
-          {slippageBps >= 300 && <p className="mt-1 text-xs text-warn">High slippage increases the risk of an unfavourable trade (front-running).</p>}
+          {slippageBps >= 300 && <FieldHint tone="warn" className="mt-1.5">High slippage increases the risk of an unfavourable trade (front-running).</FieldHint>}
         </div>
 
         {q && (
@@ -244,7 +244,7 @@ export default function SwapPage() {
         {q && market?.level === 'unknown' && <Notice>No market price is available to double-check this quote. Compare the rate yourself before you continue.</Notice>}
 
         {needsApproval && !blocked && (
-          <div className="space-y-2 rounded-xl border border-warn/30 bg-warn/[0.06] p-3 text-sm">
+          <div className="callout flex-col !gap-2" data-tone="warn">
             {steps === undefined ? (
               <p>
                 <Spinner /> Checking approvals…

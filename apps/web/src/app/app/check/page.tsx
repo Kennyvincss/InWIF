@@ -5,7 +5,7 @@ import { AlertTriangle, CheckCircle2, Info, ScanSearch, ShieldAlert, XCircle } f
 import { analyzeToken, explorerTokenUrl, fetchTokenHolders, normaliseTokenAddress, type TokenReport } from '@inwif/core'
 import { useNetwork, useTokens } from '@/lib/hooks'
 import { withExplorer } from '@/lib/net'
-import { ErrorBox, Notice, PageHeader, Spinner, TokenIcon, cx } from '@/components/ui'
+import { ErrorBox, FieldHint, Notice, PageHeader, Spinner, TokenIcon, cx } from '@/components/ui'
 
 const VERDICT = {
   low: { label: 'Low risk', tone: 'text-accent', ring: 'border-accent/30 bg-accent/[0.06] shadow-[0_0_60px_-24px_rgba(0,229,155,.7)]', icon: CheckCircle2, text: 'No red flags found in these checks.' },
@@ -59,7 +59,7 @@ export default function TokenCheckPage() {
             {check.isPending ? <Spinner /> : <ScanSearch className="h-4 w-4" />} Check token
           </button>
         </form>
-        {input && !address && <p className="mt-2 text-xs text-bad">That is not a valid token address.</p>}
+        {input && !address && <FieldHint tone="danger" className="mt-2">That is not a valid token address.</FieldHint>}
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">Try</span>
           {tokens.slice(0, 4).map((t) => (
