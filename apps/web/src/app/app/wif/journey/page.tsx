@@ -5,7 +5,7 @@ import { journeyBadges } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useWifJourney } from '@/lib/journey'
 import { fmtPct, fmtUsd, fmtWif } from '@/lib/format'
-import { Empty, ErrorBox, PageHeader, Skeleton, TokenIcon, cx } from '@/components/ui'
+import { Callout, Empty, ErrorBox, PageHeader, Skeleton, TokenIcon, cx } from '@/components/ui'
 
 const date = (t: number) => new Date(t * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 const daysAgo = (t: number) => Math.max(0, Math.floor((Date.now() / 1000 - t) / 86_400))
@@ -104,11 +104,11 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
       </section>
 
       {(!complete || j.partial || j.unpriced > 0) && (
-        <p className="rounded-xl border border-warn/30 bg-warn/[0.07] px-4 py-3 text-xs text-[#ffe7a8]" data-testid="journey-note">
+        <Callout tone="warn" size="sm" data-testid="journey-note">
           {!complete || j.partial
             ? 'Part of your $WIF history could not be loaded, so these numbers use the transfers we could read. Your balance is always exact.'
             : `${j.unpriced} early ${j.unpriced === 1 ? 'transfer has' : 'transfers have'} no market price for that day and ${j.unpriced === 1 ? 'is' : 'are'} left out of the average.`}
-        </p>
+        </Callout>
       )}
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-3">

@@ -17,7 +17,7 @@ import { useWallet } from '@/lib/wallet-store'
 import { LogoMark } from './Logo'
 import { BackupModal } from './BackupModal'
 import { HARDWARE_ENABLED } from '@/lib/features'
-import { ErrorBox, Notice, Spinner, cx } from './ui'
+import { ErrorBox, FieldHint, Notice, Spinner, cx } from './ui'
 import { UsernameClaimForm } from './Username'
 import { useUsername } from '@/lib/usernames'
 
@@ -203,15 +203,17 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
             <div className="mt-2 text-xs">
               {importMode === 'phrase' && importInput && (
                 importCheck?.ok ? (
-                  <p className="text-ok">Valid {importCheck.wordCount}-word phrase · first address {accountFromMnemonic(importInput, 0).address}</p>
+                  <FieldHint tone="ok">
+                    Valid {importCheck.wordCount}-word phrase · first address <span className="mono-chip">{accountFromMnemonic(importInput, 0).address}</span>
+                  </FieldHint>
                 ) : (
-                  <p className="text-bad">
+                  <FieldHint tone="danger">
                     {importCheck?.error}
                     {importCheck?.unknownWords.length ? ` Unknown: ${importCheck.unknownWords.slice(0, 5).join(', ')}` : ''}
-                  </p>
+                  </FieldHint>
                 )
               )}
-              {importMode === 'key' && importInput && (importKey ? <p className="text-ok">Valid private key.</p> : <p className="text-bad">Not a valid secp256k1 private key.</p>)}
+              {importMode === 'key' && importInput && (importKey ? <FieldHint tone="ok">Valid private key.</FieldHint> : <FieldHint tone="danger">Not a valid private key.</FieldHint>)}
             </div>
             <Notice>Validation happens on this device. Nothing you type here is transmitted or logged.</Notice>
             <div className="mt-5 flex gap-2">
@@ -237,7 +239,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
           <div>
             <h2 className="font-display text-2xl font-bold">Watch an address</h2>
             <input className="input mt-4 font-mono" placeholder="0x…" value={watchInput} onChange={(e) => setWatchInput(e.target.value)} aria-label="Address to watch" />
-            {watchInput && !checkRecipient(watchInput).ok && <p className="mt-2 text-xs text-bad">{checkRecipient(watchInput).findings[0]?.message}</p>}
+            {watchInput && !checkRecipient(watchInput).ok && <FieldHint tone="danger" className="mt-2">{checkRecipient(watchInput).findings[0]?.message}</FieldHint>}
             <div className="mt-5 flex gap-2">
               <button className="btn-ghost" onClick={() => setStep('welcome')}>
                 Back
@@ -275,7 +277,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
               <div>
                 <label className="label" htmlFor="pw1">Password</label>
                 <input id="pw1" type="password" className="input" value={pw} onChange={(e) => setPw(e.target.value)} autoComplete="new-password" />
-                {pw && !pwCheck.ok && <p className="mt-1 text-xs text-warn">{pwCheck.problems.join(' ')}</p>}
+                {pw && !pwCheck.ok && <FieldHint tone="warn" className="mt-1.5">{pwCheck.problems.join(' ')}</FieldHint>}
               </div>
               <div>
                 <label className="label" htmlFor="pw2">Confirm password</label>

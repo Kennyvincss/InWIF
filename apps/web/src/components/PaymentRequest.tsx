@@ -4,7 +4,7 @@ import QRCode from 'qrcode'
 import { HandCoins, Share2 } from 'lucide-react'
 import { PAYMENT_NOTE_MAX, buildPaymentLink, parsePaymentRequest, type TokenInfo } from '@inwif/core'
 import type { Address } from 'viem'
-import { CopyButton, TokenPicker } from './ui'
+import { CopyButton, FieldHint, TokenPicker } from './ui'
 
 /** "Pay me 5,000 WIF": builds a shareable link + QR that opens InWIF with everything filled in. */
 export function PaymentRequestCreator({ to, tokens, nativeSymbol }: { to: Address; tokens: TokenInfo[]; nativeSymbol: string }) {
@@ -51,7 +51,7 @@ export function PaymentRequestCreator({ to, tokens, nativeSymbol }: { to: Addres
             <label className="label" htmlFor="req-note">Note (optional)</label>
             <input id="req-note" className="input" maxLength={PAYMENT_NOTE_MAX} placeholder="e.g. Dinner on Friday" value={note} onChange={(e) => setNote(e.target.value)} />
           </div>
-          {!parsed.ok && amount && <p className="text-xs text-bad">{parsed.error}</p>}
+          {!parsed.ok && amount && <FieldHint tone="danger">{parsed.error}</FieldHint>}
           {link && (
             <div className="space-y-2">
               <p className="label">Your payment link</p>
