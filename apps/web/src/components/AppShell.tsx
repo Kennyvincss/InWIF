@@ -20,6 +20,7 @@ import {
   Sparkles,
   Wallet,
   X,
+  Route,
 } from 'lucide-react'
 import { NETWORKS, shortAddress } from '@inwif/core'
 import { Logo } from './Logo'
@@ -49,6 +50,7 @@ const NAV_GROUPS = [
     items: [
       { href: '/app/wif', label: '$WIF', icon: Sparkles },
       { href: '/app/wif/live', label: 'Live $WIF', icon: Radio },
+      { href: '/app/wif/journey', label: 'My $WIF journey', icon: Route },
       { href: '/app/check', label: 'Token check', icon: ScanSearch },
       { href: '/app/defi', label: 'DeFi', icon: Landmark },
     ],
