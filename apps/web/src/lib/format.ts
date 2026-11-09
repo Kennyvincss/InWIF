@@ -42,7 +42,8 @@ export function fmtWif(v: number | null | undefined): string {
   if (a >= 1_000_000) return new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(v)
   if (a >= 1) return v.toLocaleString('en-US', { maximumFractionDigits: a >= 1000 ? 0 : 2 })
   if (a === 0) return '0'
-  return v.toLocaleString('en-US', { maximumSignificantDigits: 3 })
+  if (a < 0.01) return v > 0 ? '<0.01' : '>-0.01'
+  return v.toLocaleString('en-US', { maximumFractionDigits: 2 })
 }
 
 export type DisplayCurrency = 'WIF' | 'USD'
