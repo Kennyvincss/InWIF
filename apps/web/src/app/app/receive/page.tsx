@@ -47,7 +47,7 @@ export default function ReceivePage() {
           </div>
           <div>
             <p className="label">Your address</p>
-            <p className="break-all rounded-xl border border-white/[0.08] bg-black/60 p-3 font-mono text-sm">{address}</p>
+            <p className="break-all rounded-xl border border-white/[0.08] bg-ink-900 p-3 font-mono text-sm">{address}</p>
           </div>
           <div className="flex gap-2">
             <CopyButton value={address} label="Copy address" />

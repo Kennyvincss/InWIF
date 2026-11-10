@@ -10,11 +10,11 @@ import { cx } from './ui'
 /** The simulated device: everything inside the "aluminium" frame happens "on the device". */
 export function DeviceFrame({ children, onReject, onApprove, label = 'InWIF One' }: { children: React.ReactNode; onReject?: () => void; onApprove?: () => void; label?: string }) {
   return (
-    <div className="relative mx-auto w-[300px] rounded-[30px] bg-gradient-to-b from-[#3a414d] via-[#262c35] to-[#171b21] p-[3px] shadow-[0_30px_60px_-20px_rgba(0,0,0,.8)]">
+    <div className="relative mx-auto w-[300px] rounded-[30px] bg-gradient-to-b from-[#3a414d] via-[#262c35] to-[#171b21] p-[3px]">
       <div className="rounded-[28px] bg-gradient-to-b from-[#2b313b] to-[#1a1e25] p-4">
         <div className="mb-3 flex items-center justify-between px-1">
           <span className="font-display text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">{label}</span>
-          <span className="h-1.5 w-1.5 rounded-full bg-accent shadow-[0_0_8px_#00E59B]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-accent" />
         </div>
         <div className="min-h-[220px] rounded-2xl border border-black/60 bg-[#05070a] p-3 font-mono text-[12px] leading-relaxed text-accent-soft shadow-inner">
           {children}
@@ -28,7 +28,7 @@ export function DeviceFrame({ children, onReject, onApprove, label = 'InWIF One'
           >
             <X className="h-5 w-5" />
           </button>
-          <div className="h-1 w-14 rounded-full bg-black/40" title="USB-C" />
+          <div className="h-1 w-14 rounded-full bg-ink-900" title="USB-C" />
           <button
             aria-label="Approve on device"
             onClick={onApprove}

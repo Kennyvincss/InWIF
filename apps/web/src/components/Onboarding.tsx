@@ -81,7 +81,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
     }
   }
 
-  const card = 'card w-full max-w-xl bg-[#08080A]/90 p-6 sm:p-9'
+  const card = 'card w-full max-w-xl bg-ink-800 p-6 sm:p-9'
 
   return (
     <div className={cx('flex items-center justify-center gap-16', !embedded && 'min-h-[80vh]')}>
@@ -114,7 +114,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
             <h1 className="mt-6 font-display text-[30px] font-semibold leading-tight">Welcome to InWIF</h1>
             <p className="mt-2 text-mute">Your assets. Your keys. Your control. Everything is created and encrypted on this device.</p>
             <div className="mt-7 grid gap-3">
-              <div className="rounded-2xl border border-accent/25 bg-accent/[0.04] p-4 shadow-[0_0_40px_-20px_rgba(0,229,155,.6)]">
+              <div className="rounded-2xl border border-accent/25 bg-accent/[0.04] p-4">
                 <div className="flex items-center gap-4">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-accent/30 bg-accent/10 text-accent">
                     <Plus className="h-5 w-5" />
@@ -125,7 +125,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                   </div>
                 </div>
                 <div className="mt-4 flex items-center gap-2">
-                  <div className="flex rounded-full border border-white/[0.08] bg-black/40 p-0.5 font-mono text-[11px]">
+                  <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
                     {([128, 256] as const).map((s) => (
                       <button key={s} className={cx('rounded-full px-3 py-1 transition', strength === s ? 'bg-white text-black' : 'text-mute hover:text-white')} onClick={() => setStrength(s)}>
                         {s === 128 ? '12 words' : '24 words'}

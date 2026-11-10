@@ -46,7 +46,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       })
       if (prefs.browser && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
         try {
-          new Notification(n.title, { body: n.body, icon: '/icon.svg' })
+          new Notification(n.title, { body: n.body, icon: '/icon-192.png' })
         } catch {
           /* ignore */
         }

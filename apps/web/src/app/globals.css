@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --bg: #000000;
-  --line: rgba(255, 255, 255, 0.07);
-  --accent: #00e59b;
-  --data: #22e5ff;
-  --text: #ffffff;
-  --text-2: #8b8d98;
+  --bg: #242424;
+  --panel: #272727;
+  --line: #323232;
+  --accent: #b1fb59;
+  --text: #ededed;
+  --text-2: #8e8e8e;
   color-scheme: dark;
 }
 
@@ -25,59 +25,56 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  letter-spacing: -0.011em;
+  letter-spacing: -0.006em;
 }
 
 ::selection {
-  background: rgba(0, 229, 155, 0.28);
+  background: rgba(177, 251, 89, 0.3);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  scrollbar-color: #3d3d3d transparent;
 }
 
-/* Headings: Geist, tight and confident rather than heavy. */
+/* Headings: clean and medium weight, like the reference dashboard. */
 .font-display {
-  letter-spacing: -0.035em;
+  letter-spacing: -0.02em;
 }
+.font-display.font-bold,
 .font-display.font-extrabold {
-  font-weight: 650;
+  font-weight: 600;
 }
 
 @layer components {
   /*
-   * Callouts (notices, warnings, errors): dark glass with a thin glowing tone bar on the
-   * left and a small tinted icon tile. Body text stays white/grey; only the bar, the tile and
-   * a faint wash carry the tone, so every callout reads as part of the same surface.
+   * Callouts (notices, warnings, errors): flat panel with a 1px border, a thin tone bar on
+   * the left and a small tinted icon tile. Body text stays light grey; only the bar and the
+   * tile carry the tone.
    */
   .callout {
-    --tone: 138 143 152;
+    --tone: 142 142 142;
     position: relative;
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
     overflow: hidden;
-    border-radius: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.075);
-    background:
-      linear-gradient(90deg, rgb(var(--tone) / 0.09), rgb(var(--tone) / 0) 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+    border-radius: 6px;
+    border: 1px solid #393939;
+    background: #272727;
     padding: 0.875rem 1rem 0.875rem 1.125rem;
     font-size: 0.875rem;
     line-height: 1.55;
-    color: rgba(255, 255, 255, 0.7);
+    color: #b5b5b5;
   }
   .callout::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 0.85rem;
-    bottom: 0.85rem;
-    width: 2px;
-    border-radius: 0 2px 2px 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
     background: rgb(var(--tone));
-    box-shadow: 0 0 14px rgb(var(--tone) / 0.85);
   }
   .callout-icon {
     display: grid;
@@ -85,13 +82,12 @@ body {
     width: 1.75rem;
     height: 1.75rem;
     flex-shrink: 0;
-    border-radius: 0.6rem;
-    border: 1px solid rgb(var(--tone) / 0.28);
-    background: rgb(var(--tone) / 0.12);
+    border-radius: 4px;
+    background: rgb(var(--tone) / 0.16);
     color: rgb(var(--tone));
   }
   .callout-title {
-    color: #fff;
+    color: #ededed;
     font-weight: 500;
   }
   .callout-sm {
@@ -101,16 +97,14 @@ body {
   .callout-sm .callout-icon {
     width: 1.5rem;
     height: 1.5rem;
-    border-radius: 0.5rem;
   }
-  [data-tone='ok'] { --tone: 0 229 155; }
-  [data-tone='info'] { --tone: 34 229 255; }
-  [data-tone='warn'] { --tone: 255 194 75; }
-  [data-tone='danger'] { --tone: 255 77 106; }
-  [data-tone='neutral'] { --tone: 138 143 152; }
+  [data-tone='ok'] { --tone: 46 204 113; }
+  [data-tone='info'] { --tone: 180 170 255; }
+  [data-tone='warn'] { --tone: 255 205 26; }
+  [data-tone='danger'] { --tone: 255 90 95; }
+  [data-tone='neutral'] { --tone: 142 142 142; }
   .callout[data-tone='neutral']::before { display: none; }
-  .callout[data-tone='neutral'] { background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012)); }
-  .callout[data-tone='neutral'] .callout-icon { border-color: rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.04); color: rgba(255, 255, 255, 0.55); }
+  .callout[data-tone='neutral'] .callout-icon { background: #2e2e2e; color: #9a9a9a; }
 
   /* Inline field feedback under inputs: tone icon + calm text. */
   .field-hint {
@@ -119,7 +113,7 @@ body {
     gap: 0.4rem;
     font-size: 0.8125rem;
     line-height: 1.5;
-    color: rgba(255, 255, 255, 0.62);
+    color: #a3a3a3;
   }
   .field-hint > svg {
     margin-top: 0.15rem;
@@ -130,108 +124,105 @@ body {
     display: inline-block;
     max-width: 100%;
     overflow-wrap: anywhere;
-    border-radius: 0.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(255, 255, 255, 0.04);
+    border-radius: 4px;
+    border: 1px solid #393939;
+    background: #2e2e2e;
     padding: 0.05rem 0.4rem;
     font-family: var(--font-geist-mono), ui-monospace, monospace;
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.85);
+    color: #ededed;
   }
 
-  /* Ambient light: faint emerald and cyan that fade into pure black. */
+  /* Page background: flat charcoal. */
   .ambient {
-    background:
-      radial-gradient(1000px 480px at 10% -14%, rgba(0, 229, 155, 0.07), transparent 62%),
-      radial-gradient(900px 460px at 100% -10%, rgba(34, 229, 255, 0.055), transparent 60%),
-      #000;
-    background-attachment: fixed;
+    background: var(--bg);
   }
 
-  /* Frosted glass surface with a hairline border and a lit top edge. */
+  /* Panel: flat charcoal with a 1px border. */
   .card {
-    @apply relative rounded-2xl border border-line bg-[#070709]/80 shadow-card backdrop-blur-xl transition-[border-color,box-shadow,background-color,transform];
-  }
-  .card::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%);
-    -webkit-mask:
-      linear-gradient(#000 0 0) content-box,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+    @apply relative rounded-lg border border-line bg-ink-800 transition-[border-color,background-color];
   }
   a.card:hover,
   button.card:hover,
   .card-hover:hover {
-    @apply border-line-strong shadow-glow-soft;
+    @apply border-line-strong bg-ink-700;
   }
 
   .btn {
-    @apply inline-flex select-none items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-[background-color,border-color,box-shadow,color,transform,opacity] duration-150
-      active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100
-      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply inline-flex select-none items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium transition-[background-color,border-color,color,opacity,filter] duration-150
+      disabled:cursor-not-allowed disabled:opacity-40
+      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-800;
   }
-  /* Primary: stark white. */
+  /* Primary: solid brand lime, dark text (the reference's solid "Call" / active-nav buttons). */
   .btn-primary {
-    @apply btn bg-white text-black hover:bg-white hover:shadow-glow-white disabled:hover:shadow-none;
+    @apply btn bg-accent text-[#111] hover:brightness-105 disabled:hover:brightness-100;
   }
-  /* Accent: vivid emerald, for the one action that should glow. */
   .btn-accent {
-    @apply btn bg-accent text-black hover:shadow-glow disabled:hover:shadow-none;
+    @apply btn bg-accent text-[#111] hover:brightness-105;
   }
+  /* Secondary: transparent with a 1px border (the reference's "Create Task" / "Reminder"). */
   .btn-ghost {
-    @apply btn border border-white/[0.09] bg-white/[0.03] text-white backdrop-blur hover:border-white/[0.18] hover:bg-white/[0.06];
+    @apply btn border border-ink-500 bg-transparent text-[#ededed] hover:border-[#4a4a4a] hover:bg-ink-600;
+  }
+  /* Filled grey (the reference's "More"). */
+  .btn-soft {
+    @apply btn bg-ink-500 text-[#ededed] hover:bg-[#424242];
   }
   .btn-danger {
-    @apply btn bg-bad text-white hover:shadow-[0_0_30px_-6px_rgba(255,77,106,.6)];
+    @apply btn bg-bad text-white hover:brightness-105;
   }
 
   .input {
-    @apply w-full rounded-xl border border-white/[0.08] bg-white/[0.02] px-3.5 py-2.5 text-sm text-white outline-none transition-[border-color,box-shadow,background-color]
-      placeholder:text-dim hover:border-white/[0.14] focus:border-accent/50 focus:bg-black focus:shadow-[0_0_0_3px_rgba(0,229,155,.12),0_0_26px_-8px_rgba(0,229,155,.4)];
+    @apply w-full rounded-md border border-ink-500 bg-ink-700 px-3.5 py-2.5 text-sm text-[#ededed] outline-none transition-[border-color,background-color]
+      placeholder:text-dim hover:border-[#454545] focus:border-accent/60 focus:bg-ink-900;
   }
-  /* Terminal micro-label. */
+  /* Section label: small uppercase grey sans ("RECENT ACTIVITY"). */
   .label {
-    @apply mb-2 block font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-dim;
+    @apply mb-2 block text-[11.5px] font-medium uppercase tracking-[0.04em] text-[#9095A4];
   }
+  /* Tag: small rectangle ("New", "In progress"). */
   .chip {
-    @apply inline-flex items-center gap-1 rounded-full border border-white/[0.09] bg-white/[0.03] px-2.5 py-0.5 text-[11px] font-medium text-mute transition-[border-color,color,background-color,box-shadow];
+    @apply inline-flex items-center gap-1 rounded border border-ink-500 bg-ink-600 px-2 py-0.5 text-[11.5px] font-medium text-[#b5b5b5] transition-[border-color,color,background-color];
+  }
+  .tag {
+    @apply inline-flex items-center gap-1 rounded-sm px-1.5 py-0.5 text-[12px] font-medium leading-tight;
+  }
+  .tag-lavender {
+    @apply tag bg-lavender text-[#17142e];
+  }
+  .tag-green {
+    @apply tag bg-ok text-[#08240f];
+  }
+  .tag-lime {
+    @apply tag bg-accent text-[#111];
+  }
+  .tag-sun {
+    @apply tag bg-sun text-[#1a1400];
   }
   .eyebrow {
-    @apply inline-flex items-center gap-2 font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-accent;
+    @apply inline-flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.06em] text-accent;
   }
   .mono {
     @apply font-mono;
   }
   .live-dot {
-    @apply inline-block h-1.5 w-1.5 animate-pulsedot rounded-full bg-accent shadow-[0_0_10px_rgba(0,229,155,.9)];
+    @apply inline-block h-2 w-2 rounded-full bg-ok;
   }
 }
 
 .bg-grid {
-  background-image: linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 56px 56px;
 }
 
+/* Kept for existing markup: solid brand colours instead of gradients. */
 .text-gradient {
-  background: linear-gradient(110deg, #ffffff 10%, #7cffcf 55%, #22e5ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: var(--accent);
 }
 
 .text-fade {
-  background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.55) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: #ededed;
 }
 
 @media (prefers-reduced-motion: reduce) {

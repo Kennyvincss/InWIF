@@ -87,7 +87,7 @@ try {
   await pageA.waitForTimeout(600)
   await pageA.screenshot({ path: `${OUT}/username-claimed.png` })
   await pageA.getByRole('link', { name: 'Open my wallet' }).click()
-  await pageA.locator('aside').getByText(`@${NAME_A}`).waitFor({ timeout: 15000 })
+  await pageA.getByTestId('account-button').getByText(`@${NAME_A}`).waitFor({ timeout: 15000 })
   assert(true, 'username shown on the account card')
 
   console.log('Person B signs up: taken and look-alike names are refused')

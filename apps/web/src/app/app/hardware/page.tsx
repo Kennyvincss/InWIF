@@ -33,7 +33,6 @@ function HardwareComingSoon() {
     <div className="space-y-6">
       <PageHeader title="Hardware wallet" subtitle="Keys kept on a dedicated device, every signature confirmed with a physical button." />
       <section className="card relative overflow-hidden p-6">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="flex items-center gap-2 font-display text-lg font-bold">
             <Cpu className="h-5 w-5 text-accent" /> InWIF One

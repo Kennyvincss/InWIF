@@ -1,42 +1,58 @@
 import type { Config } from 'tailwindcss'
 
 /**
- * InWIF "stealth terminal" design system.
- * True-black canvas · glass surfaces separated by hairline borders · stark white for primary
- * actions · vivid emerald for active/positive states · electric cyan for data.
+ * InWIF design system, modelled on a flat charcoal dashboard:
+ * charcoal surfaces (#242424 page, #272727 panels, #212121 insets) separated by 1px borders,
+ * small square-ish corners, no glows or glass. The logo's lime is the primary accent
+ * (active navigation, main actions); green marks success and gains; lavender, yellow and
+ * red are used for tags, counts and warnings.
  */
 export default {
   content: ['./src/**/*.{ts,tsx}'],
   theme: {
     extend: {
       colors: {
-        ink: { 950: '#000000', 900: '#040405', 800: '#08080A', 700: '#0F0F12', 600: '#17171B' },
-        line: { DEFAULT: 'rgba(255,255,255,0.07)', strong: 'rgba(255,255,255,0.14)' },
-        accent: { DEFAULT: '#00E59B', soft: '#7CFFCF', deep: '#00B87C' },
-        cyan: { DEFAULT: '#22E5FF', soft: '#A5F3FC', deep: '#06B6D4' },
-        mute: '#8B8D98',
-        dim: '#5B5D68',
-        ok: '#00E59B',
-        bad: '#FF4D6A',
-        warn: '#FFC24B',
+        ink: { 950: '#1C1C1C', 900: '#212121', 800: '#242424', 700: '#272727', 600: '#2E2E2E', 500: '#393939' },
+        line: { DEFAULT: '#323232', strong: '#3D3D3D' },
+        accent: { DEFAULT: '#B1FB59', soft: '#D2FF9C', deep: '#8FD63A' },
+        // "cyan" was the data colour; data now uses the brand lime too.
+        cyan: { DEFAULT: '#B1FB59', soft: '#D2FF9C', deep: '#8FD63A' },
+        lavender: { DEFAULT: '#B4AAFF', deep: '#9081FF' },
+        violet: '#5039FF',
+        sun: '#FFCD1A',
+        mute: '#8E8E8E',
+        dim: '#6E717B',
+        ok: '#2ECC71',
+        bad: '#FF5A5F',
+        warn: '#FFCD1A',
       },
       fontFamily: {
         sans: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
         display: ['var(--font-geist-sans)', 'system-ui', 'sans-serif'],
         mono: ['var(--font-geist-mono)', 'ui-monospace', 'monospace'],
       },
-      boxShadow: {
-        card: '0 1px 0 0 rgba(255,255,255,.04) inset, 0 30px 60px -30px rgba(0,0,0,.9)',
-        glow: '0 0 0 1px rgba(0,229,155,.35), 0 0 32px -6px rgba(0,229,155,.45)',
-        'glow-soft': '0 0 0 1px rgba(0,229,155,.16), 0 0 44px -14px rgba(0,229,155,.40)',
-        'glow-white': '0 0 0 1px rgba(255,255,255,.35), 0 0 30px -6px rgba(255,255,255,.45)',
-        'glow-cyan': '0 0 0 1px rgba(34,229,255,.25), 0 0 32px -8px rgba(34,229,255,.5)',
+      // Small, square-ish corners everywhere (pills and dots keep rounded-full).
+      borderRadius: {
+        sm: '3px',
+        DEFAULT: '4px',
+        md: '5px',
+        lg: '6px',
+        xl: '6px',
+        '2xl': '8px',
+        '3xl': '10px',
       },
-      transitionDuration: { DEFAULT: '180ms' },
+      // Flat surfaces: the old glows become plain borders.
+      boxShadow: {
+        card: 'none',
+        glow: '0 0 0 1px rgba(177,251,89,.45)',
+        'glow-soft': '0 0 0 1px #3D3D3D',
+        'glow-white': 'none',
+        'glow-cyan': '0 0 0 1px rgba(177,251,89,.35)',
+      },
+      transitionDuration: { DEFAULT: '150ms' },
       transitionTimingFunction: { DEFAULT: 'cubic-bezier(0.22, 1, 0.36, 1)' },
       keyframes: {
-        pulsedot: { '0%,100%': { opacity: '1' }, '50%': { opacity: '.35' } },
-        sheen: { '0%': { transform: 'translateX(-100%)' }, '100%': { transform: 'translateX(100%)' } },
+        pulsedot: { '0%,100%': { opacity: '1' }, '50%': { opacity: '.4' } },
       },
       animation: {
         pulsedot: 'pulsedot 2s ease-in-out infinite',

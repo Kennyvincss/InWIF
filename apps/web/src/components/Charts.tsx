@@ -4,11 +4,10 @@ import type { PricePoint } from '@inwif/core'
 import { fmtUsd } from '@/lib/format'
 
 /**
- * Categorical slots for the true-black theme: electric cyan first, then hues spaced around the
- * wheel at similar brightness so neighbours stay distinct (including for common colour-vision
- * deficiencies) against #000–#0A0A0B surfaces.
+ * Categorical slots on charcoal: brand lime first, then the palette's lavender, yellow and green,
+ * then two extra hues, all at similar brightness so neighbours stay distinct.
  */
-export const SERIES = ['#22E5FF', '#00E59B', '#F5C451', '#FF6B9A', '#9B8CFF', '#FF8A4C']
+export const SERIES = ['#B1FB59', '#B4AAFF', '#FFCD1A', '#2ECC71', '#FF8A4C', '#7FD4FF']
 
 /** Single-series area chart with crosshair tooltip and a table fallback. */
 export function AreaChart({ data, height = 200, label, format = fmtUsd }: { data: PricePoint[]; height?: number; label: string; format?: (v: number) => string }) {
@@ -70,20 +69,20 @@ export function AreaChart({ data, height = 200, label, format = fmtUsd }: { data
       >
         <defs>
           <linearGradient id={fillId} x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#22E5FF" stopOpacity=".24" />
-            <stop offset=".7" stopColor="#22E5FF" stopOpacity=".04" />
-            <stop offset="1" stopColor="#22E5FF" stopOpacity="0" />
+            <stop offset="0" stopColor="#B1FB59" stopOpacity=".24" />
+            <stop offset=".7" stopColor="#B1FB59" stopOpacity=".04" />
+            <stop offset="1" stopColor="#B1FB59" stopOpacity="0" />
           </linearGradient>
         </defs>
         {[0.25, 0.5, 0.75].map((f) => (
           <line key={f} x1={0} x2={W} y1={pad.t + f * (H - pad.t - pad.b)} y2={pad.t + f * (H - pad.t - pad.b)} stroke="rgba(255,255,255,.045)" strokeDasharray="2 4" />
         ))}
         <path d={area} fill={`url(#${fillId})`} />
-        <path d={path} fill="none" stroke="#22E5FF" strokeWidth={2} strokeLinejoin="round" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px rgba(34,229,255,.55))' }} />
+        <path d={path} fill="none" stroke="#B1FB59" strokeWidth={2} strokeLinejoin="round" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px rgba(177,251,89,.55))' }} />
         {hover !== null && (
           <>
             <line x1={xs[hover]} x2={xs[hover]} y1={pad.t} y2={H - pad.b} stroke="rgba(255,255,255,.25)" vectorEffect="non-scaling-stroke" />
-            <circle cx={xs[hover]} cy={ys[hover]} r={5} fill="#22E5FF" stroke="#000" strokeWidth={2} style={{ filter: 'drop-shadow(0 0 8px rgba(34,229,255,.8))' }} />
+            <circle cx={xs[hover]} cy={ys[hover]} r={5} fill="#B1FB59" stroke="#000" strokeWidth={2} style={{ filter: 'drop-shadow(0 0 8px rgba(177,251,89,.8))' }} />
           </>
         )}
         <text x={pad.l} y={H - 6} fill="#8A8F98" fontSize={11}>
