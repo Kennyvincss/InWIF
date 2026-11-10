@@ -4,6 +4,8 @@ import { BellRing, Coins, Network, ShieldCheck, Trash2, Smartphone } from 'lucid
 import { NETWORKS, normaliseTokenAddress, readTokenMetadata, INWIF_POLICY } from '@inwif/core'
 import { InstallButton } from '@/components/InstallButton'
 import { MyUsernameCard } from '@/components/Username'
+import { RecoveryCard } from '@/components/RevealSecret'
+import { SigninCard } from '@/components/SigninCard'
 import { useWallet, type Settings } from '@/lib/wallet-store'
 import { useNetwork, useTokens } from '@/lib/hooks'
 import { SELECTABLE_NETWORKS } from '@/lib/net'
@@ -57,6 +59,8 @@ export default function SettingsPage() {
       <PageHeader title="Settings" />
 
       <MyUsernameCard />
+      <SigninCard />
+      <RecoveryCard />
 
       <section className="card p-5">
         <h2 className="mb-1 flex items-center gap-2 font-display font-bold"><Smartphone className="h-5 w-5 text-accent" /> Install InWIF</h2>

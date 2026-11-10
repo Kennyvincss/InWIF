@@ -1,9 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { AtSign, Cpu, KeyRound, Plus, ScanEye, ShieldCheck } from 'lucide-react'
+import { AtSign, Cpu, KeyRound, LogIn, Plus, ScanEye, ShieldCheck } from 'lucide-react'
 import type { Address } from 'viem'
+import type { EncryptedVault } from '@inwif/core'
+import { enableSignin, signIn } from '@/lib/signin'
 import {
   accountFromMnemonic,
   checkMnemonic,
@@ -21,7 +23,7 @@ import { ErrorBox, FieldHint, Notice, Spinner, cx } from './ui'
 import { UsernameClaimForm } from './Username'
 import { useUsername } from '@/lib/usernames'
 
-type Step = 'welcome' | 'import' | 'watch' | 'password' | 'username' | 'done'
+type Step = 'welcome' | 'signin' | 'import' | 'watch' | 'password' | 'username' | 'done'
 
 export function Onboarding({ embedded = false, onFinished }: { embedded?: boolean; onFinished?: () => void }) {
   const wallet = useWallet()
@@ -39,7 +41,15 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [source, setSource] = useState<'create' | 'phrase' | 'key'>('create')
-  const [newWallet, setNewWallet] = useState<{ id: string; address: Address } | null>(null)
+  const [newWallet, setNewWallet] = useState<{ id: string; address: Address; vault?: EncryptedVault; kind: 'mnemonic' | 'privateKey'; name: string } | null>(null)
+  // Sign in with @username + password on other devices (on by default; uses the password just chosen).
+  const signinPw = useRef('')
+  const [signinOn, setSigninOn] = useState(true)
+  const [signinNote, setSigninNote] = useState<string | null>(null)
+  const [siUser, setSiUser] = useState('')
+  const [siPass, setSiPass] = useState('')
+  const [siErr, setSiErr] = useState<string | null>(null)
+  const [welcomeBack, setWelcomeBack] = useState<string | null>(null)
   const [claimed, setClaimed] = useState<string | null>(null)
   const existingName = useUsername(step === 'username' ? newWallet?.address : undefined)
 
@@ -67,7 +77,8 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
         w = await wallet.createFromMnemonic({ name, phrase: source === 'create' ? phrase : normaliseMnemonic(importInput), password: pw, backedUp: source !== 'create' })
         setCreatedId(source === 'create' ? w.id : null)
       }
-      setNewWallet({ id: w.id, address: w.accounts[0].address })
+      setNewWallet({ id: w.id, address: w.accounts[0].address, vault: w.vault, kind: source === 'key' ? 'privateKey' : 'mnemonic', name })
+      signinPw.current = pw
       // Clear secrets from component state as soon as they are encrypted.
       setPhrase('')
       setImportInput('')
@@ -80,6 +91,58 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
       setBusy(false)
     }
   }
+
+  /** After the username step: turn on sign-in if chosen, then finish. */
+  async function finishUsername(username: string | null) {
+    if (username) setClaimed(username)
+    if (username && signinOn && newWallet?.vault) {
+      setBusy(true)
+      try {
+        await enableSignin({
+          address: newWallet.address,
+          index: 0,
+          kind: newWallet.kind,
+          name: newWallet.name,
+          vault: newWallet.vault,
+          password: signinPw.current,
+          sign: (m) => wallet.softwareSignerFor(newWallet.id, 0).signMessage!(m),
+        })
+        setSigninNote(`You can now sign in on any device with @${username} and your password.`)
+      } catch (e) {
+        setSigninNote(`Sign-in with @${username} is not on yet: ${(e as Error).message} You can turn it on later in Settings.`)
+      } finally {
+        setBusy(false)
+      }
+    }
+    signinPw.current = ''
+    setStep('done')
+  }
+
+  async function doSignIn() {
+    setSiErr(null)
+    setBusy(true)
+    try {
+      const r = await signIn(siUser, siPass)
+      wallet.restoreWallet({ name: r.name, vault: r.vault, secret: r.secret, address: r.address, index: r.index })
+      setWelcomeBack(r.username ?? siUser.replace(/^@/, ''))
+      setSiPass('')
+      setStep('done')
+    } catch (e) {
+      setSiErr((e as Error).message)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const signinBox = (
+    <label className="mt-4 flex items-start gap-2.5 rounded-2xl bg-ink-900 p-3.5 text-sm text-mute">
+      <input type="checkbox" className="mt-0.5 accent-[#E8622C]" checked={signinOn} onChange={(e) => setSigninOn(e.target.checked)} data-testid="signin-optin" />
+      <span>
+        <span className="font-medium text-fg">Let me sign in on other devices with my username and password.</span> Your wallet is stored encrypted with your password; InWIF never sees
+        the password or your recovery phrase.
+      </span>
+    </label>
+  )
 
   const card = 'card w-full max-w-xl bg-paper p-6 sm:p-9'
 
@@ -137,6 +200,15 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                   </button>
                 </div>
               </div>
+              <button className="group flex w-full items-center gap-4 rounded-2xl border border-line bg-paper p-4 text-left transition hover:border-fg/[0.16] hover:bg-fg/[0.035]" onClick={() => setStep('signin')}>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent">
+                  <LogIn className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="font-medium">Sign in with @username</p>
+                  <p className="text-xs text-mute">Already have InWIF? Use your username and password.</p>
+                </div>
+              </button>
               <button className="group flex w-full items-center gap-4 rounded-2xl border border-line bg-paper p-4 text-left transition hover:border-fg/[0.16] hover:bg-fg/[0.035]" onClick={() => setStep('import')}>
                 <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
                   <KeyRound className="h-5 w-5" />
@@ -179,6 +251,41 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
               </button>
             </div>
           </div>
+        )}
+
+        {step === 'signin' && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault()
+              void doSignIn()
+            }}
+          >
+            <h2 className="font-display text-2xl font-bold">Sign in</h2>
+            <p className="mt-1 text-sm text-mute">Use the username and password you set up on another device. Your wallet is opened here, on this device.</p>
+            <div className="mt-5 space-y-3">
+              <div>
+                <label className="label" htmlFor="si-user">Username</label>
+                <div className="relative">
+                  <AtSign className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-dim" />
+                  <input id="si-user" className="input pl-10" placeholder="yourname" value={siUser} onChange={(e) => setSiUser(e.target.value.replace(/\s/g, '').toLowerCase())} autoComplete="username" autoCapitalize="none" spellCheck={false} autoFocus />
+                </div>
+              </div>
+              <div>
+                <label className="label" htmlFor="si-pass">Password</label>
+                <input id="si-pass" type="password" className="input" value={siPass} onChange={(e) => setSiPass(e.target.value)} autoComplete="current-password" />
+              </div>
+            </div>
+            {siErr && <div className="mt-3"><ErrorBox>{siErr}</ErrorBox></div>}
+            <div className="mt-5 flex gap-2">
+              <button type="button" className="btn-ghost" onClick={() => setStep('welcome')}>
+                Back
+              </button>
+              <button className="btn-primary flex-1" disabled={!siUser || !siPass || busy}>
+                {busy ? <Spinner /> : <LogIn className="h-4 w-4" />} {busy ? 'Signing in…' : 'Sign in'}
+              </button>
+            </div>
+            <p className="mt-4 text-xs text-dim">New to InWIF, or never turned on sign-in? Go back and create or import your wallet instead.</p>
+          </form>
         )}
 
         {step === 'import' && (
@@ -300,8 +407,9 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
               <>
                 <h2 className="mt-5 font-display text-2xl font-bold">Welcome back, @{existingName.data.username}</h2>
                 <p className="mt-1 text-sm text-mute">This wallet already has a username. Friends can send to @{existingName.data.username}.</p>
-                <button className="btn-primary mt-6 w-full" onClick={() => setStep('done')}>
-                  Continue
+                {signinBox}
+                <button className="btn-primary mt-6 w-full" disabled={busy} onClick={() => void finishUsername(existingName.data!.username)}>
+                  {busy ? <Spinner /> : null} Continue
                 </button>
               </>
             ) : (
@@ -317,16 +425,15 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                     <UsernameClaimForm
                       address={newWallet.address}
                       sign={(m) => wallet.softwareSignerFor(newWallet.id, 0).signMessage!(m)}
-                      onDone={(c) => {
-                        setClaimed(c.username)
-                        setStep('done')
-                      }}
+                      onDone={(c) => void finishUsername(c.username)}
                       autoFocus
                     />
                   )}
                 </div>
+                {signinBox}
+                {busy && <p className="mt-3 flex items-center gap-2 text-sm text-mute"><Spinner /> Turning on sign-in…</p>}
                 <p className="mt-3 text-xs text-dim">Your username is public and shows your wallet address to anyone who looks it up.</p>
-                <button className="mt-4 w-full text-center text-xs text-mute transition hover:text-fg" onClick={() => setStep('done')}>
+                <button className="mt-4 w-full text-center text-xs text-mute transition hover:text-fg" onClick={() => void finishUsername(null)}>
                   Skip for now, add one later in Settings
                 </button>
               </>
@@ -337,7 +444,8 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
         {step === 'done' && (
           <div className="text-center">
             <ShieldCheck className="mx-auto h-12 w-12 text-ok" />
-            <h2 className="mt-4 font-display text-2xl font-bold">{claimed ? `You're @${claimed}` : 'Your wallet is ready'}</h2>
+            <h2 className="mt-4 font-display text-2xl font-bold">{welcomeBack ? `Welcome back, @${welcomeBack}` : claimed ? `You're @${claimed}` : 'Your wallet is ready'}</h2>
+            {signinNote && <p className="mt-2 text-sm text-mute" data-testid="signin-note">{signinNote}</p>}
             <p className="mt-2 text-sm text-mute">Every InWIF feature is free, for every user. No subscriptions, no paywalls, and you never need $WIF to use the wallet.</p>
             {createdId && (
               <div className="mt-5 text-left">

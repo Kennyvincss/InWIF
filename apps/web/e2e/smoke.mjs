@@ -36,8 +36,8 @@ const shot = (n) => page.screenshot({ path: `${OUT}/${n}.png`, fullPage: false }
 try {
 console.log('Landing')
 await page.goto(BASE)
-await page.getByText('Your InWIF.').first().waitFor()
-assert(await page.getByRole('link', { name: 'Get Started' }).first().isVisible(), 'hero CTA visible')
+await page.getByText('Your crypto.').first().waitFor()
+assert(await page.getByRole('link', { name: 'Launch wallet' }).first().isVisible(), 'hero CTA visible')
 await page.waitForTimeout(1200)
 await shot('01-landing')
 

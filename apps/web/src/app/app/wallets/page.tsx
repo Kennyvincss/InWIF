@@ -5,6 +5,7 @@ import { shortAddress, type WalletSecret } from '@inwif/core'
 import { useWallet, type WalletRec } from '@/lib/wallet-store'
 import { Onboarding } from '@/components/Onboarding'
 import { BackupModal } from '@/components/BackupModal'
+import { RevealSecretModal } from '@/components/RevealSecret'
 import { Badge, CopyButton, ErrorBox, Modal, Notice, PageHeader, cx } from '@/components/ui'
 
 export default function WalletsPage() {
@@ -44,8 +45,8 @@ export default function WalletsPage() {
 function WalletCard({ wallet }: { wallet: WalletRec }) {
   const w = useWallet()
   const [pw, setPw] = useState('')
-  const [mode, setMode] = useState<null | 'unlock' | 'reveal'>(null)
-  const [secret, setSecret] = useState<WalletSecret | null>(null)
+  const [mode, setMode] = useState<null | 'unlock'>(null)
+  const [reveal, setReveal] = useState(false)
   const [err, setErr] = useState<string | null>(null)
   const [name, setName] = useState(wallet.name)
   const [backup, setBackup] = useState(false)
@@ -55,9 +56,8 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
   async function submit() {
     setErr(null)
     try {
-      if (mode === 'unlock') await w.unlock(wallet.id, pw)
-      else setSecret(await w.revealSecret(wallet.id, pw))
-      if (mode === 'unlock') setMode(null)
+      await w.unlock(wallet.id, pw)
+      setMode(null)
     } catch (e) {
       setErr((e as Error).message)
     }
@@ -91,8 +91,8 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
             </button>
           )}
           {hasKeys && (
-            <button className="btn-ghost px-2.5 py-1.5 text-xs" onClick={() => setMode('reveal')}>
-              <Eye className="h-3.5 w-3.5" /> Reveal secret
+            <button className="btn-ghost px-2.5 py-1.5 text-xs" onClick={() => setReveal(true)}>
+              <Eye className="h-3.5 w-3.5" /> {wallet.kind === 'mnemonic' ? 'Show recovery phrase' : 'Show private key'}
             </button>
           )}
           <button className="btn-ghost px-2.5 py-1.5 text-xs" onClick={() => w.setArchived(wallet.id, !wallet.archived)}>
@@ -161,21 +161,16 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
       {err && !mode && <div className="mt-2"><ErrorBox>{err}</ErrorBox></div>}
 
       <BackupModal walletId={wallet.id} open={backup} onClose={() => setBackup(false)} />
+      <RevealSecretModal walletId={wallet.id} accountIndex={w.activeWallet?.id === wallet.id ? w.activeAccount?.index : 0} open={reveal} onClose={() => setReveal(false)} />
       <Modal
         open={!!mode}
         onClose={() => {
           setMode(null)
-          setSecret(null)
           setErr(null)
         }}
-        title={mode === 'unlock' ? `Unlock ${wallet.name}` : 'Reveal secret'}
+        title={`Unlock ${wallet.name}`}
       >
-        {secret ? (
-          <div className="space-y-3">
-            <Notice tone="warn">Anyone who sees this controls your funds. Close this window when done.</Notice>
-            <p className="break-words rounded-xl bg-ink-900 p-4 font-mono text-sm">{secret.kind === 'mnemonic' ? secret.phrase : secret.privateKey}</p>
-          </div>
-        ) : (
+        {(
           <form
             className="space-y-3"
             onSubmit={(e) => {
@@ -183,14 +178,13 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
               void submit()
             }}
           >
-            {mode === 'reveal' && <Notice tone="warn">InWIF staff will never ask for this. Make sure no one can see your screen.</Notice>}
             <label className="label" htmlFor={`pw-${wallet.id}`}>
               <KeyRound className="mr-1 inline h-3 w-3" /> Wallet password
             </label>
             <input id={`pw-${wallet.id}`} type="password" className="input" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus />
             {err && <ErrorBox>{err}</ErrorBox>}
             <button className="btn-primary w-full" disabled={!pw}>
-              {mode === 'unlock' ? 'Unlock' : 'Reveal'}
+              Unlock
             </button>
           </form>
         )}

@@ -20,7 +20,7 @@ import { getAddress, isAddress, recoverMessageAddress, type Address, type Hex } 
 export const USERNAME_MIN = 3
 export const USERNAME_MAX = 20
 /** How many names one address may claim (switching name keeps the old one for that address). */
-export const USERNAMES_PER_ADDRESS = 3
+export const USERNAMES_PER_ADDRESS = 5
 /** A claim must be signed within this window of the server's clock. */
 export const CLAIM_MAX_AGE_MS = 10 * 60_000
 
