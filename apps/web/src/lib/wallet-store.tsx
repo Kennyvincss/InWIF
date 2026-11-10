@@ -127,6 +127,8 @@ interface Ctx {
   importPrivateKey: (p: { name: string; privateKey: `0x${string}`; password: string }) => Promise<WalletRec>
   addHardwareWallet: (p: { name: string; serial: string; model: string; simulated: boolean; accounts: AccountRec[] }) => WalletRec
   addWatchWallet: (p: { name: string; address: Address }) => WalletRec
+  /** Add (or reopen) a wallet from an encrypted vault the user just signed in with. */
+  restoreWallet: (p: { name: string; vault: EncryptedVault; secret: WalletSecret; address: Address; index: number }) => WalletRec
   unlock: (walletId: string, password: string) => Promise<void>
   lock: () => void
   setActive: (walletId: string, accountIndex?: number) => void
@@ -224,6 +226,26 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     return w
   }
 
+  const restoreWallet: Ctx['restoreWallet'] = ({ name, vault, secret, address, index }) => {
+    const target = getAddress(address)
+    const existing = state.wallets.find((w) => w.accounts.some((a) => a.address === target) && w.kind === secret.kind)
+    if (existing) {
+      markUnlocked(existing.id, secret)
+      const acct = existing.accounts.find((a) => a.address === target)!
+      update((s) => ({ ...s, wallets: s.wallets.map((w) => (w.id === existing.id ? { ...w, archived: false } : w)), activeWalletId: existing.id, activeAccountIndex: acct.index }))
+      return existing
+    }
+    const accounts: AccountRec[] =
+      secret.kind === 'mnemonic'
+        ? [...new Set([0, index])].map((i) => ({ index: i, address: accountFromMnemonic(secret.phrase, i).address, label: `Account ${i + 1}` }))
+        : [{ index: 0, address: accountFromPrivateKey(secret.privateKey).address, label: 'Imported key' }]
+    // A phrase restored from the online copy still needs a paper backup: keep the reminder on.
+    const w: WalletRec = { id: uid(), name, kind: secret.kind, accounts, vault, archived: false, createdAt: Date.now(), backedUp: secret.kind !== 'mnemonic' }
+    update((s) => ({ ...s, wallets: [...s.wallets, w], activeWalletId: w.id, activeAccountIndex: secret.kind === 'mnemonic' ? index : 0 }))
+    markUnlocked(w.id, secret)
+    return w
+  }
+
   const find = (id: string) => {
     const w = state.wallets.find((x) => x.id === id)
     if (!w) throw new Error('Wallet not found')
@@ -280,6 +302,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     importPrivateKey,
     addHardwareWallet,
     addWatchWallet,
+    restoreWallet,
     unlock,
     lock,
     setActive: (walletId, accountIndex) =>

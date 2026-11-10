@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 import { AtSign, CheckCircle2, XCircle } from 'lucide-react'
 import type { Address } from 'viem'
 import { USERNAME_MAX, type UsernameClaim } from '@inwif/core'
@@ -14,9 +14,12 @@ export function UsernameClaimForm({
   onDone,
   submitLabel = 'Claim username',
   autoFocus,
+  unlock,
 }: {
   address: Address
   sign?: (message: string) => Promise<`0x${string}`>
+  /** Offered when the wallet is locked: unlock it here with the wallet password. */
+  unlock?: (password: string) => Promise<void>
   onDone?: (claim: UsernameClaim) => void
   submitLabel?: string
   autoFocus?: boolean
@@ -24,8 +27,25 @@ export function UsernameClaimForm({
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState<string | null>(null)
+  const [pw, setPw] = useState('')
+  const [unlocking, setUnlocking] = useState(false)
+  const inputId = useId()
   const setUsername = useSetUsername()
   const { name, check, pending, lookup, error } = useNameLookup(input)
+
+  async function doUnlock() {
+    if (!unlock || !pw) return
+    setErr(null)
+    setUnlocking(true)
+    try {
+      await unlock(pw)
+      setPw('')
+    } catch {
+      setErr('Wrong password.')
+    } finally {
+      setUnlocking(false)
+    }
+  }
 
   const mine = (owner?: string) => !!owner && owner.toLowerCase() === address.toLowerCase()
   let status: { tone: 'ok' | 'bad' | 'mute'; text: string } | null = null
@@ -61,11 +81,11 @@ export function UsernameClaimForm({
         void submit()
       }}
     >
-      <label className="label" htmlFor="username">Username</label>
+      <label className="label" htmlFor={inputId}>Username</label>
       <div className="relative">
         <AtSign className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-dim" />
         <input
-          id="username"
+          id={inputId}
           className="input pl-10 text-[15px]"
           placeholder="yourname"
           value={input}
@@ -83,7 +103,32 @@ export function UsernameClaimForm({
         {status?.text ?? '3–20 letters, numbers or _'}
       </p>
       {err && <div className="mt-2"><ErrorBox>{err}</ErrorBox></div>}
-      {!sign && <FieldHint tone="warn" className="mt-2">Unlock this wallet to claim a username.</FieldHint>}
+      {!sign && !unlock && <FieldHint tone="warn" className="mt-2">Unlock this wallet to claim a username.</FieldHint>}
+      {!sign && unlock && (
+        <div className="mt-3">
+          <label className="label" htmlFor={`${inputId}-pw`}>Wallet password</label>
+          <div className="flex gap-2">
+            <input
+              id={`${inputId}-pw`}
+              type="password"
+              className="input"
+              value={pw}
+              onChange={(e) => setPw(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  void doUnlock()
+                }
+              }}
+              autoComplete="current-password"
+            />
+            <button type="button" className="btn-ghost shrink-0" disabled={!pw || unlocking} onClick={() => void doUnlock()}>
+              {unlocking ? <Spinner /> : 'Unlock'}
+            </button>
+          </div>
+          <p className="mt-1.5 text-xs text-dim">Your wallet is locked. Enter its password to sign the change (free, no transaction).</p>
+        </div>
+      )}
       <button className="btn-primary mt-4 w-full" disabled={!canClaim}>
         {busy ? <Spinner /> : <AtSign className="h-4 w-4" />} {busy ? 'Saving…' : name && status?.tone === 'ok' ? `Claim @${name}` : submitLabel}
       </button>
@@ -100,12 +145,16 @@ export function UsernameText({ address, className }: { address?: Address; classN
 
 /** The active account's username, or a way to claim one (Settings and Receive). */
 export function MyUsernameCard({ compact }: { compact?: boolean }) {
-  const { activeWallet, activeAccount, isUnlocked, softwareSignerFor } = useWallet()
+  const { activeWallet, activeAccount, isUnlocked, unlock, softwareSignerFor } = useWallet()
   const address = activeAccount?.address
   const u = useUsername(address)
+  const [changing, setChanging] = useState(false)
+  const [changedFrom, setChangedFrom] = useState<string | null>(null)
   if (!activeWallet || !address) return null
   const canSign = (activeWallet.kind === 'mnemonic' || activeWallet.kind === 'privateKey') && isUnlocked(activeWallet.id)
   const sign = canSign ? (m: string) => softwareSignerFor(activeWallet.id, activeAccount.index).signMessage!(m) : undefined
+  const software = activeWallet.kind === 'mnemonic' || activeWallet.kind === 'privateKey'
+  const unlockHere = software && !canSign ? (pw: string) => unlock(activeWallet.id, pw) : undefined
 
   return (
     <section className="card p-5" id="username">
@@ -119,7 +168,42 @@ export function MyUsernameCard({ compact }: { compact?: boolean }) {
           <p className="font-display text-2xl font-semibold text-accent" data-testid="my-username">@{u.data.username}</p>
           <CopyButton value={`@${u.data.username}`} label="Copy" />
           <p className="w-full text-sm text-mute">Anyone on InWIF can send to @{u.data.username}. It always points to this account&apos;s address.</p>
+          {changedFrom && (
+            <p className="w-full text-sm text-ok" data-testid="username-changed">
+              Changed from @{changedFrom}. Your old name still points to you, so old links keep working and nobody else can take it.
+            </p>
+          )}
           <PayPageLink username={u.data.username} />
+          {!compact && (activeWallet.kind === 'mnemonic' || activeWallet.kind === 'privateKey') && (
+            <div className="w-full">
+              {!changing ? (
+                <button className="btn-ghost" onClick={() => setChanging(true)}>
+                  <AtSign className="h-4 w-4" /> Change username
+                </button>
+              ) : (
+                <div className="rounded-2xl bg-ink-900 p-4">
+                  <p className="mb-3 text-sm text-mute">
+                    Pick a new username. @{u.data.username} stays yours and keeps working, so nobody can take it over. You can have up to 5 names.
+                  </p>
+                  <UsernameClaimForm
+                    address={address}
+                    sign={sign}
+                    unlock={unlockHere}
+                    submitLabel="Change username"
+                    autoFocus
+                    onDone={(c) => {
+                      setChangedFrom(u.data?.username ?? null)
+                      setChanging(false)
+                      void c
+                    }}
+                  />
+                  <button className="mt-2 w-full text-center text-xs text-mute hover:text-fg" onClick={() => setChanging(false)}>
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       ) : activeWallet.kind === 'watch' ? (
         <p className="text-sm text-mute">Watch-only wallets can&apos;t claim a username.</p>
@@ -128,7 +212,7 @@ export function MyUsernameCard({ compact }: { compact?: boolean }) {
       ) : (
         <>
           {!compact && <p className="mb-4 text-sm text-mute">Let friends send to @username instead of your long address. Free, no transaction.</p>}
-          <UsernameClaimForm address={address} sign={sign} />
+          <UsernameClaimForm address={address} sign={sign} unlock={unlockHere} />
         </>
       )}
     </section>

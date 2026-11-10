@@ -26,6 +26,8 @@
 | XSS / supply chain in web | CSP with `connect-src` limited to InWIF, the Robinhood Chain RPCs and the explorer; no third-party scripts; `frame-ancestors 'none'`; pinned lockfile; `pnpm audit` (inline scripts still allowed, see `security-review-2026-11.md`) |
 | Skipped backup | The backup quiz requires every requested word; a wallet that was never backed up can be deleted only by typing DELETE |
 | Phishing (secret pasted) | Recipient field detects pasted keys and phrases and blocks them |
+| Sign in with @username (optional, on by default at sign-up) | The server stores only the vault already encrypted on the device (AES-256-GCM, PBKDF2 600k) and SHA-256 of a separate sign-in key (PBKDF2 600k over the password with a per-account salt, domain-separated from the encryption key); it never receives the password or the secret. Sign-in key compared in constant time; 10 wrong passwords per hour pause sign-in for that account for an hour; per-IP rate limit. Turning it on or off needs a signature from the wallet's own key. Passwords need 12+ characters. Turning it off deletes the online copy |
+| Shoulder-surfing when viewing the phrase / key | Password re-entry, "nobody can see my screen" check, blurred until tapped, clipboard cleared after 30 s, window closes itself after 60 s |
 
 ## Known limitations (be honest with users)
 - **Prototype simulator.** The browser device simulator is not secure hardware: its keys live in JS memory.
@@ -33,6 +35,7 @@
 - **Compromised device.** A compromised computer or phone can still observe the user. Hardware signing reduces this risk but does not remove it.
 - **No safety guarantee.** InWIF cannot detect every malicious contract. No warning does not mean safe.
 - **No audit yet.** No independent audit has happened.
+- **Username sign-in is password-strength bound.** With sign-in on, anyone who knows the username and guesses the password can open the wallet; the lockout slows online guessing, but someone who obtained the stored vault (e.g. a server breach) could guess offline at PBKDF2 speed. Users who don't want this can untick it at sign-up or turn it off in Settings.
 
 ## Reporting vulnerabilities
 See [../SECURITY.md](../SECURITY.md).

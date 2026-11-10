@@ -70,7 +70,7 @@ export interface PasswordPolicyResult {
 
 export function checkPassword(password: string): PasswordPolicyResult {
   const problems: string[] = []
-  if (password.length < 10) problems.push('Use at least 10 characters.')
+  if (password.length < 12) problems.push('Use at least 12 characters.')
   if (!/[a-zA-Z]/.test(password)) problems.push('Include at least one letter.')
   if (!/[0-9\W_]/.test(password)) problems.push('Include at least one number or symbol.')
   return { ok: problems.length === 0, problems }
