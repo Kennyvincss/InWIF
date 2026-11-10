@@ -31,7 +31,7 @@ function ago(ts: number, now: number) {
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{children}</p>
+  return <p className="text-[11.5px]  text-dim font-medium">{children}</p>
 }
 
 export default function LiveWifPage() {
@@ -141,14 +141,14 @@ export default function LiveWifPage() {
           <div className="flex items-center gap-3">
             <TokenIcon symbol="WIF" size={44} />
             <div>
-              <p className="flex items-center gap-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">
+              <p className="flex items-center gap-2 text-[11.5px]  text-dim font-medium">
                 <span className="live-dot" /> Live · {updatedAgo === null ? 'connecting' : `updated ${updatedAgo}s ago`}
               </p>
               <p className="font-display text-3xl font-semibold">{price ? fmtUsd(price) : '—'}</p>
             </div>
           </div>
           {[
-            { k: '24h change', v: fmtPct(h24?.priceChangePct ?? market.data?.change24hPct), tone: (h24?.priceChangePct ?? 0) >= 0 ? 'text-accent' : 'text-bad' },
+            { k: '24h change', v: fmtPct(h24?.priceChangePct ?? market.data?.change24hPct), tone: (h24?.priceChangePct ?? 0) >= 0 ? 'text-ok' : 'text-bad' },
             { k: '24h volume', v: fmtUsd(h24?.volumeUsd ?? market.data?.volume24hUsd, { compact: true }) },
             { k: 'Liquidity', v: fmtUsd(stats.data?.liquidityUsd ?? market.data?.liquidityUsd, { compact: true }) },
             { k: 'Holders', v: holders.data?.holders ? Number(holders.data.holders).toLocaleString() : '—' },
@@ -168,9 +168,9 @@ export default function LiveWifPage() {
         <section className="card p-6 lg:col-span-5">
           <div className="flex items-center justify-between gap-3">
             <Label>Buy vs sell pressure</Label>
-            <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
+            <div className="flex rounded-full border border-fg/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
               {WINDOWS.map((x) => (
-                <button key={x.k} className={cx('rounded-full px-2.5 py-1 transition', win === x.k ? 'bg-white text-black' : 'text-mute hover:text-white')} onClick={() => setWin(x.k)}>
+                <button key={x.k} className={cx('rounded-full px-2.5 py-1 transition', win === x.k ? 'bg-fg text-paper' : 'text-mute hover:text-fg')} onClick={() => setWin(x.k)}>
                   {x.label}
                 </button>
               ))}
@@ -182,19 +182,19 @@ export default function LiveWifPage() {
             <>
               <div className="mt-6 flex items-end justify-between">
                 <div>
-                  <p className={cx('font-display text-5xl font-semibold', buyPct === null ? 'text-mute' : buyPct >= 50 ? 'text-accent' : 'text-bad')}>{buyPct === null ? '—' : `${buyPct}%`}</p>
+                  <p className={cx('font-display text-5xl font-semibold', buyPct === null ? 'text-mute' : buyPct >= 50 ? 'text-ok' : 'text-bad')}>{buyPct === null ? '—' : `${buyPct}%`}</p>
                   <p className="mt-1 text-sm text-mute">{buyPct === null ? 'No trades in this window yet' : buyPct >= 50 ? 'of the volume is buying' : 'of the volume is buying — sellers lead'}</p>
                 </div>
-                <Radio className={cx('h-6 w-6', buyPct !== null && buyPct >= 50 ? 'text-accent' : 'text-bad')} />
+                <Radio className={cx('h-6 w-6', buyPct !== null && buyPct >= 50 ? 'text-ok' : 'text-bad')} />
               </div>
-              <div className="mt-5 flex h-2.5 overflow-hidden rounded-full bg-white/[0.06]">
-                <div className="bg-accent transition-[width] duration-500" style={{ width: `${buyPct ?? 0}%` }} />
+              <div className="mt-5 flex h-2.5 overflow-hidden rounded-full bg-fg/[0.06]">
+                <div className="bg-ok transition-[width] duration-500" style={{ width: `${buyPct ?? 0}%` }} />
                 <div className="bg-bad/90 transition-[width] duration-500" style={{ width: `${buyPct === null ? 0 : 100 - buyPct}%` }} />
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-xl border border-accent/20 bg-accent/[0.05] p-3">
+                <div className="rounded-xl border border-ok/20 bg-ok/[0.06] p-3">
                   <Label>Buys</Label>
-                  <p className="mt-1 font-medium text-accent">{fmtUsd(flow.buyUsd)}</p>
+                  <p className="mt-1 font-medium text-ok">{fmtUsd(flow.buyUsd)}</p>
                   <p className="text-xs text-dim">{(w?.buys ?? flow.buys).toLocaleString()} trades</p>
                 </div>
                 <div className="rounded-xl border border-bad/20 bg-bad/[0.05] p-3">
@@ -213,13 +213,13 @@ export default function LiveWifPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="flex items-center gap-2">
               <Fish className="h-4 w-4 text-cyan" />
-              <span className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Whale alerts</span>
+              <span className="text-[11.5px]  text-dim font-medium">Whale alerts</span>
             </p>
             <div className="flex items-center gap-2 text-xs text-mute">
               Over
-              <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
+              <div className="flex rounded-full border border-fg/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
                 {WHALE_LEVELS.map((v) => (
-                  <button key={v} className={cx('rounded-full px-2.5 py-1 transition', whaleUsd === v ? 'bg-cyan text-black' : 'text-mute hover:text-white')} onClick={() => setWhaleUsd(v)}>
+                  <button key={v} className={cx('rounded-full px-2.5 py-1 transition', whaleUsd === v ? 'bg-cyan text-paper' : 'text-mute hover:text-fg')} onClick={() => setWhaleUsd(v)}>
                     ${v.toLocaleString()}
                   </button>
                 ))}
@@ -231,7 +231,7 @@ export default function LiveWifPage() {
             {!trades.isLoading && whales.length === 0 && <p className="py-10 text-center text-sm text-mute">No trades over ${whaleUsd.toLocaleString()} in the last day. You&apos;ll get an alert when one happens.</p>}
             {whales.slice(0, 6).map((t) => (
               <li key={`${t.txHash}:${t.kind}:${t.baseAmount}`} className="flex items-center gap-3 rounded-xl border border-cyan/15 bg-cyan/[0.03] px-3 py-2.5">
-                <span className={cx('grid h-8 w-8 shrink-0 place-items-center rounded-lg', t.kind === 'buy' ? 'bg-accent/15 text-accent' : 'bg-bad/15 text-bad')}>
+                <span className={cx('grid h-8 w-8 shrink-0 place-items-center rounded-lg', t.kind === 'buy' ? 'bg-ok/15 text-ok' : 'bg-bad/15 text-bad')}>
                   {t.kind === 'buy' ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
                 </span>
                 <div className="min-w-0 flex-1">
@@ -254,11 +254,11 @@ export default function LiveWifPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 px-6 pb-3 pt-6">
           <Label>Trade feed</Label>
           <label className="flex cursor-pointer items-center gap-2 text-xs text-mute">
-            <input type="checkbox" className="accent-[#B1FB59]" checked={whalesOnly} onChange={(e) => setWhalesOnly(e.target.checked)} />
+            <input type="checkbox" className="accent-[#E8622C]" checked={whalesOnly} onChange={(e) => setWhalesOnly(e.target.checked)} />
             Whales only
           </label>
         </div>
-        <div className="hidden grid-cols-[4rem,4.5rem,1fr,1fr,1fr,8rem] gap-3 border-y border-white/[0.06] bg-white/[0.015] px-6 py-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] md:grid font-medium">
+        <div className="hidden grid-cols-[4rem,4.5rem,1fr,1fr,1fr,8rem] gap-3 border-y border-line bg-ink-900 px-6 py-2 text-[11.5px]  text-dim md:grid font-medium">
           <span>Age</span>
           <span>Side</span>
           <span className="text-right">WIF</span>
@@ -276,7 +276,7 @@ export default function LiveWifPage() {
             <Skeleton className="h-64" />
           </div>
         )}
-        <ul className="divide-y divide-white/[0.04]">
+        <ul className="divide-y divide-fg/[0.04]">
           {feed.map((t) => {
             const k = `${t.txHash}:${t.kind}:${t.baseAmount}`
             const whale = t.volumeUsd >= whaleUsd
@@ -285,12 +285,12 @@ export default function LiveWifPage() {
                 key={k}
                 className={cx(
                   'grid grid-cols-[3rem,1fr,auto] items-center gap-3 px-6 py-2.5 text-sm transition-colors duration-700 md:grid-cols-[4rem,4.5rem,1fr,1fr,1fr,8rem]',
-                  fresh.has(k) ? (t.kind === 'buy' ? 'bg-accent/[0.12]' : 'bg-bad/[0.12]') : 'hover:bg-white/[0.02]',
+                  fresh.has(k) ? (t.kind === 'buy' ? 'bg-ok/[0.12]' : 'bg-bad/[0.12]') : 'hover:bg-fg/[0.02]',
                 )}
               >
                 <span className="font-mono text-xs text-dim">{ago(t.timestamp, now)}</span>
                 <span className="flex items-center gap-1.5">
-                  <span className={cx('tag capitalize', t.kind === 'buy' ? 'bg-ok text-[#08240f]' : 'bg-bad text-white')}>{t.kind}</span>
+                  <span className={cx('tag capitalize', t.kind === 'buy' ? 'bg-ok text-paper' : 'bg-bad text-paper')}>{t.kind}</span>
                   {whale && <Fish className="h-3.5 w-3.5 text-cyan" aria-label="Whale" />}
                   <span className="text-xs text-mute md:hidden">{compact(t.baseAmount)} WIF</span>
                 </span>
@@ -298,7 +298,7 @@ export default function LiveWifPage() {
                 <span className="hidden text-right text-mute md:block">{ethFmt(t.quoteAmount)}</span>
                 <span className={cx('text-right font-medium', whale && 'text-cyan')}>{fmtUsd(t.volumeUsd)}</span>
                 <a
-                  className="hidden items-center justify-end gap-1 text-right font-mono text-xs text-dim transition hover:text-white md:flex"
+                  className="hidden items-center justify-end gap-1 text-right font-mono text-xs text-dim transition hover:text-fg md:flex"
                   href={explorerTxUrl(network, t.txHash)}
                   target="_blank"
                   rel="noreferrer"

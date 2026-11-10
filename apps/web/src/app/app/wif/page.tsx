@@ -139,15 +139,15 @@ export default function WifPage() {
         </h2>
         <div className="mt-3 grid gap-4 text-sm text-mute md:grid-cols-3">
           <p>
-            <span className="font-semibold text-white">InWIF is a free gateway.</span> It gives every World Is Flat community member a secure, self-custody home for $WIF on Robinhood
+            <span className="font-semibold text-fg">InWIF is a free gateway.</span> It gives every World Is Flat community member a secure, self-custody home for $WIF on Robinhood
             Chain — with hardware-grade signing on the way.
           </p>
           <p>
-            <span className="font-semibold text-white">$WIF is the ecosystem token, not a toll.</span> Holding $WIF unlocks nothing extra in InWIF: every wallet, security and
+            <span className="font-semibold text-fg">$WIF is the ecosystem token, not a toll.</span> Holding $WIF unlocks nothing extra in InWIF: every wallet, security and
             portfolio feature is identical for every user.
           </p>
           <p>
-            <span className="font-semibold text-white">Utility is real and on-chain.</span> Track $WIF, trade it, audit its approvals, build an
+            <span className="font-semibold text-fg">Utility is real and on-chain.</span> Track $WIF, trade it, audit its approvals, build an
             on-chain ecosystem profile, and discover reviewed apps built around it.
           </p>
         </div>
@@ -177,10 +177,10 @@ export default function WifPage() {
             {SECURITY_QUESTS.map((q) => {
               const done = !!state.quests[q.id]
               return (
-                <li key={q.id} className="flex items-start gap-3 rounded-xl border border-white/[0.06] p-3">
+                <li key={q.id} className="flex items-start gap-3 rounded-xl border border-fg/[0.06] p-3">
                   <input
                     type="checkbox"
-                    className="mt-1 accent-[#B1FB59]"
+                    className="mt-1 accent-[#E8622C]"
                     checked={done}
                     aria-label={q.title}
                     onChange={() =>
@@ -212,7 +212,7 @@ export default function WifPage() {
         <h2 className="mb-3 font-display font-bold">Ecosystem applications</h2>
         <div className="grid gap-3 md:grid-cols-3">
           {ECOSYSTEM_APPS.map((a) => (
-            <Link key={a.id} href={a.href} className="rounded-xl border border-white/[0.06] p-4 hover:border-accent/30">
+            <Link key={a.id} href={a.href} className="rounded-xl border border-fg/[0.06] p-4 hover:border-accent/30">
               <p className="font-semibold">{a.name}</p>
               <p className="mt-1 text-xs text-mute">{a.description}</p>
             </Link>

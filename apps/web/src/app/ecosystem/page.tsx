@@ -39,7 +39,7 @@ export default function EcosystemPage() {
             </p>
             <div className="card p-5">
               <p className="label">Official contract · {ROBINHOOD_MAINNET.name}</p>
-              <p className="break-all font-mono text-sm text-white">{WIF_ADDRESS}</p>
+              <p className="break-all font-mono text-sm text-fg">{WIF_ADDRESS}</p>
               <a className="mt-2 inline-block text-xs text-accent" href={explorerTokenUrl(ROBINHOOD_MAINNET, WIF_ADDRESS)} target="_blank" rel="noreferrer">View on explorer ↗</a>
             </div>
           </div>
@@ -74,7 +74,7 @@ export default function EcosystemPage() {
           ))}
         </div>
         <div className="mt-6 text-sm text-mute">
-          <p className="font-semibold text-white">Listing criteria for third-party apps</p>
+          <p className="font-semibold text-fg">Listing criteria for third-party apps</p>
           <ul className="mt-2 list-disc pl-5">{LISTING_CRITERIA.map((c) => <li key={c}>{c}</li>)}</ul>
           <p className="mt-3">InWIF does not invent governance rights: holding $WIF does not by itself grant voting power. If the World Is Flat community launches on-chain governance, InWIF will integrate it as it actually works.</p>
         </div>

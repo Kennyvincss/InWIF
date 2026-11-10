@@ -59,10 +59,10 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
     .join('\n')
 
   const stats = [
-    { k: 'Average buy price', v: j.avgCostUsd !== null ? fmtUsd(j.avgCostUsd) : '—', sub: vsAvg !== null ? `Today ${fmtUsd(currentPriceUsd)} · ${fmtPct(vsAvg)}` : undefined, tone: vsAvg === null ? '' : vsAvg >= 0 ? 'text-accent' : 'text-bad' },
+    { k: 'Average buy price', v: j.avgCostUsd !== null ? fmtUsd(j.avgCostUsd) : '—', sub: vsAvg !== null ? `Today ${fmtUsd(currentPriceUsd)} · ${fmtPct(vsAvg)}` : undefined, tone: vsAvg === null ? '' : vsAvg >= 0 ? 'text-ok' : 'text-bad' },
     { k: 'You hold', v: mask(`${fmtWif(j.holding)} WIF`), sub: mask(`Worth ${fmtUsd(currentPriceUsd !== null ? j.holding * currentPriceUsd : null)}`) },
-    { k: 'Unrealised', v: mask(fmtUsd(j.unrealizedUsd)), sub: 'On what you still hold', tone: (j.unrealizedUsd ?? 0) >= 0 ? 'text-accent' : 'text-bad' },
-    { k: 'Realised', v: mask(fmtUsd(j.realizedUsd)), sub: j.sells ? `From ${j.sells} ${j.sells === 1 ? 'sale' : 'sales'}` : 'Nothing sold yet', tone: j.realizedUsd >= 0 ? 'text-accent' : 'text-bad' },
+    { k: 'Unrealised', v: mask(fmtUsd(j.unrealizedUsd)), sub: 'On what you still hold', tone: (j.unrealizedUsd ?? 0) >= 0 ? 'text-ok' : 'text-bad' },
+    { k: 'Realised', v: mask(fmtUsd(j.realizedUsd)), sub: j.sells ? `From ${j.sells} ${j.sells === 1 ? 'sale' : 'sales'}` : 'Nothing sold yet', tone: j.realizedUsd >= 0 ? 'text-ok' : 'text-bad' },
     { k: 'First $WIF', v: j.firstIn !== null ? date(j.firstIn) : '—', sub: j.firstIn !== null ? `${daysAgo(j.firstIn)} days ago` : undefined },
     { k: 'Last sold', v: j.lastOut !== null ? date(j.lastOut) : 'Never 🙌', sub: j.lastOut !== null ? `${daysAgo(j.lastOut)} days ago` : 'Not a single $WIF sold' },
   ]
@@ -73,12 +73,12 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
         <div className="relative flex flex-wrap items-center gap-4">
           <TokenIcon symbol="WIF" size={52} />
           <div className="min-w-0 flex-1 basis-[14rem]">
-            <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{!complete || j.partial ? 'Estimated profit / loss · recent history' : 'Total profit / loss'}</p>
-            <p className={cx('whitespace-nowrap font-display text-[40px] font-semibold leading-tight sm:text-[52px]', up ? 'text-accent' : 'text-bad')} data-testid="journey-pnl">
+            <p className="text-[11.5px]  text-dim font-medium">{!complete || j.partial ? 'Estimated profit / loss · recent history' : 'Total profit / loss'}</p>
+            <p className={cx('whitespace-nowrap font-display text-[40px] font-semibold leading-tight sm:text-[52px]', up ? 'text-ok' : 'text-bad')} data-testid="journey-pnl">
               {j.pnlUsd === null ? '—' : mask(`${up ? '+' : '−'}${fmtUsd(Math.abs(j.pnlUsd))}`)}
             </p>
             <p className="text-sm text-mute">
-              {j.pnlPct !== null && <span className={up ? 'text-accent' : 'text-bad'}>{fmtPct(j.pnlPct)}</span>} on {mask(fmtUsd(j.investedUsd))} of $WIF bought or received
+              {j.pnlPct !== null && <span className={up ? 'text-ok' : 'text-bad'}>{fmtPct(j.pnlPct)}</span>} on {mask(fmtUsd(j.investedUsd))} of $WIF bought or received
             </p>
           </div>
           <a
@@ -93,7 +93,7 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
         {badges.length > 0 && (
           <div className="relative mt-6 flex flex-wrap gap-2" data-testid="journey-badges">
             {badges.map((b) => (
-              <span key={b.label} className="rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-sm" title={b.detail}>
+              <span key={b.label} className="rounded-full border border-fg/[0.1] bg-fg/[0.04] px-3 py-1.5 text-sm" title={b.detail}>
                 {b.emoji} {b.label}
                 <span className="ml-2 text-xs text-dim">{b.detail}</span>
               </span>
@@ -113,7 +113,7 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
       <section className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {stats.map((s) => (
           <div key={s.k} className="card p-4">
-            <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{s.k}</p>
+            <p className="text-[11.5px]  text-dim font-medium">{s.k}</p>
             <p className={cx('mt-1.5 font-display text-xl font-semibold', s.tone)}>{s.v}</p>
             {s.sub && <p className="mt-0.5 text-xs text-mute">{s.sub}</p>}
           </div>
@@ -123,14 +123,14 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
       <section className="card p-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-display font-bold">Your $WIF moves</h2>
-          <Link href="/app/wif/card" className="flex items-center gap-1.5 text-xs text-mute hover:text-white">
+          <Link href="/app/wif/card" className="flex items-center gap-1.5 text-xs text-mute hover:text-fg">
             <IdCard className="h-3.5 w-3.5" /> Make your holder card
           </Link>
         </div>
-        <ul className="divide-y divide-white/[0.05]">
+        <ul className="divide-y divide-fg/[0.05]">
           {j.events.slice(0, 15).map((e, i) => (
             <li key={`${e.t}-${i}`} className="flex items-center gap-3 py-2.5 text-sm">
-              <span className={cx('rounded-lg p-1.5', e.direction === 'in' ? 'bg-accent/10 text-accent' : 'bg-white/5 text-mute')}>
+              <span className={cx('rounded-lg p-1.5', e.direction === 'in' ? 'bg-accent/10 text-accent' : 'bg-fg/5 text-mute')}>
                 {e.direction === 'in' ? <ArrowDownLeft className="h-4 w-4" /> : <ArrowUpRight className="h-4 w-4" />}
               </span>
               <div className="min-w-0 flex-1">
@@ -142,7 +142,7 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
                 </p>
               </div>
               {e.realizedUsd !== null && (
-                <span className={cx('font-mono text-xs', e.realizedUsd >= 0 ? 'text-accent' : 'text-bad')}>{mask(`${e.realizedUsd >= 0 ? '+' : '−'}${fmtUsd(Math.abs(e.realizedUsd))}`)}</span>
+                <span className={cx('font-mono text-xs', e.realizedUsd >= 0 ? 'text-ok' : 'text-bad')}>{mask(`${e.realizedUsd >= 0 ? '+' : '−'}${fmtUsd(Math.abs(e.realizedUsd))}`)}</span>
               )}
             </li>
           ))}

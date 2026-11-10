@@ -55,7 +55,7 @@ export function PaymentRequestCreator({ to, tokens, nativeSymbol }: { to: Addres
           {link && (
             <div className="space-y-2">
               <p className="label">Your payment link</p>
-              <p className="break-all rounded-xl border border-white/[0.08] bg-ink-900 p-3 font-mono text-xs text-mute">{link}</p>
+              <p className="break-all rounded-xl border border-fg/[0.08] bg-ink-900 p-3 font-mono text-xs text-mute">{link}</p>
               <div className="flex flex-wrap gap-2">
                 <CopyButton value={link} label="Copy link" />
                 {typeof navigator !== 'undefined' && 'share' in navigator && (
@@ -67,7 +67,7 @@ export function PaymentRequestCreator({ to, tokens, nativeSymbol }: { to: Addres
             </div>
           )}
         </div>
-        <div className="rounded-2xl bg-white p-3 self-start">
+        <div className="rounded-2xl bg-paper p-3 ring-1 ring-line self-start">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {qr ? <img src={qr} alt="QR code for the payment link" className="h-auto w-full" /> : <div className="aspect-square" />}
         </div>

@@ -34,7 +34,7 @@ export function Modal({
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/80 p-0 backdrop-blur-md sm:items-center sm:p-6"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-fg/35 p-0 backdrop-blur-sm sm:items-center sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -44,14 +44,14 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={cx('card max-h-[92vh] w-full min-w-0 overflow-y-auto overflow-x-hidden rounded-b-none bg-ink-800 p-6 sm:rounded-2xl', wide ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
+            className={cx('card max-h-[92vh] w-full min-w-0 overflow-y-auto overflow-x-hidden rounded-b-none bg-paper p-6 sm:rounded-3xl', wide ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 30, opacity: 0 }}
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-display text-lg font-semibold">{title}</h2>
-              <button onClick={onClose} className="rounded-lg p-1.5 text-mute hover:bg-white/5 hover:text-white" aria-label="Close">
+              <button onClick={onClose} className="rounded-lg p-1.5 text-mute hover:bg-fg/5 hover:text-fg" aria-label="Close">
                 <X className="h-5 w-5" />
               </button>
             </div>
@@ -84,14 +84,14 @@ export function CopyButton({ value, label = 'Copy' }: { value: string; label?: s
 
 export function Badge({ tone = 'mute', children }: { tone?: 'ok' | 'bad' | 'warn' | 'lime' | 'mute'; children: React.ReactNode }) {
   const tones = {
-    ok: 'border-ok bg-ok text-[#08240f]',
-    bad: 'border-bad bg-bad text-white',
-    warn: 'border-sun bg-sun text-[#1a1400]',
-    lime: 'border-lavender bg-lavender text-[#17142e]',
-    mute: 'border-ink-500 bg-ink-600 text-[#cfcfcf]',
+    ok: 'bg-[#E3F3EA] text-ok',
+    bad: 'bg-[#FCE4E4] text-bad',
+    warn: 'bg-[#FBF0D6] text-warn',
+    lime: 'bg-accent-soft text-accent-deep',
+    mute: 'bg-ink-600 text-mute',
   }
-  // Small solid rectangular tags, like the reference's "New" / "In progress" / "Important".
-  return <span className={cx('inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-sm border px-1.5 py-[1px] text-[11.5px] font-medium', tones[tone])}>{children}</span>
+  // Soft pill tags.
+  return <span className={cx('inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[12px] font-medium', tones[tone])}>{children}</span>
 }
 
 export type CalloutTone = 'neutral' | 'info' | 'ok' | 'warn' | 'danger'
@@ -167,8 +167,8 @@ export function Notice({ children, tone = 'mute' }: { children: React.ReactNode;
 
 export function Empty({ icon, title, children }: { icon: React.ReactNode; title: string; children?: React.ReactNode }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.09] bg-white/[0.01] px-6 py-12 text-center">
-      <div className="mb-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 text-mute">{icon}</div>
+    <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-line-strong bg-ink-900 px-6 py-12 text-center">
+      <div className="mb-4 rounded-2xl bg-accent-soft p-3 text-accent">{icon}</div>
       <p className="font-medium">{title}</p>
       {children && <div className="mt-1 max-w-sm text-sm text-mute">{children}</div>}
     </div>
@@ -176,15 +176,15 @@ export function Empty({ icon, title, children }: { icon: React.ReactNode; title:
 }
 
 export function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={cx('animate-pulse rounded-lg bg-white/[0.05]', className)} />
+  return <div className={cx('animate-pulse rounded-lg bg-fg/[0.05]', className)} />
 }
 
 export function PageHeader({ title, subtitle, actions }: { title: string; subtitle?: string; actions?: React.ReactNode }) {
   return (
     <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <h1 className="font-display text-[28px] font-semibold leading-tight sm:text-[34px]">{title}</h1>
-        {subtitle && <p className="mt-1.5 max-w-2xl text-sm text-mute">{subtitle}</p>}
+        <h1 className="font-display text-[30px] font-bold leading-tight sm:text-[38px]">{title}</h1>
+        {subtitle && <p className="mt-2 max-w-2xl text-[15px] text-mute">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -193,7 +193,7 @@ export function PageHeader({ title, subtitle, actions }: { title: string; subtit
 
 export function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-4 border-b border-white/[0.05] py-3 text-sm last:border-0">
+    <div className="flex items-start justify-between gap-4 border-b border-fg/[0.05] py-3 text-sm last:border-0">
       <span className="shrink-0 text-mute">{label}</span>
       <span className="min-w-0 break-all text-right">{children}</span>
     </div>
@@ -210,14 +210,14 @@ const TOKEN_LOGOS: Record<string, string> = {
 }
 
 export function TokenIcon({ symbol, src, size = 36 }: { symbol: string; src?: string; size?: number }) {
-  const palette: Record<string, string> = { ETH: '#8EA2FF', WIF: '#B1FB59', WETH: '#B6C1FF', USDG: '#62D99A', cbBTC: '#F7A64B' }
+  const palette: Record<string, string> = { ETH: '#8EA2FF', WIF: '#E8622C', WETH: '#B6C1FF', USDG: '#62D99A', cbBTC: '#F7A64B' }
   const logo = src ?? TOKEN_LOGOS[symbol.toUpperCase()]
   if (logo)
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={logo} alt="" width={size} height={size} className="shrink-0 rounded-full bg-ink-700" style={{ width: size, height: size }} />
   return (
     <span
-      className="inline-flex shrink-0 items-center justify-center rounded-full font-display text-[11px] font-extrabold text-ink-950"
+      className="inline-flex shrink-0 items-center justify-center rounded-full font-display text-[11px] font-extrabold text-paper"
       style={{ width: size, height: size, background: palette[symbol] ?? '#8993A4' }}
       aria-hidden
     >
@@ -264,12 +264,12 @@ export function TokenPicker({ options, value, onChange, label, className }: { op
         <ChevronDown className="h-4 w-4 shrink-0 text-mute" />
       </button>
       {open && (
-        <ul role="listbox" aria-label={label} className="absolute right-0 z-30 mt-1 max-h-72 min-w-full overflow-auto rounded-xl border border-white/10 bg-ink-800 p-1 shadow-xl">
+        <ul role="listbox" aria-label={label} className="absolute right-0 z-30 mt-1 max-h-72 min-w-full overflow-auto rounded-2xl border border-line bg-paper p-1.5 shadow-[0_18px_44px_-18px_rgba(17,17,17,.22)]">
           {options.map((o) => (
             <li key={o.key} role="option" aria-selected={o.key === value}>
               <button
                 type="button"
-                className={cx('flex w-full items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm hover:bg-white/[0.06]', o.key === value && 'bg-white/[0.04]')}
+                className={cx('flex w-full items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-left text-sm hover:bg-fg/[0.06]', o.key === value && 'bg-fg/[0.04]')}
                 onClick={() => {
                   onChange(o.key)
                   setOpen(false)
@@ -292,7 +292,7 @@ export function PercentButtons({ onPick, disabled }: { onPick: (pct: number) => 
   return (
     <div className="flex gap-1.5">
       {[25, 50, 75, 100].map((p) => (
-        <button key={p} type="button" className="chip hover:border-accent/40 hover:text-accent disabled:opacity-40" disabled={disabled} onClick={() => onPick(p)}>
+        <button key={p} type="button" className="chip hover:bg-accent-soft hover:text-accent-deep disabled:opacity-40" disabled={disabled} onClick={() => onPick(p)}>
           {p}%
         </button>
       ))}
@@ -306,7 +306,7 @@ export function AddressAvatar({ address, size = 28 }: { address?: string; size?:
   return (
     <span
       aria-hidden
-      className="inline-block shrink-0 rounded-full ring-1 ring-white/15"
+      className="inline-block shrink-0 rounded-full ring-1 ring-fg/15"
       style={{ width: size, height: size, background: `conic-gradient(from ${h}deg, hsl(${h} 90% 55%), hsl(${(h + 80) % 360} 90% 60%), hsl(${(h + 200) % 360} 85% 50%), hsl(${h} 90% 55%))` }}
     />
   )

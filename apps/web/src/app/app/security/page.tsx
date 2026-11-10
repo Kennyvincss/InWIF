@@ -147,7 +147,7 @@ export default function SecurityPage() {
             This does not prove no approvals exist for tokens InWIF did not scan.
           </Empty>
         ) : (
-          <ul className="divide-y divide-white/[0.05]">
+          <ul className="divide-y divide-fg/[0.05]">
             {approvals.data.approvals.map((a) => {
               const t = symbols[a.token.toLowerCase()]
               return (
@@ -156,7 +156,7 @@ export default function SecurityPage() {
                     <p className="font-medium">
                       {t?.symbol ?? shortAddress(a.token)} → {known[a.spender.toLowerCase()] ?? shortAddress(a.spender)}
                     </p>
-                    <a className="font-mono text-xs text-mute hover:text-white" href={explorerAddressUrl(network, a.spender)} target="_blank" rel="noreferrer">
+                    <a className="font-mono text-xs text-mute hover:text-fg" href={explorerAddressUrl(network, a.spender)} target="_blank" rel="noreferrer">
                       {a.spender}
                     </a>
                   </div>

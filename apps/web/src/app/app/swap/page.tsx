@@ -159,7 +159,7 @@ export default function SwapPage() {
 
         <div className="-my-2 flex justify-center">
           <button
-            className="rounded-xl border border-white/10 bg-ink-800 p-2 hover:border-accent/40"
+            className="rounded-xl border border-fg/10 bg-ink-800 p-2 hover:border-accent/40"
             aria-label="Switch tokens"
             onClick={() => {
               setFrom(toKey)
@@ -207,7 +207,7 @@ export default function SwapPage() {
         </div>
 
         {q && (
-          <div className="rounded-xl border border-white/[0.06] px-4 py-1">
+          <div className="rounded-xl border border-fg/[0.06] px-4 py-1">
             <Row label="Rate">
               1 {from.symbol} ≈ {(Number(formatUnits(q.amountOut, to.decimals)) / Number(formatUnits(q.amountIn, from.decimals))).toPrecision(6)} {to.symbol}
             </Row>

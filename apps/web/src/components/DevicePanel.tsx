@@ -13,10 +13,10 @@ export function DeviceFrame({ children, onReject, onApprove, label = 'InWIF One'
     <div className="relative mx-auto w-[300px] rounded-[30px] bg-gradient-to-b from-[#3a414d] via-[#262c35] to-[#171b21] p-[3px]">
       <div className="rounded-[28px] bg-gradient-to-b from-[#2b313b] to-[#1a1e25] p-4">
         <div className="mb-3 flex items-center justify-between px-1">
-          <span className="font-display text-[10px] font-bold uppercase tracking-[0.25em] text-white/40">{label}</span>
+          <span className="font-display text-[10px] font-bold uppercase tracking-[0.25em] text-fg/40">{label}</span>
           <span className="h-1.5 w-1.5 rounded-full bg-accent" />
         </div>
-        <div className="min-h-[220px] rounded-2xl border border-black/60 bg-[#05070a] p-3 font-mono text-[12px] leading-relaxed text-accent-soft shadow-inner">
+        <div className="min-h-[220px] rounded-2xl border border-paper/60 bg-[#05070a] p-3 font-mono text-[12px] leading-relaxed text-accent-soft shadow-inner">
           {children}
         </div>
         <div className="mt-4 flex items-center justify-between px-2">
@@ -24,7 +24,7 @@ export function DeviceFrame({ children, onReject, onApprove, label = 'InWIF One'
             aria-label="Reject on device"
             onClick={onReject}
             disabled={!onReject}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[#3b424e] to-[#22272f] text-bad shadow-md ring-1 ring-black/50 transition active:scale-95 disabled:opacity-30"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[#3b424e] to-[#22272f] text-bad shadow-md ring-1 ring-paper/50 transition active:scale-95 disabled:opacity-30"
           >
             <X className="h-5 w-5" />
           </button>
@@ -33,7 +33,7 @@ export function DeviceFrame({ children, onReject, onApprove, label = 'InWIF One'
             aria-label="Approve on device"
             onClick={onApprove}
             disabled={!onApprove}
-            className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[#3b424e] to-[#22272f] text-accent shadow-md ring-1 ring-black/50 transition active:scale-95 disabled:opacity-30"
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[#3b424e] to-[#22272f] text-accent shadow-md ring-1 ring-paper/50 transition active:scale-95 disabled:opacity-30"
           >
             <Check className="h-5 w-5" />
           </button>
@@ -62,8 +62,8 @@ export function SimulatorScreen() {
         <div className="max-h-[230px] space-y-1.5 overflow-y-auto pr-1">
           {p.lines.map((l) => (
             <div key={l.label}>
-              <span className="text-white/40">{l.label}</span>
-              <div className="break-all text-white">{l.value}</div>
+              <span className="text-fg/40">{l.label}</span>
+              <div className="break-all text-fg">{l.value}</div>
             </div>
           ))}
           {p.warnings.map((w) => (
@@ -72,7 +72,7 @@ export function SimulatorScreen() {
             </div>
           ))}
         </div>
-        <p className="mt-2 text-center text-[10px] text-white/40">✕ reject · ✓ approve</p>
+        <p className="mt-2 text-center text-[10px] text-fg/40">✕ reject · ✓ approve</p>
       </DeviceFrame>
     )
   }
@@ -81,14 +81,14 @@ export function SimulatorScreen() {
     return (
       <DeviceFrame onApprove={() => h.clearRecoveryWords()}>
         <p className="mb-2 font-bold text-accent">WRITE DOWN THESE WORDS</p>
-        <ol className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-white">
+        <ol className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-fg">
           {h.recoveryWords.map((w, i) => (
             <li key={i}>
-              <span className="text-white/40">{i + 1}.</span> {w}
+              <span className="text-fg/40">{i + 1}.</span> {w}
             </li>
           ))}
         </ol>
-        <p className="mt-2 text-[10px] text-white/50">Shown only on this screen. Press ✓ when done.</p>
+        <p className="mt-2 text-[10px] text-fg/50">Shown only on this screen. Press ✓ when done.</p>
       </DeviceFrame>
     )
   }
@@ -130,14 +130,14 @@ export function SimulatorScreen() {
           >
             {mode === 'restore' && (
               <textarea
-                className="h-20 w-full resize-none rounded border border-white/10 bg-black p-1.5 text-white outline-none"
+                className="h-20 w-full resize-none rounded border border-fg/10 bg-paper p-1.5 text-fg outline-none"
                 placeholder="recovery phrase (typed on device)"
                 value={phrase}
                 onChange={(e) => setPhrase(e.target.value)}
               />
             )}
             <input
-              className="w-full rounded border border-white/10 bg-black p-1.5 text-white outline-none"
+              className="w-full rounded border border-fg/10 bg-paper p-1.5 text-fg outline-none"
               placeholder="Choose PIN (6–8 digits)"
               type="password"
               inputMode="numeric"
@@ -146,10 +146,10 @@ export function SimulatorScreen() {
             />
             {err && <p className="text-bad">{err}</p>}
             <div className="flex gap-2">
-              <button type="button" className="flex-1 rounded border border-white/10 py-1" onClick={() => setMode('menu')}>
+              <button type="button" className="flex-1 rounded border border-fg/10 py-1" onClick={() => setMode('menu')}>
                 Back
               </button>
-              <button className="flex-1 rounded bg-accent py-1 font-bold text-black">OK</button>
+              <button className="flex-1 rounded bg-accent py-1 font-bold text-paper">OK</button>
             </div>
           </form>
         )}
@@ -171,7 +171,7 @@ export function SimulatorScreen() {
         >
           <p className="text-accent">LOCKED · enter PIN</p>
           <input
-            className="w-full rounded border border-white/10 bg-black p-1.5 text-center tracking-[0.5em] text-white outline-none"
+            className="w-full rounded border border-fg/10 bg-paper p-1.5 text-center tracking-[0.5em] text-fg outline-none"
             type="password"
             inputMode="numeric"
             value={pin}
@@ -179,7 +179,7 @@ export function SimulatorScreen() {
             aria-label="Device PIN"
           />
           {err && <p className="text-bad">{err}</p>}
-          <button className="w-full rounded bg-accent py-1 font-bold text-black">Unlock</button>
+          <button className="w-full rounded bg-accent py-1 font-bold text-paper">Unlock</button>
         </form>
       </DeviceFrame>
     )
@@ -188,10 +188,10 @@ export function SimulatorScreen() {
   return (
     <DeviceFrame>
       <p className="text-accent">READY</p>
-      <p className="mt-2 text-white/70">Firmware {st.firmware}</p>
-      <p className="text-white/70">Serial {sim.serial}</p>
-      <p className="mt-3 text-white/50">Waiting for a request from the companion app…</p>
-      <button className="mt-4 rounded border border-white/10 px-2 py-1 text-white/60 hover:text-white" onClick={() => sim.lock()}>
+      <p className="mt-2 text-fg/70">Firmware {st.firmware}</p>
+      <p className="text-fg/70">Serial {sim.serial}</p>
+      <p className="mt-3 text-fg/50">Waiting for a request from the companion app…</p>
+      <button className="mt-4 rounded border border-fg/10 px-2 py-1 text-fg/60 hover:text-fg" onClick={() => sim.lock()}>
         Lock device
       </button>
     </DeviceFrame>
@@ -211,11 +211,11 @@ export function DevicePanel() {
           initial={{ x: 40, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 40, opacity: 0 }}
-          className="fixed bottom-4 right-4 z-[60] rounded-3xl border border-white/10 bg-ink-950/95 p-4 backdrop-blur"
+          className="fixed bottom-4 right-4 z-[60] rounded-3xl border border-fg/10 bg-ink-950/95 p-4 backdrop-blur"
         >
           <div className="mb-3 flex items-center justify-between">
             <span className="chip">Simulator · not secure hardware</span>
-            <button className="rounded p-1 text-mute hover:text-white" onClick={() => h.setPanelOpen(false)} aria-label="Minimise device">
+            <button className="rounded p-1 text-mute hover:text-fg" onClick={() => h.setPanelOpen(false)} aria-label="Minimise device">
               <Minimize2 className="h-4 w-4" />
             </button>
           </div>

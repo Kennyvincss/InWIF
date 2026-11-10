@@ -51,7 +51,7 @@ export function ActivityList({
         Showing your recent token transfers. Full history, including ETH transfers, will appear shortly.
       </Callout>
     )}
-    <ul className="divide-y divide-white/[0.05]">
+    <ul className="divide-y divide-fg/[0.05]">
       {visible.map((i) => {
         const flag = shield.flags.get(activityKey(i))
         const Icon = i.status === 'failed' ? XCircle : i.kind === 'contract' ? FileCode2 : i.direction === 'in' ? ArrowDownLeft : ArrowUpRight
@@ -60,7 +60,7 @@ export function ActivityList({
         const url = explorerTxUrl(network, i.hash)
         return (
           <li key={`${i.hash}-${i.kind}-${i.tokenAddress ?? ''}-${i.value}`} className="flex items-center gap-3 py-3">
-            <span className={`rounded-xl p-2 ${i.status === 'failed' ? 'bg-bad/10 text-bad' : i.direction === 'in' ? 'bg-ok/10 text-ok' : 'bg-white/5 text-mute'}`}>
+            <span className={`rounded-xl p-2 ${i.status === 'failed' ? 'bg-bad/10 text-bad' : i.direction === 'in' ? 'bg-ok/10 text-ok' : 'bg-fg/5 text-mute'}`}>
               <Icon className="h-4 w-4" />
             </span>
             <div className="min-w-0 flex-1">
@@ -70,7 +70,7 @@ export function ActivityList({
                 {i.status === 'pending' && <Badge tone="warn">Pending</Badge>}
                 {flag && <Badge tone="bad">Possible scam</Badge>}
               </p>
-              {flag && <p className="text-xs text-white/55">{flag.message}</p>}
+              {flag && <p className="text-xs text-fg/55">{flag.message}</p>}
               <p className="truncate font-mono text-xs text-mute">{i.direction === 'in' ? `from ${who(i.from)}` : `to ${i.to ? who(i.to) : 'contract creation'}`}</p>
             </div>
             <div className="text-right">
@@ -83,7 +83,7 @@ export function ActivityList({
               <p className="text-xs text-mute">{timeAgo(i.timestamp)}</p>
             </div>
             {url && (
-              <a href={url} target="_blank" rel="noreferrer" className="rounded-lg p-1.5 text-mute hover:text-white" aria-label="Open in explorer">
+              <a href={url} target="_blank" rel="noreferrer" className="rounded-lg p-1.5 text-mute hover:text-fg" aria-label="Open in explorer">
                 <ExternalLink className="h-4 w-4" />
               </a>
             )}
@@ -95,7 +95,7 @@ export function ActivityList({
       <button
         type="button"
         onClick={() => setShowHidden((v) => !v)}
-        className="callout callout-sm mt-2 w-full text-left transition hover:border-white/[0.14]"
+        className="callout callout-sm mt-2 w-full text-left transition hover:border-fg/[0.14]"
         data-tone="danger"
         data-testid="scam-hidden"
       >
@@ -103,7 +103,7 @@ export function ActivityList({
           <ShieldAlert className="h-3.5 w-3.5" />
         </span>
         <span className="flex-1 self-center">
-          <b className="text-white">{flagged.length} suspicious {flagged.length === 1 ? 'transfer' : 'transfers'} hidden.</b> Fake tokens, $0 transfers and look-alike addresses are planted by scammers so you copy the wrong address.
+          <b className="text-fg">{flagged.length} suspicious {flagged.length === 1 ? 'transfer' : 'transfers'} hidden.</b> Fake tokens, $0 transfers and look-alike addresses are planted by scammers so you copy the wrong address.
         </span>
         <span className="chip shrink-0 self-center">{showHidden ? 'Hide' : 'Show'}</span>
       </button>

@@ -58,7 +58,7 @@ export function BackupModal({ walletId, open, onClose }: { walletId: string; ope
           }}
         >
           <p className="text-sm text-mute">
-            Your recovery phrase is the only way to restore <b className="text-white">{wallet?.name ?? 'this wallet'}</b> if you lose this device or clear your browser. InWIF can never
+            Your recovery phrase is the only way to restore <b className="text-fg">{wallet?.name ?? 'this wallet'}</b> if you lose this device or clear your browser. InWIF can never
             recover it for you.
           </p>
           <label className="label" htmlFor="backup-pw">
@@ -78,7 +78,7 @@ export function BackupModal({ walletId, open, onClose }: { walletId: string; ope
           <div className="relative">
             <ol className={cx('grid grid-cols-2 gap-2 sm:grid-cols-3', !revealed && 'select-none blur-md')}>
               {words.map((w, i) => (
-                <li key={i} className="rounded-xl border border-white/10 bg-ink-900 px-3 py-2 text-sm">
+                <li key={i} className="rounded-xl border border-fg/10 bg-ink-900 px-3 py-2 text-sm">
                   <span className="mr-2 text-mute">{i + 1}</span>
                   <span className="font-medium">{w}</span>
                 </li>
