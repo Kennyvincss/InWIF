@@ -1,6 +1,6 @@
 # InWIF launch guide
 
-This guide takes InWIF from today's state to fully functional. The live site is https://inwif.vercel.app, and the web
+This guide takes InWIF from today's state to fully functional. The live site is https://inwif.xyz (Vercel also still serves https://inwif.vercel.app), and the web
 wallet works on Robinhood Chain mainnet.
 
 Each step says who does what:
@@ -82,7 +82,7 @@ the limit needs one shared store.
 - The site accepts either variable naming from the Vercel integration: `UPSTASH_REDIS_REST_URL` and
   `UPSTASH_REDIS_REST_TOKEN`, or `KV_REST_API_URL` and `KV_REST_API_TOKEN`.
 
-**Check:** https://inwif.vercel.app/api/health shows `"sharedLimitsAndCache": "connected"`. If it says
+**Check:** https://inwif.xyz/api/health shows `"sharedLimitsAndCache": "connected"`. If it says
 `not configured`, make sure the variables are set for **Production** and redeploy.
 
 **Usage:** watch the command count in the Upstash console. If the free tier runs out, the site falls back to
@@ -102,7 +102,7 @@ per-instance limits; upgrade the Upstash plan if that happens often.
    - **Start:** `pnpm --filter @inwif/api start`. Migrations run automatically at start-up.
    - **Environment variables:**
      - `DATABASE_URL` = the connection string, kept secret in the host's dashboard
-     - `CORS_ORIGINS` = `https://inwif.vercel.app` (plus your domain)
+     - `CORS_ORIGINS` = `https://inwif.xyz` (plus `https://inwif.vercel.app` while both are in use)
      - `REDIS_URL` (optional)
 3. Check that `https://<your-api-host>/api/health` returns `"free": true`.
 

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { NETWORKS } from '@inwif/core'
+import { ETHEREUM_MAINNET, NETWORKS } from '@inwif/core'
 
 vi.mock('server-only', () => ({}))
 
@@ -11,6 +11,7 @@ describe('content security policy', () => {
       if (n.key === 'local') continue
       for (const u of [...n.rpcUrls, n.explorer.apiV2 ?? n.explorer.url]) expect(CONNECT_SRC).toContain(new URL(u).origin)
     }
+    for (const u of ETHEREUM_MAINNET.rpcUrls) expect(CONNECT_SRC).toContain(new URL(u).origin)
     expect(CONNECT_SRC).not.toContain('https:')
     expect(CONNECT_SRC).not.toContain('wss:')
     // The Dwellir key is used only by the server relay, so the browser never needs that host.

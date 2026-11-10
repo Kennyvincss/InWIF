@@ -77,6 +77,8 @@ export interface Persisted {
   deviceNames: Record<string, string>
   /** Usernames this device has paid before (name → address). A change is flagged before sending. */
   namePins: Record<string, Address>
+  /** Bridge deposits from Ethereum this device started (shown on the Bridge page). */
+  l1Deposits: { hash: `0x${string}`; address: Address; amount: string; at: number }[]
 }
 
 const KEY = 'inwif:v1'
@@ -109,6 +111,7 @@ const EMPTY: Persisted = {
   quests: {},
   deviceNames: {},
   namePins: {},
+  l1Deposits: [],
 }
 
 const uid = () => (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2))

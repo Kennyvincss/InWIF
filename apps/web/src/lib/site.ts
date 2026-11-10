@@ -1,12 +1,12 @@
 /** Canonical site origin. Accepts `example.com` or `https://example.com` (trailing slash optional). */
 export function normaliseSiteUrl(raw: string | undefined): string {
   const v = (raw ?? '').trim().replace(/\/+$/, '')
-  if (!v) return 'https://inwif.vercel.app'
+  if (!v) return 'https://inwif.xyz'
   const withScheme = /^https?:\/\//i.test(v) ? v : `https://${v}`
   try {
     return new URL(withScheme).origin
   } catch {
-    return 'https://inwif.vercel.app'
+    return 'https://inwif.xyz'
   }
 }
 
