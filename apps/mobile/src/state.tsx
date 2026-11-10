@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { accountFromMnemonic, getPublicClient, NETWORKS, type NetworkKey } from '@inwif/core'
+import { accountFromMnemonic, getPublicClient, NETWORKS, normaliseNetworkKey, type NetworkKey } from '@inwif/core'
 import { loadMeta, saveMeta, saveSecret } from './secure'
 
 export interface MobileWallet {
@@ -32,7 +32,7 @@ export function StateProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false)
   useEffect(() => {
     loadMeta<Meta>({ wallets: [], network: 'robinhood' }).then((m) => {
-      setMeta(m)
+      setMeta({ ...m, network: normaliseNetworkKey(m.network) })
       setReady(true)
     })
   }, [])

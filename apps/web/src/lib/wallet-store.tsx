@@ -12,6 +12,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { getAddress, type Address } from 'viem'
 import {
   DEFAULT_NETWORK,
+  normaliseNetworkKey,
   accountFromMnemonic,
   accountFromPrivateKey,
   decryptSecret,
@@ -154,7 +155,7 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const s = load<Persisted>(KEY, EMPTY)
-    setState({ ...EMPTY, ...s, settings: { ...DEFAULT_SETTINGS, ...s.settings, notifications: { ...DEFAULT_SETTINGS.notifications, ...s.settings?.notifications } } })
+    setState({ ...EMPTY, ...s, network: normaliseNetworkKey(s.network), settings: { ...DEFAULT_SETTINGS, ...s.settings, notifications: { ...DEFAULT_SETTINGS.notifications, ...s.settings?.notifications } } })
     setReady(true)
   }, [])
 

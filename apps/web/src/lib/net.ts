@@ -10,8 +10,8 @@ export const RELAY_FIRST = process.env.NEXT_PUBLIC_RPC_RELAY_FIRST === '1'
 export const LOCAL_ENABLED = process.env.NEXT_PUBLIC_ENABLE_LOCAL_NETWORK === 'true'
 
 export const SELECTABLE_NETWORKS: NetworkKey[] = LOCAL_ENABLED
-  ? ['robinhood', 'robinhoodTestnet', 'local']
-  : ['robinhood', 'robinhoodTestnet']
+  ? ['robinhood', 'local']
+  : ['robinhood']
 
 /**
  * Network config as used in the browser: direct public RPCs first, then the

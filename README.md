@@ -79,12 +79,14 @@ See [docs/deployment.md](docs/deployment.md) and [docs/testing.md](docs/testing.
 
 ## Network
 
-| | Mainnet | Testnet |
-|---|---|---|
-| Chain ID | 4663 | 46630 |
-| RPC | `https://rpc.mainnet.chain.robinhood.com` | `https://rpc.testnet.chain.robinhood.com/rpc` |
-| Explorer | `https://robinhoodchain.blockscout.com` | `https://explorer.testnet.chain.robinhood.com` |
-| Gas | ETH | Sepolia ETH |
+InWIF runs on Robinhood Chain mainnet only.
+
+| | Robinhood Chain |
+|---|---|
+| Chain ID | 4663 |
+| RPC | `https://rpc.mainnet.chain.robinhood.com` |
+| Explorer | `https://robinhoodchain.blockscout.com` |
+| Gas | ETH |
 
 - **$WIF:** `0x5173b8eA6923c2d40267890D45C46a3480954773`. Its name, symbol and decimals are read on-chain at runtime and any mismatch is flagged.
 - **Sources:** parameters come from `ethereum-lists/chains` and the Uniswap SDK. See [docs/research.md](docs/research.md).

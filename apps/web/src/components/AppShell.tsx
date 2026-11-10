@@ -267,18 +267,24 @@ function NetworkStatus() {
     <div className="flex items-center gap-2">
       <span className="relative inline-flex items-center">
         <span className={cx('pointer-events-none absolute left-3 h-2 w-2 rounded-full', v.data?.ok ? 'bg-ok' : 'bg-dim')} />
-        <select
-          aria-label="Network"
-          className="h-10 max-w-[8.5rem] cursor-pointer appearance-none truncate rounded-full border border-line bg-paper pl-7 pr-3 text-[13px] font-medium text-fg outline-none transition hover:bg-ink-600 min-[381px]:max-w-[10rem] sm:max-w-none"
-          value={state.network}
-          onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))}
-        >
-          {SELECTABLE_NETWORKS.map((k) => (
-            <option key={k} value={k}>
-              {NETWORKS[k].name}
-            </option>
-          ))}
-        </select>
+        {SELECTABLE_NETWORKS.length > 1 ? (
+          <select
+            aria-label="Network"
+            className="h-10 max-w-[8.5rem] cursor-pointer appearance-none truncate rounded-full border border-line bg-paper pl-7 pr-3 text-[13px] font-medium text-fg outline-none transition hover:bg-ink-600 min-[381px]:max-w-[10rem] sm:max-w-none"
+            value={state.network}
+            onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))}
+          >
+            {SELECTABLE_NETWORKS.map((k) => (
+              <option key={k} value={k}>
+                {NETWORKS[k].name}
+              </option>
+            ))}
+          </select>
+        ) : (
+          <span className="flex h-10 items-center truncate rounded-full border border-line bg-paper pl-7 pr-3 text-[13px] font-medium text-fg" data-testid="network-pill">
+            {NETWORKS[state.network].name}
+          </span>
+        )}
       </span>
       {/* Only speak up when something is wrong: signing is disabled until the network checks out. */}
       {!v.isLoading && !v.data?.ok && <Badge tone="bad">Network issue</Badge>}

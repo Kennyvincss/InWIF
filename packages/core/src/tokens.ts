@@ -52,7 +52,6 @@ export const DEFAULT_TOKENS: Record<NetworkKey, TokenInfo[]> = {
       source: 'Uniswap default token list',
     },
   ],
-  robinhoodTestnet: [],
   local: [],
 }
 

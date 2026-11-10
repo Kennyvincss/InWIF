@@ -6,7 +6,7 @@ const ME = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'
 describe('network config', () => {
   it('matches the public registry values', () => {
     expect(NETWORKS.robinhood.chainId).toBe(4663)
-    expect(NETWORKS.robinhoodTestnet.chainId).toBe(46630)
+    expect(Object.keys(NETWORKS)).toEqual(['robinhood', 'local'])
     expect(NETWORKS.robinhood.nativeCurrency.symbol).toBe('ETH')
   })
   it('verifyNetwork fails closed on chain-id mismatch or RPC errors', async () => {

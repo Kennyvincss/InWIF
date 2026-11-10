@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { ROBINHOOD_MAINNET, ROBINHOOD_TESTNET, getServerPublicClient, managedRpcKey, rpcUpstreams, shouldFailOver } from '../src'
+import { ROBINHOOD_MAINNET, getServerPublicClient, managedRpcKey, rpcUpstreams, shouldFailOver } from '../src'
 
 const ENV = { DWELLIR_API_KEY: 'test-key' }
 
@@ -18,10 +18,6 @@ describe('server RPC upstreams (Dwellir)', () => {
   it('never sends eth_getLogs (or filters) to Dwellir', () => {
     expect(rpcUpstreams(ROBINHOOD_MAINNET, ['eth_getLogs'], ENV).some((u) => u.managed)).toBe(false)
     expect(rpcUpstreams(ROBINHOOD_MAINNET, ['eth_blockNumber', 'eth_newFilter'], ENV).some((u) => u.managed)).toBe(false)
-  })
-  it('leaves the testnet unchanged (Dwellir has no Robinhood testnet)', () => {
-    expect(ROBINHOOD_TESTNET.managedRpc).toBeUndefined()
-    expect(rpcUpstreams(ROBINHOOD_TESTNET, [], ENV).every((u) => !u.managed)).toBe(true)
   })
   it('fails over on limits, plan errors, auth errors and non-JSON bodies, not on normal results', () => {
     expect(shouldFailOver(200, '{"jsonrpc":"2.0","id":1,"result":"0x1237"}')).toBe(false)
