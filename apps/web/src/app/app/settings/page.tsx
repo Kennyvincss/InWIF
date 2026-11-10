@@ -71,11 +71,15 @@ export default function SettingsPage() {
 
       <section className="card p-5">
         <h2 className="mb-3 flex items-center gap-2 font-display font-bold"><Network className="h-5 w-5 text-accent" /> Network</h2>
-        <select className="input" value={state.network} onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))} aria-label="Network">
-          {SELECTABLE_NETWORKS.map((k) => (
-            <option key={k} value={k}>{NETWORKS[k].name}</option>
-          ))}
-        </select>
+        {SELECTABLE_NETWORKS.length > 1 ? (
+          <select className="input" value={state.network} onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))} aria-label="Network">
+            {SELECTABLE_NETWORKS.map((k) => (
+              <option key={k} value={k}>{NETWORKS[k].name}</option>
+            ))}
+          </select>
+        ) : (
+          <p className="text-sm text-mute"><b className="text-fg">{network.name}</b> mainnet. InWIF works with real funds on Robinhood Chain only.</p>
+        )}
         <div className="mt-3">
           <Row label="Chain ID">{network.chainId}</Row>
           <Row label="Native currency">{network.nativeCurrency.symbol}</Row>

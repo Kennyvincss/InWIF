@@ -100,7 +100,7 @@ fn wipes_after_ten_wrong_pins() {
 #[test]
 fn enforces_chain_allow_list() {
     let mut d = dev(true);
-    d.allowed_chain_ids = vec![46630];
+    d.allowed_chain_ids = vec![31337];
     assert_eq!(decode(&d.handle(&hex::decode(SIGN_WIF_REQ).unwrap())).unwrap().code, Status::ChainNotAllowed as u8);
 }
 

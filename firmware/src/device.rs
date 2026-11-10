@@ -116,7 +116,7 @@ impl<U: Ui> Device<U> {
             serial: String::from(serial),
             firmware: String::from("0.1.0-dev"),
             model: String::from("InWIF One (dev board)"),
-            allowed_chain_ids: vec![4663, 46630, 31337],
+            allowed_chain_ids: vec![4663, 31337],
             seed: None,
             pin_hash: None,
             locked: true,

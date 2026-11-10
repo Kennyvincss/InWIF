@@ -52,7 +52,7 @@ export interface AppDeps {
 }
 
 const addr = z.string().refine((v) => isAddress(v, { strict: false }), 'Invalid address').transform((v) => getAddress(v))
-const network = z.enum(['robinhood', 'robinhoodTestnet']).default('robinhood')
+const network = z.enum(['robinhood']).default('robinhood')
 const sha256 = (s: string) => createHash('sha256').update(s).digest('hex')
 
 export class HttpError extends Error {

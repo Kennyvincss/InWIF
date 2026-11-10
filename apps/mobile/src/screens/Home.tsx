@@ -38,7 +38,6 @@ export function Home() {
         </View>
       ))}
       <Notice text="InWIF is free. No subscriptions, no paywalls, no InWIF fees — only network gas." />
-      <Button title={app.network === 'robinhood' ? 'Switch to testnet' : 'Switch to mainnet'} kind="ghost" onPress={() => app.setNetwork(app.network === 'robinhood' ? 'robinhoodTestnet' : 'robinhood')} />
     </ScrollView>
   )
 }

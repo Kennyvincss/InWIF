@@ -7,14 +7,14 @@
  * match the configured value.
  *
  * Sources (retrieved 2026-11-04):
- *  - ethereum-lists/chains `_data/chains/eip155-4663.json` and `eip155-46630.json`
+ *  - ethereum-lists/chains `_data/chains/eip155-4663.json`
  *    (the registry behind chainlist.org)
  *  - Uniswap/interface `packages/uniswap/src/features/chains/evm/info/robinhood.ts`
  *  - Uniswap/sdks `sdks/sdk-core/src/addresses.ts` and `entities/weth9.ts`
  */
 import { defineChain, type Address, type Chain, type Hex } from 'viem'
 
-export type NetworkKey = 'robinhood' | 'robinhoodTestnet' | 'local'
+export type NetworkKey = 'robinhood' | 'local'
 
 export interface ExplorerConfig {
   name: string
@@ -121,7 +121,6 @@ const read = (f: () => string | undefined): string | undefined => {
 }
 const RPC_OVERRIDE = {
   robinhood: read(() => process.env.NEXT_PUBLIC_ROBINHOOD_RPC_URL),
-  robinhoodTestnet: read(() => process.env.NEXT_PUBLIC_ROBINHOOD_TESTNET_RPC_URL),
   local: read(() => process.env.NEXT_PUBLIC_LOCAL_RPC_URL),
 }
 
@@ -196,26 +195,6 @@ export const ROBINHOOD_MAINNET: NetworkConfig = {
   transactionsEnabled: true,
 }
 
-export const ROBINHOOD_TESTNET: NetworkConfig = {
-  key: 'robinhoodTestnet',
-  chainId: 46630,
-  name: 'Robinhood Chain Testnet',
-  shortName: 'rh-testnet',
-  isTestnet: true,
-  nativeCurrency: { name: 'Sepolia Ether', symbol: 'ETH', decimals: 18 },
-  rpcUrls: [
-    RPC_OVERRIDE.robinhoodTestnet ?? 'https://rpc.testnet.chain.robinhood.com/rpc',
-    'https://robinhood-sepolia-rpc.publicnode.com',
-  ],
-  explorer: {
-    name: 'Blockscout (testnet)',
-    url: 'https://explorer.testnet.chain.robinhood.com',
-    apiV2: 'https://explorer.testnet.chain.robinhood.com/api/v2',
-  },
-  sources: ['https://github.com/ethereum-lists/chains/blob/master/_data/chains/eip155-46630.json'],
-  transactionsEnabled: true,
-}
-
 /** Local Anvil/Hardhat development node. Never shown unless explicitly enabled. */
 export const LOCAL_DEV: NetworkConfig = {
   key: 'local',
@@ -232,11 +211,15 @@ export const LOCAL_DEV: NetworkConfig = {
 
 export const NETWORKS: Record<NetworkKey, NetworkConfig> = {
   robinhood: ROBINHOOD_MAINNET,
-  robinhoodTestnet: ROBINHOOD_TESTNET,
   local: LOCAL_DEV,
 }
 
 export const DEFAULT_NETWORK: NetworkKey = 'robinhood'
+
+/** A saved network that no longer exists (e.g. the removed testnet) falls back to mainnet. */
+export function normaliseNetworkKey(key: unknown): NetworkKey {
+  return typeof key === 'string' && key in NETWORKS ? (key as NetworkKey) : DEFAULT_NETWORK
+}
 
 export function getNetwork(key: NetworkKey): NetworkConfig {
   return NETWORKS[key]

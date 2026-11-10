@@ -1,5 +1,5 @@
 import { SitePage, Section } from '@/components/site/Site'
-import { ROBINHOOD_MAINNET, ROBINHOOD_TESTNET, WIF_ADDRESS } from '@inwif/core'
+import { ROBINHOOD_MAINNET, WIF_ADDRESS } from '@inwif/core'
 
 export const metadata = { title: 'InWIF documentation' }
 
@@ -25,7 +25,6 @@ export default function DocsPage() {
 
             <H id="network">Network</H>
             <p><b>{ROBINHOOD_MAINNET.name}</b> — chain ID {ROBINHOOD_MAINNET.chainId}, gas in ETH, RPC <code>{ROBINHOOD_MAINNET.rpcUrls[0]}</code>, explorer <code>{ROBINHOOD_MAINNET.explorer.url}</code>.</p>
-            <p><b>{ROBINHOOD_TESTNET.name}</b> — chain ID {ROBINHOOD_TESTNET.chainId}, RPC <code>{ROBINHOOD_TESTNET.rpcUrls[0]}</code>.</p>
             <p>$WIF: <code>{WIF_ADDRESS}</code>. Uniswap V3: factory <code>{u.factory}</code>, QuoterV2 <code>{u.quoterV2}</code>, SwapRouter02 <code>{u.swapRouter02}</code>, WETH9 <code>{u.weth9}</code>. Uniswap V4: Universal Router <code>{ROBINHOOD_MAINNET.uniswapV4!.universalRouter}</code>, Permit2 <code>{ROBINHOOD_MAINNET.uniswapV4!.permit2}</code>; swaps route through the reviewed $WIF/ETH pool (Pons, pool ID <code>{ROBINHOOD_MAINNET.uniswapV4!.pools[0]!.id}</code>) when it gives the better price. Sources: ethereum-lists/chains and the Uniswap SDK; every value is re-checked on-chain at runtime.</p>
 
             <H id="hardware">Hardware protocol (IWDP v1)</H>

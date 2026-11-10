@@ -39,7 +39,7 @@ Recommended order:
   first, and any limit, plan or auth error fails over to the public RPCs automatically.
 - **Log queries stay public.** `eth_getLogs` and filter calls always go to the public RPCs. Dwellir's Free plan has no
   `eth_getLogs`, and paid plans cap it at 500 or 10,000 blocks, far below InWIF's history scans.
-- **Not covered:** testnet (Dwellir has no Robinhood testnet), the mobile and desktop apps (they have no server to hold
+- **Not covered:** the mobile and desktop apps (they have no server to hold
   the key) and local development all keep using public RPCs.
 
 **You:**

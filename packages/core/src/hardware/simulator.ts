@@ -79,7 +79,7 @@ export class SimulatedDevice {
 
   constructor(ui: DeviceUI, opts: { allowedChainIds?: number[]; serial?: string } = {}) {
     this.#ui = ui
-    this.allowedChainIds = opts.allowedChainIds ?? [4663, 46630, 31337]
+    this.allowedChainIds = opts.allowedChainIds ?? [4663, 31337]
     this.serial = opts.serial ?? `IWSIM-${bytesToHex(randomBytes(4)).slice(2).toUpperCase()}`
     this.#attestationKey = bytesToHex(randomBytes(32))
   }

@@ -287,7 +287,7 @@ function HardwareConsole() {
           <li>• Seed generated on-device and shown only on the device screen</li>
           <li>• PIN entered on the device, never sent over USB; wipe after 10 failures</li>
           <li>• Device decodes transactions itself — the app cannot hide details</li>
-          <li>• On-device chain allow-list (Robinhood Chain mainnet / testnet)</li>
+          <li>• On-device chain allow-list (Robinhood Chain mainnet)</li>
           <li>• Challenge-response attestation against the InWIF vendor root</li>
           <li>• Firmware accepted only with a valid vendor signature</li>
         </ul>

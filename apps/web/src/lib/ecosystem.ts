@@ -12,7 +12,7 @@ export interface EcosystemApp {
   category: 'built-in' | 'defi' | 'community' | 'tooling'
   href: string
   contracts?: string[]
-  status: 'live' | 'testnet' | 'planned'
+  status: 'live' | 'planned'
   reviewedAt?: string
 }
 
