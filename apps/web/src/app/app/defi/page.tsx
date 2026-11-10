@@ -30,7 +30,6 @@ export default function DefiPage() {
       <PageHeader title="DeFi" subtitle="Only verified protocols on Robinhood Chain. Access is free; protocol fees and risks are always disclosed." />
 
       <section className="card relative overflow-hidden p-5">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-accent/10 blur-3xl" />
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="flex items-center gap-2 font-display font-bold">
             <Coins className="h-5 w-5 text-accent" /> $WIF staking

@@ -33,7 +33,7 @@ export function SiteHeader() {
       <div
         className={cx(
           'mx-auto flex max-w-6xl items-center gap-4 rounded-2xl border px-3 py-2 transition-[background-color,border-color,box-shadow] sm:px-4',
-          scrolled ? 'border-white/[0.09] bg-black/70 shadow-[0_20px_60px_-30px_rgba(0,0,0,1)] backdrop-blur-xl' : 'border-transparent bg-transparent',
+          scrolled ? 'border-white/[0.09] bg-black/70 backdrop-blur-xl' : 'border-transparent bg-transparent',
         )}
       >
         <Link href="/" aria-label="InWIF home" className="shrink-0">
@@ -79,12 +79,11 @@ export function SiteHeader() {
 export function SiteFooter() {
   return (
     <footer className="relative mt-10 border-t border-white/[0.06]">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
       <div className="mx-auto grid max-w-6xl gap-12 px-5 py-16 md:grid-cols-[1.4fr,1fr,1fr]">
         <div>
           <Logo />
           <p className="mt-5 max-w-sm text-sm leading-relaxed text-mute">Your assets. Your keys. Your control. A free self-custody wallet for Robinhood Chain and the World Is Flat community.</p>
-          <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/[0.08] px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-mute">
+          <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-white/[0.08] px-3 py-1 text-[11.5px] uppercase tracking-[0.04em] text-mute font-medium">
             <span className="live-dot" /> Free forever · 0% fees
           </p>
         </div>
@@ -110,7 +109,7 @@ export function SiteFooter() {
       <div className="border-t border-white/[0.06]">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-6 text-xs text-dim sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} InWIF. Pre-release software, not yet independently audited.</span>
-          <span className="font-mono uppercase tracking-[0.14em]">No subscriptions · No paywalls · No InWIF fees</span>
+          <span className="uppercase tracking-[0.04em] font-medium">No subscriptions · No paywalls · No InWIF fees</span>
         </div>
       </div>
     </footer>

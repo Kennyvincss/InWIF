@@ -31,7 +31,7 @@ function ago(ts: number, now: number) {
 }
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">{children}</p>
+  return <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{children}</p>
 }
 
 export default function LiveWifPage() {
@@ -137,12 +137,11 @@ export default function LiveWifPage() {
 
       {/* TICKER */}
       <section className="card relative overflow-hidden p-5 sm:p-6">
-        <div className="pointer-events-none absolute -left-16 -top-24 h-64 w-64 rounded-full bg-[radial-gradient(closest-side,rgba(0,229,155,.14),transparent)]" />
         <div className="relative flex flex-wrap items-center gap-x-8 gap-y-5">
           <div className="flex items-center gap-3">
             <TokenIcon symbol="WIF" size={44} />
             <div>
-              <p className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">
+              <p className="flex items-center gap-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">
                 <span className="live-dot" /> Live · {updatedAgo === null ? 'connecting' : `updated ${updatedAgo}s ago`}
               </p>
               <p className="font-display text-3xl font-semibold">{price ? fmtUsd(price) : '—'}</p>
@@ -169,7 +168,7 @@ export default function LiveWifPage() {
         <section className="card p-6 lg:col-span-5">
           <div className="flex items-center justify-between gap-3">
             <Label>Buy vs sell pressure</Label>
-            <div className="flex rounded-full border border-white/[0.08] bg-black/40 p-0.5 font-mono text-[11px]">
+            <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
               {WINDOWS.map((x) => (
                 <button key={x.k} className={cx('rounded-full px-2.5 py-1 transition', win === x.k ? 'bg-white text-black' : 'text-mute hover:text-white')} onClick={() => setWin(x.k)}>
                   {x.label}
@@ -189,7 +188,7 @@ export default function LiveWifPage() {
                 <Radio className={cx('h-6 w-6', buyPct !== null && buyPct >= 50 ? 'text-accent' : 'text-bad')} />
               </div>
               <div className="mt-5 flex h-2.5 overflow-hidden rounded-full bg-white/[0.06]">
-                <div className="bg-accent shadow-[0_0_12px_rgba(0,229,155,.7)] transition-[width] duration-500" style={{ width: `${buyPct ?? 0}%` }} />
+                <div className="bg-accent transition-[width] duration-500" style={{ width: `${buyPct ?? 0}%` }} />
                 <div className="bg-bad/90 transition-[width] duration-500" style={{ width: `${buyPct === null ? 0 : 100 - buyPct}%` }} />
               </div>
               <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
@@ -214,11 +213,11 @@ export default function LiveWifPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="flex items-center gap-2">
               <Fish className="h-4 w-4 text-cyan" />
-              <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">Whale alerts</span>
+              <span className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Whale alerts</span>
             </p>
             <div className="flex items-center gap-2 text-xs text-mute">
               Over
-              <div className="flex rounded-full border border-white/[0.08] bg-black/40 p-0.5 font-mono text-[11px]">
+              <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
                 {WHALE_LEVELS.map((v) => (
                   <button key={v} className={cx('rounded-full px-2.5 py-1 transition', whaleUsd === v ? 'bg-cyan text-black' : 'text-mute hover:text-white')} onClick={() => setWhaleUsd(v)}>
                     ${v.toLocaleString()}
@@ -255,11 +254,11 @@ export default function LiveWifPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 px-6 pb-3 pt-6">
           <Label>Trade feed</Label>
           <label className="flex cursor-pointer items-center gap-2 text-xs text-mute">
-            <input type="checkbox" className="accent-[#22E5FF]" checked={whalesOnly} onChange={(e) => setWhalesOnly(e.target.checked)} />
+            <input type="checkbox" className="accent-[#B1FB59]" checked={whalesOnly} onChange={(e) => setWhalesOnly(e.target.checked)} />
             Whales only
           </label>
         </div>
-        <div className="hidden grid-cols-[4rem,4.5rem,1fr,1fr,1fr,8rem] gap-3 border-y border-white/[0.06] bg-white/[0.015] px-6 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-dim md:grid">
+        <div className="hidden grid-cols-[4rem,4.5rem,1fr,1fr,1fr,8rem] gap-3 border-y border-white/[0.06] bg-white/[0.015] px-6 py-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] md:grid font-medium">
           <span>Age</span>
           <span>Side</span>
           <span className="text-right">WIF</span>
@@ -291,7 +290,7 @@ export default function LiveWifPage() {
               >
                 <span className="font-mono text-xs text-dim">{ago(t.timestamp, now)}</span>
                 <span className="flex items-center gap-1.5">
-                  <span className={cx('rounded-md px-1.5 py-0.5 font-mono text-[10.5px] font-semibold uppercase', t.kind === 'buy' ? 'bg-accent/15 text-accent' : 'bg-bad/15 text-bad')}>{t.kind}</span>
+                  <span className={cx('tag capitalize', t.kind === 'buy' ? 'bg-ok text-[#08240f]' : 'bg-bad text-white')}>{t.kind}</span>
                   {whale && <Fish className="h-3.5 w-3.5 text-cyan" aria-label="Whale" />}
                   <span className="text-xs text-mute md:hidden">{compact(t.baseAmount)} WIF</span>
                 </span>

@@ -134,7 +134,6 @@ export default function WifPage() {
       </div>
 
       <section className="card relative overflow-hidden p-6">
-        <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
         <h2 className="flex items-center gap-2 font-display text-xl font-extrabold">
           <Sparkles className="h-5 w-5 text-accent" /> Powered by the World Is Flat Ecosystem
         </h2>
@@ -181,7 +180,7 @@ export default function WifPage() {
                 <li key={q.id} className="flex items-start gap-3 rounded-xl border border-white/[0.06] p-3">
                   <input
                     type="checkbox"
-                    className="mt-1 accent-[#00E59B]"
+                    className="mt-1 accent-[#B1FB59]"
                     checked={done}
                     aria-label={q.title}
                     onChange={() =>

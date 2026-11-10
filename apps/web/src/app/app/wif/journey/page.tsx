@@ -70,11 +70,10 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
   return (
     <>
       <section className={cx('card relative overflow-hidden p-6 sm:p-8', up ? 'border-accent/25' : 'border-bad/25')} data-testid="journey-hero">
-        <div className={cx('pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full blur-3xl', up ? 'bg-accent/15' : 'bg-bad/15')} />
         <div className="relative flex flex-wrap items-center gap-4">
           <TokenIcon symbol="WIF" size={52} />
           <div className="min-w-0 flex-1 basis-[14rem]">
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">{!complete || j.partial ? 'Estimated profit / loss · recent history' : 'Total profit / loss'}</p>
+            <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{!complete || j.partial ? 'Estimated profit / loss · recent history' : 'Total profit / loss'}</p>
             <p className={cx('whitespace-nowrap font-display text-[40px] font-semibold leading-tight sm:text-[52px]', up ? 'text-accent' : 'text-bad')} data-testid="journey-pnl">
               {j.pnlUsd === null ? '—' : mask(`${up ? '+' : '−'}${fmtUsd(Math.abs(j.pnlUsd))}`)}
             </p>
@@ -114,7 +113,7 @@ function Journey({ j, complete, currentPriceUsd, mask }: { j: NonNullable<Return
       <section className="grid grid-cols-2 gap-3 md:grid-cols-3">
         {stats.map((s) => (
           <div key={s.k} className="card p-4">
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-dim">{s.k}</p>
+            <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{s.k}</p>
             <p className={cx('mt-1.5 font-display text-xl font-semibold', s.tone)}>{s.v}</p>
             {s.sub && <p className="mt-0.5 text-xs text-mute">{s.sub}</p>}
           </div>

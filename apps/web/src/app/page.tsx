@@ -36,10 +36,9 @@ export default function Home() {
       {/* HERO */}
       <section className="relative -mt-[76px] overflow-hidden pt-[76px]">
         <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]" />
-        <div className="pointer-events-none absolute left-1/2 top-[-260px] h-[620px] w-[1100px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(0,229,155,.18),rgba(34,229,255,.08)_55%,transparent)] blur-2xl" />
         <div className="relative mx-auto max-w-6xl px-5 pb-10 pt-20 text-center sm:pt-28">
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.03] px-3.5 py-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-mute backdrop-blur">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.03] px-3.5 py-1.5 text-[11.5px] uppercase tracking-[0.04em] text-mute backdrop-blur font-medium">
               <span className="live-dot" /> Live on Robinhood Chain<span className="hidden sm:inline"> · Free forever</span>
             </span>
           </motion.div>
@@ -68,11 +67,10 @@ export default function Home() {
 
         {/* PRODUCT PREVIEW */}
         <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.9, delay: 0.25, ease: [0.22, 1, 0.36, 1] }} className="relative mx-auto max-w-5xl px-5 pb-6">
-          <div className="pointer-events-none absolute inset-x-10 bottom-0 top-16 rounded-[40px] bg-accent/10 blur-3xl" />
           <div className="lg:[transform:perspective(2200px)_rotateX(10deg)]">
             <ProductPreview price={wif.data?.priceUsd ?? null} change={wif.data?.change24hPct ?? null} />
           </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-ink-800 to-transparent" />
         </motion.div>
       </section>
 
@@ -92,7 +90,7 @@ export default function Home() {
             { k: 'Email needed', v: 'None', sub: 'No email, no personal details' },
           ].map((s, i) => (
             <div key={s.k} className={cx('p-6 sm:p-7', i % 2 === 1 && 'border-l border-white/[0.07]', i >= 2 && 'border-t border-white/[0.07] md:border-t-0', i === 2 && 'md:border-l')}>
-              <p className="flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">
+              <p className="flex items-center gap-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">
                 {s.live && <span className="live-dot" />} {s.k}
               </p>
               <p className="mt-3 font-display text-3xl font-semibold sm:text-4xl">{s.v}</p>
@@ -110,7 +108,7 @@ export default function Home() {
               <TokenPill symbol="ETH" amount="0.25" />
               <ArrowRight className="h-4 w-4 text-dim" />
               <TokenPill symbol="WIF" amount="≈ best price" />
-              <span className="ml-auto rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.14em] text-accent">0% InWIF fee</span>
+              <span className="ml-auto rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[11.5px] uppercase tracking-[0.04em] text-accent font-medium">0% InWIF fee</span>
             </div>
           </Bento>
           <Bento className="md:col-span-2" icon={Eye} title="See before you sign" body="Every transaction is checked first and explained in plain words.">
@@ -126,19 +124,19 @@ export default function Home() {
             <svg viewBox="0 0 400 70" className="mt-5 h-14 w-full" preserveAspectRatio="none" aria-hidden>
               <defs>
                 <linearGradient id="bento-spark" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0" stopColor="#22E5FF" stopOpacity=".3" />
-                  <stop offset="1" stopColor="#22E5FF" stopOpacity="0" />
+                  <stop offset="0" stopColor="#B1FB59" stopOpacity=".3" />
+                  <stop offset="1" stopColor="#B1FB59" stopOpacity="0" />
                 </linearGradient>
               </defs>
               <path d={`${SPARK} L400 70 L0 70 Z`} fill="url(#bento-spark)" />
-              <path d={SPARK} fill="none" stroke="#22E5FF" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 6px rgba(34,229,255,.6))' }} />
+              <path d={SPARK} fill="none" stroke="#B1FB59" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 6px rgba(177,251,89,.6))' }} />
             </svg>
           </Bento>
           <Bento className="md:col-span-2" icon={KeyRound} title="Approval manager" body="See every app allowed to spend your tokens, and revoke it in one tap." />
           <Bento className="md:col-span-2" icon={AtSign} title="Send to @username" body="Pick a username when you sign up. Friends send you $WIF at @name — no long addresses, no copy-paste mistakes." />
           <Bento className="md:col-span-3" icon={Lock} title="Keys stay with you" body="Your recovery phrase is created and encrypted on your device. InWIF never sees it, and nothing outside InWIF can ask your wallet to sign." />
           <Bento className="md:col-span-3" icon={Layers} title="Free. Forever." body="No subscriptions, no premium tier, no paywalls. Every feature, for every user.">
-            <p className="mt-4 font-display text-6xl font-semibold text-accent drop-shadow-[0_0_24px_rgba(0,229,155,.45)]">0%</p>
+            <p className="mt-4 font-display text-6xl font-semibold text-accent drop-">0%</p>
           </Bento>
         </div>
       </Section>
@@ -160,7 +158,7 @@ export default function Home() {
                   <span className="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] transition group-hover:border-accent/40 group-hover:text-accent group-hover:shadow-glow-soft">
                     <f.icon className="h-5 w-5" />
                   </span>
-                  <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">{f.tag}</span>
+                  <span className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{f.tag}</span>
                 </div>
                 <h3 className="mt-5 text-lg font-semibold">{f.t}</h3>
                 <p className="mt-1.5 flex-1 text-sm leading-relaxed text-mute">{f.b}</p>
@@ -178,13 +176,12 @@ export default function Home() {
         <div className="card overflow-hidden">
           <div className="grid items-center gap-10 p-8 sm:p-10 lg:grid-cols-[auto,1fr]">
             <div className="relative mx-auto">
-              <div className="absolute inset-0 rounded-full bg-accent/25 blur-3xl" />
               <TokenIcon symbol="WIF" size={140} />
             </div>
             <div className="min-w-0">
               <p className="text-lg leading-relaxed text-white/90">The free, secure home for the World Is Flat community on Robinhood Chain: a live $WIF dashboard, zero-fee swaps and your on-chain ecosystem profile.</p>
-              <div className="mt-6 flex min-w-0 items-center gap-2 rounded-xl border border-white/[0.08] bg-black/60 px-3 py-2">
-                <span className="shrink-0 font-mono text-[10.5px] uppercase tracking-[0.14em] text-dim">Contract</span>
+              <div className="mt-6 flex min-w-0 items-center gap-2 rounded-xl border border-white/[0.08] bg-ink-900 px-3 py-2">
+                <span className="shrink-0 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Contract</span>
                 <span className="min-w-0 flex-1 truncate font-mono text-xs text-mute">{WIF_ADDRESS}</span>
                 <CopyButton value={WIF_ADDRESS} />
               </div>
@@ -259,7 +256,6 @@ export default function Home() {
       <section className="relative mx-auto max-w-6xl px-5 pb-24">
         <div className="card relative overflow-hidden px-6 py-16 text-center sm:py-20">
           <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
-          <div className="pointer-events-none absolute left-1/2 top-1/2 h-72 w-[42rem] max-w-full -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/15 blur-3xl" />
           <h2 className="relative font-display text-[36px] font-semibold leading-tight sm:text-[56px]">
             <span className="text-fade">Own your keys.</span> <span className="text-gradient">Start in seconds.</span>
           </h2>
@@ -288,7 +284,7 @@ function Bento({ className, icon: Icon, title, body, children }: { className?: s
 
 function TokenPill({ symbol, amount }: { symbol: string; amount: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-black/60 py-1.5 pl-1.5 pr-3.5">
+    <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-ink-900 py-1.5 pl-1.5 pr-3.5">
       <TokenIcon symbol={symbol} size={26} />
       <span className="text-sm font-medium">{symbol}</span>
       <span className="font-mono text-xs text-mute">{amount}</span>
@@ -309,14 +305,14 @@ function ProductPreview({ price, change }: { price: number | null; change: numbe
         <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
         <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
         <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-        <span className="ml-3 hidden font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim sm:inline">inwif · portfolio</span>
-        <span className="ml-auto inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">
+        <span className="ml-3 hidden text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] sm:inline font-medium">inwif · portfolio</span>
+        <span className="ml-auto inline-flex items-center gap-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">
           <span className="live-dot" /> Robinhood Chain
         </span>
       </div>
       <div className="grid gap-px bg-white/[0.05] md:grid-cols-[1.5fr,1fr]">
         <div className="bg-[#060608] p-5 sm:p-7">
-          <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">Total balance · sample</p>
+          <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Total balance · sample</p>
           <div className="mt-2 flex flex-wrap items-baseline gap-3">
             <p className="font-display text-4xl font-semibold sm:text-5xl">$14,872.40</p>
             <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 font-mono text-xs text-accent">+4.21%</span>
@@ -324,12 +320,12 @@ function ProductPreview({ price, change }: { price: number | null; change: numbe
           <svg viewBox="0 0 400 70" className="mt-6 h-24 w-full" preserveAspectRatio="none" aria-hidden>
             <defs>
               <linearGradient id="hero-spark" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0" stopColor="#22E5FF" stopOpacity=".28" />
-                <stop offset="1" stopColor="#22E5FF" stopOpacity="0" />
+                <stop offset="0" stopColor="#B1FB59" stopOpacity=".28" />
+                <stop offset="1" stopColor="#B1FB59" stopOpacity="0" />
               </linearGradient>
             </defs>
             <path d={`${SPARK} L400 70 L0 70 Z`} fill="url(#hero-spark)" />
-            <path d={SPARK} fill="none" stroke="#22E5FF" strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px rgba(34,229,255,.6))' }} />
+            <path d={SPARK} fill="none" stroke="#B1FB59" strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px rgba(177,251,89,.6))' }} />
           </svg>
           <div className="mt-5 grid grid-cols-4 gap-2">
             {['Send', 'Receive', 'Swap', 'Stake'].map((a, i) => (
@@ -340,7 +336,7 @@ function ProductPreview({ price, change }: { price: number | null; change: numbe
           </div>
         </div>
         <div className="bg-[#060608] p-5 sm:p-6">
-          <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">Assets</p>
+          <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Assets</p>
           <ul className="mt-3 divide-y divide-white/[0.05]">
             {rows.map((r) => (
               <li key={r.s} className="flex items-center gap-3 py-3">
@@ -358,8 +354,8 @@ function ProductPreview({ price, change }: { price: number | null; change: numbe
               </li>
             ))}
           </ul>
-          <div className="mt-3 rounded-xl border border-white/[0.07] bg-black/60 p-3">
-            <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">Swap</p>
+          <div className="mt-3 rounded-xl border border-white/[0.07] bg-ink-900 p-3">
+            <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Swap</p>
             <div className="mt-2 flex items-center gap-2 text-sm">
               <TokenIcon symbol="ETH" size={20} /> ETH <ArrowRight className="h-3.5 w-3.5 text-dim" /> <TokenIcon symbol="WIF" size={20} /> WIF
               <span className="ml-auto font-mono text-[11px] text-accent">0% fee</span>

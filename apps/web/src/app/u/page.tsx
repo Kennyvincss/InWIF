@@ -62,9 +62,7 @@ function Profile() {
   const tweet = `Pay me in $WIF: @${claim.username} on InWIF ${link}`
   return (
     <div className="card relative overflow-hidden p-8 text-center" data-testid="pay-profile">
-      <div className="pointer-events-none absolute left-1/2 top-0 h-56 w-[28rem] -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent/20 blur-3xl" />
       <div className="relative mx-auto w-fit">
-        <div className="absolute inset-0 rounded-full bg-accent/25 blur-2xl" />
         <AddressAvatar address={claim.address} size={84} />
         <span className="absolute -bottom-1 -right-1 rounded-full border-2 border-black">
           <TokenIcon symbol="WIF" size={30} />
@@ -75,9 +73,9 @@ function Profile() {
       </h1>
       <p className="relative mt-3 text-mute">Send me $WIF on Robinhood Chain.</p>
 
-      <div className="relative mx-auto mt-7 flex max-w-md items-center gap-3 rounded-2xl border border-white/[0.08] bg-black/60 p-3 text-left">
+      <div className="relative mx-auto mt-7 flex max-w-md items-center gap-3 rounded-2xl border border-white/[0.08] bg-ink-900 p-3 text-left">
         <div className="min-w-0 flex-1">
-          <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">Wallet address</p>
+          <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Wallet address</p>
           <p className="break-all font-mono text-xs text-mute">{claim.address}</p>
         </div>
         <CopyButton value={claim.address} />

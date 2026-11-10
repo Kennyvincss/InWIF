@@ -55,7 +55,7 @@ export function PaymentRequestCreator({ to, tokens, nativeSymbol }: { to: Addres
           {link && (
             <div className="space-y-2">
               <p className="label">Your payment link</p>
-              <p className="break-all rounded-xl border border-white/[0.08] bg-black/60 p-3 font-mono text-xs text-mute">{link}</p>
+              <p className="break-all rounded-xl border border-white/[0.08] bg-ink-900 p-3 font-mono text-xs text-mute">{link}</p>
               <div className="flex flex-wrap gap-2">
                 <CopyButton value={link} label="Copy link" />
                 {typeof navigator !== 'undefined' && 'share' in navigator && (

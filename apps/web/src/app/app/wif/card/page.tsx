@@ -56,13 +56,13 @@ async function drawCard(canvas: HTMLCanvasElement, d: CardData) {
   ctx.fillStyle = '#000'
   ctx.fillRect(0, 0, W, H)
   const g1 = ctx.createRadialGradient(180, 80, 0, 180, 80, 620)
-  g1.addColorStop(0, 'rgba(0,229,155,0.28)')
-  g1.addColorStop(1, 'rgba(0,229,155,0)')
+  g1.addColorStop(0, 'rgba(177,251,89,0.28)')
+  g1.addColorStop(1, 'rgba(177,251,89,0)')
   ctx.fillStyle = g1
   ctx.fillRect(0, 0, W, H)
   const g2 = ctx.createRadialGradient(1080, 600, 0, 1080, 600, 560)
-  g2.addColorStop(0, 'rgba(34,229,255,0.20)')
-  g2.addColorStop(1, 'rgba(34,229,255,0)')
+  g2.addColorStop(0, 'rgba(177,251,89,0.20)')
+  g2.addColorStop(1, 'rgba(177,251,89,0)')
   ctx.fillStyle = g2
   ctx.fillRect(0, 0, W, H)
   ctx.strokeStyle = 'rgba(255,255,255,0.035)'
@@ -85,14 +85,14 @@ async function drawCard(canvas: HTMLCanvasElement, d: CardData) {
   ctx.lineWidth = 2
   ctx.stroke()
 
-  const [logo, coin] = await Promise.all([loadImage('/icon.svg'), loadImage('/tokens/wif.webp')])
+  const [logo, coin] = await Promise.all([loadImage('/brand/emblem.png'), loadImage('/tokens/wif.webp')])
   ctx.drawImage(logo, 64, 60, 44, 44)
   ctx.fillStyle = '#fff'
   ctx.font = font(650, 28)
   ctx.textBaseline = 'middle'
   ctx.fillText('In', 120, 83)
   const inW = ctx.measureText('In').width
-  ctx.fillStyle = '#00E59B'
+  ctx.fillStyle = '#B1FB59'
   ctx.fillText('WIF', 120 + inW, 83)
   ctx.font = font(500, 16, mono)
   ctx.fillStyle = 'rgba(255,255,255,0.45)'
@@ -102,7 +102,7 @@ async function drawCard(canvas: HTMLCanvasElement, d: CardData) {
 
   // Coin with glow
   ctx.save()
-  ctx.shadowColor = 'rgba(0,229,155,0.55)'
+  ctx.shadowColor = 'rgba(177,251,89,0.55)'
   ctx.shadowBlur = 70
   ctx.beginPath()
   ctx.arc(230, 330, 130, 0, Math.PI * 2)
@@ -120,7 +120,7 @@ async function drawCard(canvas: HTMLCanvasElement, d: CardData) {
   // Tier + amount
   const X = 420
   ctx.font = font(500, 18, mono)
-  ctx.fillStyle = '#00E59B'
+  ctx.fillStyle = '#B1FB59'
   ctx.fillText('$WIF  ' + d.tier.name.toUpperCase(), X, 190)
   ctx.font = font(650, 76)
   ctx.fillStyle = '#fff'
@@ -147,12 +147,12 @@ async function drawCard(canvas: HTMLCanvasElement, d: CardData) {
     const w = ctx.measureText(b).width + 36
     if (bx + w > W - 64) break
     roundRect(ctx, bx, by, w, 40, 20)
-    ctx.fillStyle = 'rgba(0,229,155,0.12)'
+    ctx.fillStyle = 'rgba(177,251,89,0.12)'
     ctx.fill()
-    ctx.strokeStyle = 'rgba(0,229,155,0.45)'
+    ctx.strokeStyle = 'rgba(177,251,89,0.45)'
     ctx.lineWidth = 1.5
     ctx.stroke()
-    ctx.fillStyle = '#7CFFCF'
+    ctx.fillStyle = '#D2FF9C'
     ctx.fillText(b, bx + 18, by + 21)
     bx += w + 12
   }
@@ -256,10 +256,10 @@ export default function WifCardPage() {
       {balances.isError && <Notice tone="warn">Your balance could not be read right now.</Notice>}
       <section className="card flex flex-wrap items-center gap-x-6 gap-y-3 p-5">
         <label className="flex cursor-pointer items-center gap-2 text-sm text-mute">
-          <input type="checkbox" className="accent-[#00E59B]" checked={showAmount} onChange={(e) => setShowAmount(e.target.checked)} /> Show how much I hold
+          <input type="checkbox" className="accent-[#B1FB59]" checked={showAmount} onChange={(e) => setShowAmount(e.target.checked)} /> Show how much I hold
         </label>
         <label className="flex cursor-pointer items-center gap-2 text-sm text-mute">
-          <input type="checkbox" className="accent-[#00E59B]" checked={showAddress} onChange={(e) => setShowAddress(e.target.checked)} /> Show my address
+          <input type="checkbox" className="accent-[#B1FB59]" checked={showAddress} onChange={(e) => setShowAddress(e.target.checked)} /> Show my address
         </label>
         <div className="ml-auto flex flex-wrap gap-2">
           <button className="btn-ghost" onClick={download} disabled={!data}>

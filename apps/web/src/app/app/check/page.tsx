@@ -8,9 +8,9 @@ import { withExplorer } from '@/lib/net'
 import { ErrorBox, FieldHint, Notice, PageHeader, Spinner, TokenIcon, cx } from '@/components/ui'
 
 const VERDICT = {
-  low: { label: 'Low risk', tone: 'text-accent', ring: 'border-accent/30 bg-accent/[0.06] shadow-[0_0_60px_-24px_rgba(0,229,155,.7)]', icon: CheckCircle2, text: 'No red flags found in these checks.' },
-  medium: { label: 'Be careful', tone: 'text-warn', ring: 'border-warn/30 bg-warn/[0.06] shadow-[0_0_60px_-24px_rgba(255,194,75,.6)]', icon: AlertTriangle, text: 'Some warning signs. Read the findings before buying.' },
-  high: { label: 'High risk', tone: 'text-bad', ring: 'border-bad/30 bg-bad/[0.07] shadow-[0_0_60px_-24px_rgba(255,77,106,.7)]', icon: ShieldAlert, text: 'Serious red flags. We would not buy this.' },
+  low: { label: 'Low risk', tone: 'text-accent', ring: 'border-accent/30 bg-accent/[0.06]', icon: CheckCircle2, text: 'No red flags found in these checks.' },
+  medium: { label: 'Be careful', tone: 'text-warn', ring: 'border-warn/30 bg-warn/[0.06]', icon: AlertTriangle, text: 'Some warning signs. Read the findings before buying.' },
+  high: { label: 'High risk', tone: 'text-bad', ring: 'border-bad/30 bg-bad/[0.07]', icon: ShieldAlert, text: 'Serious red flags. We would not buy this.' },
 } as const
 
 const ITEM = {
@@ -61,7 +61,7 @@ export default function TokenCheckPage() {
         </form>
         {input && !address && <FieldHint tone="danger" className="mt-2">That is not a valid token address.</FieldHint>}
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <span className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">Try</span>
+          <span className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Try</span>
           {tokens.slice(0, 4).map((t) => (
             <button key={t.address} type="button" className="chip hover:border-white/20 hover:text-white" onClick={() => run(t.address)}>
               <TokenIcon symbol={t.symbol} size={14} /> {t.symbol}
@@ -81,7 +81,7 @@ export default function TokenCheckPage() {
         <>
           <section className={cx('card border p-6', v.ring)}>
             <div className="flex flex-wrap items-center gap-4">
-              <span className={cx('grid h-14 w-14 place-items-center rounded-2xl border border-white/10 bg-black/40', v.tone)}>
+              <span className={cx('grid h-14 w-14 place-items-center rounded-2xl border border-white/10 bg-ink-900', v.tone)}>
                 <v.icon className="h-7 w-7" />
               </span>
               <div className="min-w-0 flex-1">
@@ -101,8 +101,8 @@ export default function TokenCheckPage() {
                 { k: 'Top holder', v: r.top1Pct === null ? '—' : `${r.top1Pct.toFixed(1)}%` },
                 { k: 'Top 10', v: r.top10Pct === null ? '—' : `${r.top10Pct.toFixed(1)}%` },
               ].map((s) => (
-                <div key={s.k} className="rounded-xl border border-white/[0.07] bg-black/40 p-3">
-                  <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-dim">{s.k}</p>
+                <div key={s.k} className="rounded-xl border border-white/[0.07] bg-ink-900 p-3">
+                  <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{s.k}</p>
                   <p className="mt-1 font-medium">{s.v}</p>
                 </div>
               ))}

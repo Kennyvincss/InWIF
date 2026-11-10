@@ -44,7 +44,7 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={cx('card max-h-[92vh] w-full min-w-0 overflow-y-auto overflow-x-hidden rounded-b-none bg-[#08080A]/95 p-6 sm:rounded-2xl', wide ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
+            className={cx('card max-h-[92vh] w-full min-w-0 overflow-y-auto overflow-x-hidden rounded-b-none bg-ink-800 p-6 sm:rounded-2xl', wide ? 'sm:max-w-2xl' : 'sm:max-w-lg')}
             initial={{ y: 30, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 30, opacity: 0 }}
@@ -84,13 +84,14 @@ export function CopyButton({ value, label = 'Copy' }: { value: string; label?: s
 
 export function Badge({ tone = 'mute', children }: { tone?: 'ok' | 'bad' | 'warn' | 'lime' | 'mute'; children: React.ReactNode }) {
   const tones = {
-    ok: 'border-ok/30 bg-ok/10 text-ok',
-    bad: 'border-bad/30 bg-bad/10 text-bad',
-    warn: 'border-warn/30 bg-warn/10 text-warn',
-    lime: 'border-accent/30 bg-accent/10 text-accent',
-    mute: 'border-white/10 bg-white/[0.04] text-mute',
+    ok: 'border-ok bg-ok text-[#08240f]',
+    bad: 'border-bad bg-bad text-white',
+    warn: 'border-sun bg-sun text-[#1a1400]',
+    lime: 'border-lavender bg-lavender text-[#17142e]',
+    mute: 'border-ink-500 bg-ink-600 text-[#cfcfcf]',
   }
-  return <span className={cx('inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium', tones[tone])}>{children}</span>
+  // Small solid rectangular tags, like the reference's "New" / "In progress" / "Important".
+  return <span className={cx('inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-sm border px-1.5 py-[1px] text-[11.5px] font-medium', tones[tone])}>{children}</span>
 }
 
 export type CalloutTone = 'neutral' | 'info' | 'ok' | 'warn' | 'danger'
@@ -167,7 +168,7 @@ export function Notice({ children, tone = 'mute' }: { children: React.ReactNode;
 export function Empty({ icon, title, children }: { icon: React.ReactNode; title: string; children?: React.ReactNode }) {
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.09] bg-white/[0.01] px-6 py-12 text-center">
-      <div className="mb-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 text-mute shadow-[0_0_30px_-10px_rgba(255,255,255,.25)]">{icon}</div>
+      <div className="mb-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-3 text-mute">{icon}</div>
       <p className="font-medium">{title}</p>
       {children && <div className="mt-1 max-w-sm text-sm text-mute">{children}</div>}
     </div>
@@ -209,7 +210,7 @@ const TOKEN_LOGOS: Record<string, string> = {
 }
 
 export function TokenIcon({ symbol, src, size = 36 }: { symbol: string; src?: string; size?: number }) {
-  const palette: Record<string, string> = { ETH: '#8EA2FF', WIF: '#00E59B', WETH: '#B6C1FF', USDG: '#62D99A', cbBTC: '#F7A64B' }
+  const palette: Record<string, string> = { ETH: '#8EA2FF', WIF: '#B1FB59', WETH: '#B6C1FF', USDG: '#62D99A', cbBTC: '#F7A64B' }
   const logo = src ?? TOKEN_LOGOS[symbol.toUpperCase()]
   if (logo)
     // eslint-disable-next-line @next/next/no-img-element

@@ -87,7 +87,7 @@ export default function SettingsPage() {
           ))}
         </select>
         <label className="mt-4 flex items-center gap-3 text-sm">
-          <input type="checkbox" className="accent-[#00E59B]" checked={state.settings.hideBalances} onChange={(e) => set({ hideBalances: e.target.checked })} />
+          <input type="checkbox" className="accent-[#B1FB59]" checked={state.settings.hideBalances} onChange={(e) => set({ hideBalances: e.target.checked })} />
           Hide balances by default
         </label>
         <label className="label mt-4" htmlFor="currency">Show balances in</label>
@@ -104,7 +104,7 @@ export default function SettingsPage() {
             <label key={k} className="flex items-center gap-3 rounded-lg border border-white/[0.06] px-3 py-2 text-sm">
               <input
                 type="checkbox"
-                className="accent-[#00E59B]"
+                className="accent-[#B1FB59]"
                 checked={state.settings.notifications[k]}
                 onChange={async (e) => {
                   const on = e.target.checked

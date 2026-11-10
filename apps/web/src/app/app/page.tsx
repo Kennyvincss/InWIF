@@ -15,7 +15,7 @@ import { AddressAvatar, Badge, Callout, CopyButton, ErrorBox, Notice, Skeleton, 
 const RANGES = Object.keys(RANGE_QUERY) as ChartRange[]
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p className="font-mono text-[10.5px] uppercase tracking-[0.16em] text-dim">{children}</p>
+  return <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{children}</p>
 }
 
 export default function Dashboard() {
@@ -75,8 +75,6 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
         {/* BALANCE */}
         <section className="card relative overflow-hidden p-6 sm:p-8 lg:col-span-8">
-          <div className="pointer-events-none absolute -right-24 -top-28 h-80 w-80 rounded-full bg-[radial-gradient(closest-side,rgba(0,229,155,.16),transparent)]" />
-          <div className="pointer-events-none absolute -bottom-32 left-10 h-72 w-72 rounded-full bg-[radial-gradient(closest-side,rgba(34,229,255,.08),transparent)]" />
           <div className="relative flex flex-wrap items-start justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2">
               <Label>Total balance</Label>
@@ -89,7 +87,7 @@ export default function Dashboard() {
               >
                 {hide ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
-              <div className="flex rounded-full border border-white/[0.08] bg-black/40 p-0.5 font-mono text-[10.5px]" role="group" aria-label="Show balance in">
+              <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[10.5px]" role="group" aria-label="Show balance in">
                 {(['WIF', 'USD'] as const).map((c) => (
                   <button
                     key={c}
@@ -102,7 +100,7 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
-            <div className="flex w-full min-w-0 items-center gap-2 rounded-full border border-white/[0.08] bg-black/60 py-1 pl-1 pr-1 sm:w-auto sm:max-w-[22rem]">
+            <div className="flex w-full min-w-0 items-center gap-2 rounded-full border border-white/[0.08] bg-ink-900 py-1 pl-1 pr-1 sm:w-auto sm:max-w-[22rem]">
               <AddressAvatar address={address} size={26} />
               <span className="min-w-0 flex-1 truncate font-mono text-xs text-mute">{address}</span>
               {address && <CopyButton value={address} />}
@@ -152,7 +150,6 @@ export default function Dashboard() {
         {/* SIDE TILES */}
         <div className="grid min-w-0 grid-cols-1 gap-4 lg:col-span-4">
           <Link href="/app/wif" className="card group relative overflow-hidden p-6">
-            <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-accent/10 blur-2xl transition group-hover:bg-accent/20" />
             <div className="relative flex items-center gap-3">
               <TokenIcon symbol="WIF" size={40} />
               <div className="min-w-0">
@@ -200,7 +197,7 @@ export default function Dashboard() {
               <Label>Portfolio value</Label>
               <p className="mt-1 text-sm text-mute">Your current holdings at past prices{chartInWif ? ", in $WIF" : ""}.</p>
             </div>
-            <div className="flex rounded-full border border-white/[0.08] bg-black/40 p-0.5 font-mono text-[11px]">
+            <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
               {RANGES.map((r) => (
                 <button
                   key={r}
@@ -258,7 +255,7 @@ export default function Dashboard() {
               <Skeleton className="h-40" />
             </div>
           )}
-          <div className="hidden grid-cols-[1.6fr,1fr,0.7fr,1.2fr] gap-4 border-y border-white/[0.06] bg-white/[0.015] px-6 py-2 font-mono text-[10px] uppercase tracking-[0.16em] text-dim md:grid">
+          <div className="hidden grid-cols-[1.6fr,1fr,0.7fr,1.2fr] gap-4 border-y border-white/[0.06] bg-white/[0.015] px-6 py-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] md:grid font-medium">
             <span>Asset</span>
             <span className="text-right">Price</span>
             <span className="text-right">24h</span>
