@@ -20,7 +20,9 @@ export const CONNECT_SRC = [
   'https://rpc.testnet.chain.robinhood.com',
   'https://robinhood-sepolia-rpc.publicnode.com',
   'https://explorer.testnet.chain.robinhood.com',
-  ...[process.env.NEXT_PUBLIC_ROBINHOOD_RPC_URL, process.env.NEXT_PUBLIC_ROBINHOOD_TESTNET_RPC_URL].map(origin).filter(Boolean),
+  // Ethereum mainnet: read the user's L1 balance and send bridge deposits to Robinhood Chain.
+  'https://ethereum-rpc.publicnode.com',
+  ...[process.env.NEXT_PUBLIC_ROBINHOOD_RPC_URL, process.env.NEXT_PUBLIC_ROBINHOOD_TESTNET_RPC_URL, process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL].map(origin).filter(Boolean),
   ...(LOCAL ? ['http://127.0.0.1:8545', 'http://localhost:8545', origin(process.env.NEXT_PUBLIC_LOCAL_RPC_URL)].filter(Boolean) : []),
 ]
 

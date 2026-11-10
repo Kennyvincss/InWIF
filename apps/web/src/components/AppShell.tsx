@@ -15,6 +15,7 @@ import {
   HelpCircle,
   History,
   Landmark,
+  Layers,
   LayoutDashboard,
   Lock,
   Menu,
@@ -63,6 +64,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: '/app/receive', label: 'Receive', icon: ArrowDownLeft, keywords: 'address qr request pay page' },
       { href: '/app/swap', label: 'Swap', icon: ArrowLeftRight, keywords: 'buy sell trade' },
       { href: '/app/activity', label: 'Activity', icon: History, keywords: 'history transactions' },
+      { href: '/app/bridge', label: 'Move from Ethereum', icon: Layers, keywords: 'bridge ethereum mainnet deposit l1 eth' },
     ],
   },
   {

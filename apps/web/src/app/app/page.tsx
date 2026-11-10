@@ -5,6 +5,8 @@ import { ArrowDownLeft, ArrowLeftRight, ArrowRight, ArrowUpRight, Check, Cpu, Ey
 import { RANGE_QUERY, explorerAddressUrl, type ChartRange } from '@inwif/core'
 import { useWallet } from '@/lib/wallet-store'
 import { useActivity, usePortfolio, usePortfolioHistory, useVerification } from '@/lib/hooks'
+import { useEthereumBalance } from '@/lib/ethereum'
+import { formatEther } from 'viem'
 import { fmtPct, fmtToken, fmtUsd, fmtValue, fmtWif } from '@/lib/format'
 import { AllocationBar, AreaChart } from '@/components/Charts'
 import { ActivityList } from '@/components/ActivityList'
@@ -22,6 +24,7 @@ export default function Dashboard() {
   const { activeWallet, activeAccount, state, update } = useWallet()
   const address = activeAccount?.address
   const { balances, rows, totals, network, prices } = usePortfolio(address)
+  const l1 = useEthereumBalance(address)
   const activity = useActivity(address)
   const verification = useVerification()
   const [range, setRange] = useState<ChartRange>('7d')
@@ -70,6 +73,22 @@ export default function Dashboard() {
           </Callout>
           <BackupModal walletId={activeWallet.id} open={backupOpen} onClose={() => setBackupOpen(false)} />
         </>
+      )}
+      {!!l1.data && l1.data > 0n && (
+        <Callout
+          tone="info"
+          title={`You also have ${Number(formatEther(l1.data)).toLocaleString('en-US', { maximumFractionDigits: 6 })} ETH on Ethereum`}
+          action={
+            activeWallet?.kind !== 'watch' ? (
+              <Link href="/app/bridge" className="btn-primary">
+                Move to Robinhood Chain
+              </Link>
+            ) : undefined
+          }
+          data-testid="l1-banner"
+        >
+          InWIF runs on Robinhood Chain, so ETH on Ethereum doesn&apos;t count here yet. Move it over to use it, for example to pay network fees.
+        </Callout>
       )}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
