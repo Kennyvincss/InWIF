@@ -2,10 +2,11 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, AtSign, ArrowUpRight, Check, Eye, HandCoins, IdCard, KeyRound, Layers, Lock, Radio, ScanSearch, ShieldCheck, Smartphone, Sparkles, Zap } from 'lucide-react'
+import { ArrowRight, AtSign, ArrowUpRight, BadgeCheck, Check, Eye, HandCoins, IdCard, KeyRound, Layers, Lock, Radio, ScanSearch, ShieldCheck, Smartphone, Sparkles, Zap } from 'lucide-react'
 import { WIF_ADDRESS } from '@inwif/core'
 import { Section, SitePage } from '@/components/site/Site'
 import { DeviceRender } from '@/components/site/DeviceRender'
+import { LogoMark } from '@/components/Logo'
 import { CopyButton, TokenIcon, cx } from '@/components/ui'
 import { market } from '@/lib/market-client'
 import { fmtPct, fmtUsd } from '@/lib/format'
@@ -35,33 +36,47 @@ export default function Home() {
     <SitePage>
       {/* HERO */}
       <section className="relative -mt-[76px] overflow-hidden pt-[76px]">
-        <div className="pointer-events-none absolute inset-0 bg-grid [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent)]" />
-        <div className="relative mx-auto max-w-6xl px-5 pb-10 pt-20 text-center sm:pt-28">
-          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.09] bg-white/[0.03] px-3.5 py-1.5 text-[11.5px] uppercase tracking-[0.04em] text-mute backdrop-blur font-medium">
-              <span className="live-dot" /> Live on Robinhood Chain<span className="hidden sm:inline"> · Free forever</span>
+        <div className="relative mx-auto max-w-4xl px-5 pb-12 pt-14 text-center sm:pt-20">
+          <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }} className="mx-auto w-fit">
+            <LogoMark size={112} className="rounded-[30px] shadow-[0_24px_48px_-20px_rgba(17,17,17,.45)]" />
+          </motion.div>
+          <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }} className="mt-8">
+            <span className="eyebrow">
+              <BadgeCheck className="h-4 w-4 text-accent" /> Built for the $WIF community
             </span>
           </motion.div>
           <motion.h1
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.65, delay: 0.05, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-auto mt-8 max-w-5xl font-display text-[46px] font-semibold leading-[1] sm:text-[68px] lg:text-[86px]"
+            transition={{ duration: 0.65, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+            className="mx-auto mt-7 font-display text-[48px] font-bold leading-[0.98] tracking-[-0.045em] sm:text-[72px] lg:text-[88px]"
           >
-            <span className="text-fade lg:whitespace-nowrap">Your Crypto. Your Rules.</span>
+            <span className="text-fg">Your crypto.</span>
             <br />
-            <span className="text-gradient">Your InWIF.</span>
+            <span className="text-accent">Your rules.</span>
           </motion.h1>
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.15 }} className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-mute">
-            The self-custody wallet for Robinhood Chain. Hold, send and swap with keys that never leave your device — and never pay InWIF a cent.
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.15 }} className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-mute sm:text-xl">
+            Hold, send and swap $WIF on Robinhood Chain, pay friends by @username, and keep your keys on your own device. Free, with no InWIF fees.
           </motion.p>
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.22 }} className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link href="/app" className="btn-primary px-6 py-3 text-[15px]">
-              Get Started <ArrowRight className="h-4 w-4" />
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.22 }} className="mx-auto mt-10 max-w-md">
+            <Link href="/app" className="btn-primary h-16 w-full text-lg">
+              Launch wallet <ArrowRight className="h-5 w-5" />
             </Link>
-            <a href="#features" className="btn-ghost px-6 py-3 text-[15px]">
-              See what it does
+            <a href="#how" className="mt-5 inline-block text-[16px] font-medium text-mute transition hover:text-fg">
+              How it works
             </a>
+          </motion.div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-10 flex flex-wrap justify-center gap-2.5">
+            {[
+              { i: Check, t: 'Free forever' },
+              { i: KeyRound, t: 'Your keys' },
+              { i: AtSign, t: 'Pay by @username' },
+              { i: ShieldCheck, t: 'Scam shield' },
+            ].map(({ i: Icon, t }) => (
+              <span key={t} className="inline-flex items-center gap-2 rounded-full bg-paper px-4 py-2 text-[15px] text-mute shadow-[0_1px_2px_rgba(17,17,17,.05)]">
+                <Icon className="h-4 w-4 text-accent" /> {t}
+              </span>
+            ))}
           </motion.div>
         </div>
 
@@ -76,21 +91,21 @@ export default function Home() {
 
       {/* STATS STRIP */}
       <section className="mx-auto max-w-6xl px-5">
-        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-white/[0.07] bg-white/[0.015] md:grid-cols-4">
+        <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-line bg-paper md:grid-cols-4">
           {[
             {
               k: '$WIF price',
               v: wif.data?.priceUsd ? fmtUsd(wif.data.priceUsd) : '—',
               sub: wif.data?.change24hPct !== undefined && wif.data?.change24hPct !== null ? `${fmtPct(wif.data.change24hPct)} 24h` : 'Live market',
-              tone: (wif.data?.change24hPct ?? 0) >= 0 ? 'text-accent' : 'text-bad',
+              tone: (wif.data?.change24hPct ?? 0) >= 0 ? 'text-ok' : 'text-bad',
               live: true,
             },
             { k: 'InWIF fees', v: '0%', sub: 'On everything, forever' },
             { k: 'Custody', v: '100%', sub: 'Your keys, your device' },
             { k: 'Email needed', v: 'None', sub: 'No email, no personal details' },
           ].map((s, i) => (
-            <div key={s.k} className={cx('p-6 sm:p-7', i % 2 === 1 && 'border-l border-white/[0.07]', i >= 2 && 'border-t border-white/[0.07] md:border-t-0', i === 2 && 'md:border-l')}>
-              <p className="flex items-center gap-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">
+            <div key={s.k} className={cx('p-6 sm:p-7', i % 2 === 1 && 'border-l border-fg/[0.07]', i >= 2 && 'border-t border-fg/[0.07] md:border-t-0', i === 2 && 'md:border-l')}>
+              <p className="flex items-center gap-2 text-[11.5px]  text-dim font-medium">
                 {s.live && <span className="live-dot" />} {s.k}
               </p>
               <p className="mt-3 font-display text-3xl font-semibold sm:text-4xl">{s.v}</p>
@@ -101,6 +116,31 @@ export default function Home() {
       </section>
 
       {/* FEATURES — BENTO */}
+      {/* HOW IT WORKS */}
+      <section id="how" className="mx-auto max-w-6xl scroll-mt-24 px-5 pt-20 sm:pt-28">
+        <motion.div {...rise} className="card-dark px-7 py-12 sm:px-14 sm:py-16">
+          <h2 className="font-display text-[34px] font-bold leading-tight sm:text-[48px]">How it works</h2>
+          <div className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
+            {[
+              { i: Smartphone, t: '1. Create your wallet', b: 'Open InWIF and create a wallet in seconds. Your recovery phrase is made and encrypted on your own device.' },
+              { i: AtSign, t: '2. Pick your @username', b: 'Friends send you $WIF at @yourname instead of a long address. Claiming it is free: you sign a message, nothing is paid.' },
+              { i: ShieldCheck, t: '3. Approve every transaction', b: 'Every send and swap is checked first, explained in plain words and approved by you. InWIF never holds your keys.' },
+            ].map(({ i: Icon, t, b }) => (
+              <div key={t}>
+                <span className="grid h-[72px] w-[72px] place-items-center rounded-full bg-[#292929]">
+                  <Icon className="h-7 w-7 text-paper" />
+                </span>
+                <h3 className="mt-6 text-[22px] font-semibold">{t}</h3>
+                <p className="mt-3 text-[16px] leading-relaxed text-[#B7B7B7]">{b}</p>
+              </div>
+            ))}
+          </div>
+          <Link href="/app" className="btn-primary mt-12 h-16 w-full text-lg md:w-auto md:px-12">
+            Get started <ArrowRight className="h-5 w-5" />
+          </Link>
+        </motion.div>
+      </section>
+
       <Section id="features" eyebrow="The wallet" title={<>Everything you need. <span className="text-mute">Nothing you pay for.</span></>}>
         <div className="grid gap-4 md:grid-cols-6">
           <Bento className="md:col-span-4" icon={Zap} title="Swap at the best price" body="Trade $WIF and ETH at the best available price in a couple of taps. InWIF adds no fee — you see exactly what you get before you confirm.">
@@ -108,7 +148,7 @@ export default function Home() {
               <TokenPill symbol="ETH" amount="0.25" />
               <ArrowRight className="h-4 w-4 text-dim" />
               <TokenPill symbol="WIF" amount="≈ best price" />
-              <span className="ml-auto rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[11.5px] uppercase tracking-[0.04em] text-accent font-medium">0% InWIF fee</span>
+              <span className="ml-auto rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-[11.5px]  text-accent font-medium">0% InWIF fee</span>
             </div>
           </Bento>
           <Bento className="md:col-span-2" icon={Eye} title="See before you sign" body="Every transaction is checked first and explained in plain words.">
@@ -124,12 +164,12 @@ export default function Home() {
             <svg viewBox="0 0 400 70" className="mt-5 h-14 w-full" preserveAspectRatio="none" aria-hidden>
               <defs>
                 <linearGradient id="bento-spark" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0" stopColor="#B1FB59" stopOpacity=".3" />
-                  <stop offset="1" stopColor="#B1FB59" stopOpacity="0" />
+                  <stop offset="0" stopColor="#E8622C" stopOpacity=".3" />
+                  <stop offset="1" stopColor="#E8622C" stopOpacity="0" />
                 </linearGradient>
               </defs>
               <path d={`${SPARK} L400 70 L0 70 Z`} fill="url(#bento-spark)" />
-              <path d={SPARK} fill="none" stroke="#B1FB59" strokeWidth="2" style={{ filter: 'drop-shadow(0 0 6px rgba(177,251,89,.6))' }} />
+              <path d={SPARK} fill="none" stroke="#E8622C" strokeWidth="2"  />
             </svg>
           </Bento>
           <Bento className="md:col-span-2" icon={KeyRound} title="Approval manager" body="See every app allowed to spend your tokens, and revoke it in one tap." />
@@ -155,10 +195,10 @@ export default function Home() {
             <motion.div key={f.t} {...rise}>
               <Link href={f.h} className="card card-hover group flex h-full flex-col p-6">
                 <div className="flex items-center justify-between">
-                  <span className="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] transition group-hover:border-accent/40 group-hover:text-accent group-hover:shadow-glow-soft">
+                  <span className="inline-grid h-10 w-10 place-items-center rounded-2xl bg-accent-soft text-accent transition group-hover:border-accent/40 group-hover:text-accent group-hover:shadow-glow-soft">
                     <f.icon className="h-5 w-5" />
                   </span>
-                  <span className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{f.tag}</span>
+                  <span className="text-[11.5px]  text-dim font-medium">{f.tag}</span>
                 </div>
                 <h3 className="mt-5 text-lg font-semibold">{f.t}</h3>
                 <p className="mt-1.5 flex-1 text-sm leading-relaxed text-mute">{f.b}</p>
@@ -179,9 +219,9 @@ export default function Home() {
               <TokenIcon symbol="WIF" size={140} />
             </div>
             <div className="min-w-0">
-              <p className="text-lg leading-relaxed text-white/90">The free, secure home for the World Is Flat community on Robinhood Chain: a live $WIF dashboard, zero-fee swaps and your on-chain ecosystem profile.</p>
-              <div className="mt-6 flex min-w-0 items-center gap-2 rounded-xl border border-white/[0.08] bg-ink-900 px-3 py-2">
-                <span className="shrink-0 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Contract</span>
+              <p className="text-lg leading-relaxed text-fg/90">The free, secure home for the World Is Flat community on Robinhood Chain: a live $WIF dashboard, zero-fee swaps and your on-chain ecosystem profile.</p>
+              <div className="mt-6 flex min-w-0 items-center gap-2 rounded-xl border border-fg/[0.08] bg-ink-900 px-3 py-2">
+                <span className="shrink-0 text-[11.5px]  text-dim font-medium">Contract</span>
                 <span className="min-w-0 flex-1 truncate font-mono text-xs text-mute">{WIF_ADDRESS}</span>
                 <CopyButton value={WIF_ADDRESS} />
               </div>
@@ -239,12 +279,12 @@ export default function Home() {
 
       {/* FAQ */}
       <Section id="faq" eyebrow="FAQ" title="Questions, answered honestly.">
-        <div className="card divide-y divide-white/[0.06] px-2">
+        <div className="card divide-y divide-fg/[0.06] px-2">
           {FAQ.map((f) => (
             <details key={f.q} className="group px-4 py-5">
               <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-[15px] font-medium">
                 {f.q}
-                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/[0.1] text-mute transition group-open:rotate-45 group-open:border-accent/40 group-open:text-accent">+</span>
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-fg/[0.1] text-mute transition group-open:rotate-45 group-open:border-accent/40 group-open:text-accent">+</span>
               </summary>
               <p className="mt-3 max-w-3xl text-sm leading-relaxed text-mute">{f.a}</p>
             </details>
@@ -272,7 +312,7 @@ export default function Home() {
 function Bento({ className, icon: Icon, title, body, children }: { className?: string; icon: typeof Zap; title: string; body: string; children?: React.ReactNode }) {
   return (
     <motion.div {...rise} className={cx('card card-hover group overflow-hidden p-6 sm:p-7', className)}>
-      <span className="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-white transition group-hover:border-accent/40 group-hover:text-accent group-hover:shadow-glow-soft">
+      <span className="inline-grid h-10 w-10 place-items-center rounded-2xl bg-accent-soft text-accent text-fg transition group-hover:border-accent/40 group-hover:text-accent group-hover:shadow-glow-soft">
         <Icon className="h-5 w-5" />
       </span>
       <h3 className="mt-5 text-lg font-semibold">{title}</h3>
@@ -284,7 +324,7 @@ function Bento({ className, icon: Icon, title, body, children }: { className?: s
 
 function TokenPill({ symbol, amount }: { symbol: string; amount: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-ink-900 py-1.5 pl-1.5 pr-3.5">
+    <span className="inline-flex items-center gap-2 rounded-full border border-fg/[0.08] bg-ink-900 py-1.5 pl-1.5 pr-3.5">
       <TokenIcon symbol={symbol} size={26} />
       <span className="text-sm font-medium">{symbol}</span>
       <span className="font-mono text-xs text-mute">{amount}</span>
@@ -300,44 +340,44 @@ function ProductPreview({ price, change }: { price: number | null; change: numbe
     { s: 'USDG', n: 'Global Dollar', a: '420.00', v: '$420.00', c: 0 },
   ]
   return (
-    <div className="card overflow-hidden bg-[#060608]/90 text-left">
-      <div className="flex items-center gap-2 border-b border-white/[0.06] px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-        <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
-        <span className="ml-3 hidden text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] sm:inline font-medium">inwif · portfolio</span>
-        <span className="ml-auto inline-flex items-center gap-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">
+    <div className="card overflow-hidden text-left">
+      <div className="flex items-center gap-2 border-b border-fg/[0.06] px-4 py-3">
+        <span className="h-2.5 w-2.5 rounded-full bg-fg/10" />
+        <span className="h-2.5 w-2.5 rounded-full bg-fg/10" />
+        <span className="h-2.5 w-2.5 rounded-full bg-fg/10" />
+        <span className="ml-3 hidden text-[11.5px]  text-dim sm:inline font-medium">inwif · portfolio</span>
+        <span className="ml-auto inline-flex items-center gap-2 text-[11.5px]  text-dim font-medium">
           <span className="live-dot" /> Robinhood Chain
         </span>
       </div>
-      <div className="grid gap-px bg-white/[0.05] md:grid-cols-[1.5fr,1fr]">
-        <div className="bg-[#060608] p-5 sm:p-7">
-          <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Total balance · sample</p>
+      <div className="grid gap-px bg-fg/[0.05] md:grid-cols-[1.5fr,1fr]">
+        <div className="bg-paper p-5 sm:p-7">
+          <p className="text-[11.5px]  text-dim font-medium">Total balance · sample</p>
           <div className="mt-2 flex flex-wrap items-baseline gap-3">
             <p className="font-display text-4xl font-semibold sm:text-5xl">$14,872.40</p>
-            <span className="rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 font-mono text-xs text-accent">+4.21%</span>
+            <span className="rounded-full bg-[#E3F3EA] px-2 py-0.5 font-mono text-xs text-ok">+4.21%</span>
           </div>
           <svg viewBox="0 0 400 70" className="mt-6 h-24 w-full" preserveAspectRatio="none" aria-hidden>
             <defs>
               <linearGradient id="hero-spark" x1="0" x2="0" y1="0" y2="1">
-                <stop offset="0" stopColor="#B1FB59" stopOpacity=".28" />
-                <stop offset="1" stopColor="#B1FB59" stopOpacity="0" />
+                <stop offset="0" stopColor="#E8622C" stopOpacity=".28" />
+                <stop offset="1" stopColor="#E8622C" stopOpacity="0" />
               </linearGradient>
             </defs>
             <path d={`${SPARK} L400 70 L0 70 Z`} fill="url(#hero-spark)" />
-            <path d={SPARK} fill="none" stroke="#B1FB59" strokeWidth="2" vectorEffect="non-scaling-stroke" style={{ filter: 'drop-shadow(0 0 6px rgba(177,251,89,.6))' }} />
+            <path d={SPARK} fill="none" stroke="#E8622C" strokeWidth="2" vectorEffect="non-scaling-stroke"  />
           </svg>
           <div className="mt-5 grid grid-cols-4 gap-2">
             {['Send', 'Receive', 'Swap', 'Stake'].map((a, i) => (
-              <span key={a} className={cx('rounded-xl border py-2 text-center text-xs font-medium', i === 2 ? 'border-white bg-white text-black' : 'border-white/[0.08] bg-white/[0.02] text-white')}>
+              <span key={a} className={cx('rounded-xl border py-2 text-center text-xs font-medium', i === 2 ? 'border-fg bg-fg text-paper' : 'border-fg/[0.08] bg-fg/[0.02] text-fg')}>
                 {a}
               </span>
             ))}
           </div>
         </div>
-        <div className="bg-[#060608] p-5 sm:p-6">
-          <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Assets</p>
-          <ul className="mt-3 divide-y divide-white/[0.05]">
+        <div className="bg-paper p-5 sm:p-6">
+          <p className="text-[11.5px]  text-dim font-medium">Assets</p>
+          <ul className="mt-3 divide-y divide-fg/[0.05]">
             {rows.map((r) => (
               <li key={r.s} className="flex items-center gap-3 py-3">
                 <TokenIcon symbol={r.s} size={30} />
@@ -349,13 +389,13 @@ function ProductPreview({ price, change }: { price: number | null; change: numbe
                 </div>
                 <div className="text-right">
                   <p className="text-sm">{r.v}</p>
-                  {r.c !== null && <p className={cx('font-mono text-[11px]', r.c >= 0 ? 'text-accent' : 'text-bad')}>{fmtPct(r.c)}</p>}
+                  {r.c !== null && <p className={cx('font-mono text-[11px]', r.c >= 0 ? 'text-ok' : 'text-bad')}>{fmtPct(r.c)}</p>}
                 </div>
               </li>
             ))}
           </ul>
-          <div className="mt-3 rounded-xl border border-white/[0.07] bg-ink-900 p-3">
-            <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Swap</p>
+          <div className="mt-3 rounded-xl border border-fg/[0.07] bg-ink-900 p-3">
+            <p className="text-[11.5px]  text-dim font-medium">Swap</p>
             <div className="mt-2 flex items-center gap-2 text-sm">
               <TokenIcon symbol="ETH" size={20} /> ETH <ArrowRight className="h-3.5 w-3.5 text-dim" /> <TokenIcon symbol="WIF" size={20} /> WIF
               <span className="ml-auto font-mono text-[11px] text-accent">0% fee</span>

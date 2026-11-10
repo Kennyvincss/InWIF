@@ -13,7 +13,7 @@ export function InstallButton({ className, compact = false }: { className?: stri
     <>
       <button
         type="button"
-        className={cx(compact ? 'rounded-full border border-white/[0.08] bg-white/[0.03] p-2 transition hover:border-white/[0.16] hover:bg-white/[0.06]' : 'btn-ghost', className)}
+        className={cx(compact ? 'rounded-full border border-fg/[0.08] bg-fg/[0.03] p-2 transition hover:border-fg/[0.16] hover:bg-fg/[0.06]' : 'btn-ghost', className)}
         onClick={() => (install.canPrompt ? void install.prompt() : setIosHelp(true))}
         aria-label="Install app"
         title="Install InWIF on this device"
@@ -29,7 +29,7 @@ export function InstallButton({ className, compact = false }: { className?: stri
             { icon: Download, t: 'Tap "Add"', b: 'InWIF appears on your home screen and opens full-screen, like an app.' },
           ].map((s, i) => (
             <li key={s.t} className="flex gap-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent text-accent">
                 <s.icon className="h-4 w-4" />
               </span>
               <div>

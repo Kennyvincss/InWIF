@@ -126,10 +126,10 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
         const open = !collapsed[g.label]
         const hasActive = g.items.some((i) => i.href === active)
         return (
-          <div key={g.label} className={cx('rounded-lg', open && 'bg-ink-900 pb-1.5')}>
+          <div key={g.label} className={cx('rounded-3xl', open && 'bg-ink-900 pb-1.5')}>
             <button
               type="button"
-              className={cx('flex w-full items-center gap-3 rounded-lg px-3.5 py-3 text-[15px] transition', hasActive || open ? 'text-[#ededed]' : 'text-mute hover:text-[#ededed]')}
+              className={cx('flex w-full items-center gap-3 rounded-3xl px-3.5 py-3 text-[15px] font-medium transition', hasActive || open ? 'text-fg' : 'text-mute hover:text-fg')}
               onClick={() => setCollapsed((c) => ({ ...c, [g.label]: open }))}
               aria-expanded={open}
             >
@@ -148,8 +148,8 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
                       onClick={onNavigate}
                       aria-current={on ? 'page' : undefined}
                       className={cx(
-                        'block rounded-md py-2.5 pl-[3.1rem] pr-3 text-[14.5px] transition',
-                        on ? 'bg-accent font-medium text-[#111]' : 'text-mute hover:bg-ink-600 hover:text-[#ededed]',
+                        'block rounded-full py-2.5 pl-[3.1rem] pr-3 text-[14.5px] transition',
+                        on ? 'bg-accent-soft font-semibold text-accent-deep' : 'text-mute hover:bg-ink-600 hover:text-fg',
                       )}
                     >
                       {label}
@@ -175,8 +175,8 @@ function SideFooter({ onNavigate }: { onNavigate?: () => void }) {
           href={href}
           onClick={onNavigate}
           className={cx(
-            'flex items-center gap-3 rounded-md px-3.5 py-2.5 text-[15px] transition',
-            href === active ? 'bg-accent font-medium text-[#111]' : 'text-mute hover:bg-ink-600 hover:text-[#ededed]',
+            'flex items-center gap-3 rounded-full px-3.5 py-2.5 text-[15px] transition',
+            href === active ? 'bg-accent-soft font-semibold text-accent-deep' : 'text-mute hover:bg-ink-600 hover:text-fg',
           )}
         >
           <Icon className="h-[19px] w-[19px]" />
@@ -218,7 +218,7 @@ function CommandSearch() {
     <div ref={ref} className="relative w-full max-w-[460px]">
       <Search className="pointer-events-none absolute left-4 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-mute" />
       <input
-        className="h-11 w-full rounded-md border border-transparent bg-ink-700 pl-11 pr-3 text-[14.5px] text-[#ededed] outline-none transition placeholder:text-mute hover:border-ink-500 focus:border-accent/50"
+        className="h-11 w-full rounded-full border border-line bg-paper pl-11 pr-3 text-[14.5px] text-fg outline-none transition placeholder:text-mute hover:border-ink-500 focus:border-accent/50"
         placeholder="Search or type a command"
         aria-label="Search or type a command"
         value={q}
@@ -235,7 +235,7 @@ function CommandSearch() {
         }}
       />
       {open && (
-        <div className="absolute left-0 right-0 z-50 mt-1.5 rounded-lg border border-ink-500 bg-ink-700 p-1.5 shadow-[0_16px_40px_-12px_rgba(0,0,0,.6)]">
+        <div className="absolute left-0 right-0 z-50 mt-1.5 rounded-2xl border border-line bg-paper p-1.5 shadow-[0_18px_44px_-18px_rgba(17,17,17,.22)]">
           {results.length === 0 ? (
             <p className="px-3 py-3 text-sm text-mute">No page matches &ldquo;{q}&rdquo;.</p>
           ) : (
@@ -245,7 +245,7 @@ function CommandSearch() {
                 type="button"
                 onMouseEnter={() => setSel(i)}
                 onClick={() => go(r.href)}
-                className={cx('flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm', i === sel ? 'bg-ink-500 text-[#ededed]' : 'text-mute')}
+                className={cx('flex w-full items-center gap-3 rounded-full px-3 py-2 text-left text-sm', i === sel ? 'bg-accent-soft text-accent-deep' : 'text-mute')}
               >
                 <r.icon className="h-4 w-4" />
                 {r.label}
@@ -267,7 +267,7 @@ function NetworkStatus() {
         <span className={cx('pointer-events-none absolute left-3 h-2 w-2 rounded-full', v.data?.ok ? 'bg-ok' : 'bg-dim')} />
         <select
           aria-label="Network"
-          className="h-10 max-w-[8.5rem] cursor-pointer appearance-none truncate rounded-md border border-ink-500 bg-transparent pl-7 pr-3 text-[13px] font-medium text-[#ededed] outline-none transition hover:bg-ink-600 min-[381px]:max-w-[10rem] sm:max-w-none"
+          className="h-10 max-w-[8.5rem] cursor-pointer appearance-none truncate rounded-full border border-line bg-paper pl-7 pr-3 text-[13px] font-medium text-fg outline-none transition hover:bg-ink-600 min-[381px]:max-w-[10rem] sm:max-w-none"
           value={state.network}
           onChange={(e) => update((s) => ({ ...s, network: e.target.value as typeof s.network }))}
         >
@@ -284,7 +284,7 @@ function NetworkStatus() {
   )
 }
 
-const iconBtn = 'relative grid h-10 w-10 place-items-center rounded-md text-[#d6d6d6] transition hover:bg-ink-600 hover:text-white'
+const iconBtn = 'relative grid h-10 w-10 place-items-center rounded-full border border-line bg-paper text-fg transition hover:bg-ink-900'
 
 function Bellbox() {
   const n = useNotify()
@@ -301,20 +301,20 @@ function Bellbox() {
         }}
       >
         <Bell className="h-[19px] w-[19px]" />
-        {n.unread > 0 && <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-sm bg-sun px-1 text-[10px] font-bold text-[#1a1400]">{n.unread}</span>}
+        {n.unread > 0 && <span className="absolute right-1.5 top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[10px] font-bold text-paper">{n.unread}</span>}
       </button>
       {open && (
-        <div className="absolute right-0 z-40 mt-2 w-80 rounded-lg border border-ink-500 bg-ink-700 p-2 shadow-[0_16px_40px_-12px_rgba(0,0,0,.6)]">
+        <div className="absolute right-0 z-40 mt-2 w-80 rounded-2xl border border-line bg-paper p-2 shadow-[0_18px_44px_-18px_rgba(17,17,17,.22)]">
           <div className="flex items-center justify-between px-2 py-1">
             <span className="text-sm font-semibold">Notifications</span>
-            <button className="text-xs text-mute hover:text-white" onClick={n.clear}>
+            <button className="text-xs text-mute hover:text-fg" onClick={n.clear}>
               Clear
             </button>
           </div>
           <div className="max-h-80 overflow-y-auto">
             {n.items.length === 0 && <p className="px-2 py-6 text-center text-sm text-mute">Nothing yet.</p>}
             {n.items.map((i) => (
-              <a key={i.id} href={i.href} target={i.href ? '_blank' : undefined} rel="noreferrer" className="block rounded-md px-2 py-2 hover:bg-ink-600">
+              <a key={i.id} href={i.href} target={i.href ? '_blank' : undefined} rel="noreferrer" className="block rounded-full px-2 py-2 hover:bg-ink-600">
                 <p className="text-sm font-medium">{i.title}</p>
                 {i.body && <p className="truncate text-xs text-mute">{i.body}</p>}
                 <p className="text-[10px] text-mute">{timeAgo(new Date(i.at).toISOString())}</p>
@@ -339,14 +339,14 @@ function AccountMenu() {
     <div ref={ref} className="relative">
       <button
         type="button"
-        className="flex items-center gap-2.5 rounded-md py-1 pl-1 pr-2 transition hover:bg-ink-600"
+        className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-2 transition hover:bg-ink-600"
         onClick={() => setOpen(!open)}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Account"
         data-testid="account-button"
       >
-        <span className="rounded-full ring-2 ring-[#d6d3f7]/80 ring-offset-2 ring-offset-ink-800">
+        <span className="rounded-full ring-2 ring-accent/25 ring-offset-2 ring-offset-ink-800">
           <AddressAvatar address={activeAccount.address} size={34} />
         </span>
         <span className="hidden min-w-0 text-left xl:block">
@@ -359,7 +359,7 @@ function AccountMenu() {
         <ChevronDown className="h-4 w-4 text-mute" />
       </button>
       {open && (
-        <div role="menu" className="absolute right-0 z-40 mt-2 w-[19rem] rounded-lg border border-ink-500 bg-ink-700 p-1.5 shadow-[0_16px_40px_-12px_rgba(0,0,0,.6)]">
+        <div role="menu" className="absolute right-0 z-40 mt-2 w-[19rem] rounded-lg border border-ink-500 bg-ink-700 p-1.5 shadow-[0_18px_44px_-18px_rgba(17,17,17,.22)]">
           <div className="flex items-center gap-3 px-2.5 py-2.5">
             <AddressAvatar address={activeAccount.address} size={36} />
             <div className="min-w-0 flex-1">
@@ -368,7 +368,7 @@ function AccountMenu() {
             </div>
             <button
               type="button"
-              className="rounded-md border border-ink-500 p-1.5 text-mute hover:bg-ink-600 hover:text-white"
+              className="rounded-full border border-line p-1.5 text-mute hover:bg-ink-600 hover:text-fg"
               aria-label="Copy address"
               onClick={() => {
                 navigator.clipboard?.writeText(activeAccount.address)
@@ -382,7 +382,7 @@ function AccountMenu() {
           {copied && <p className="px-2.5 pb-1 text-xs text-ok">Address copied</p>}
           {accounts.length > 1 && (
             <div className="border-t border-line pt-1.5">
-              <p className="px-2.5 pb-1 pt-1 text-[11px] font-medium uppercase tracking-[0.04em] text-[#9095A4]">Switch account</p>
+              <p className="px-2.5 pb-1 pt-1 text-[11px] font-medium  text-dim">Switch account</p>
               <div className="max-h-56 overflow-y-auto">
                 {accounts.map(({ w, a }) => {
                   const on = w.id === activeWallet?.id && a.index === activeAccount.index
@@ -394,7 +394,7 @@ function AccountMenu() {
                         setActive(w.id, a.index)
                         setOpen(false)
                       }}
-                      className={cx('flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm', on ? 'bg-ink-500' : 'hover:bg-ink-600')}
+                      className={cx('flex w-full items-center gap-2.5 rounded-full px-2.5 py-2 text-left text-sm', on ? 'bg-accent-soft' : 'hover:bg-ink-600')}
                     >
                       <AddressAvatar address={a.address} size={22} />
                       <span className="min-w-0 flex-1 truncate">
@@ -408,7 +408,7 @@ function AccountMenu() {
             </div>
           )}
           <div className="mt-1.5 border-t border-line pt-1.5">
-            <Link href="/app/wallets" onClick={() => setOpen(false)} className="block rounded-md px-2.5 py-2 text-sm text-mute hover:bg-ink-600 hover:text-white">
+            <Link href="/app/wallets" onClick={() => setOpen(false)} className="block rounded-full px-2.5 py-2 text-sm text-mute hover:bg-ink-600 hover:text-fg">
               Manage wallets
             </Link>
           </div>
@@ -429,13 +429,13 @@ function Breadcrumbs() {
   const last = activity.data?.find((i) => i.timestamp)?.timestamp
   return (
     <div className="flex min-h-[64px] flex-wrap items-center gap-x-4 gap-y-1 border-b border-line px-4 py-3 sm:px-8">
-      <button type="button" aria-label="Back" className="-ml-1 rounded-md p-1 text-[#ededed] transition hover:bg-ink-600" onClick={() => router.back()}>
+      <button type="button" aria-label="Back" className="-ml-1 rounded-full p-1 text-fg transition hover:bg-ink-600" onClick={() => router.back()}>
         <ArrowLeft className="h-5 w-5" />
       </button>
       <p className="flex min-w-0 items-center gap-2 text-[15px]">
         {group && (
           <>
-            <span className="font-medium text-[#ededed]">{group.label}</span>
+            <span className="font-medium text-fg">{group.label}</span>
             <ChevronRight className="h-4 w-4 text-mute" />
           </>
         )}
@@ -445,7 +445,7 @@ function Breadcrumbs() {
         <p className="ml-auto flex items-center gap-2 text-[13.5px] text-mute">
           <span className="live-dot" />
           Last activity{' '}
-          <span className="text-[#ededed]">
+          <span className="text-fg">
             {new Date(last).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
           </span>
         </p>
@@ -459,7 +459,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [mobileNav, setMobileNav] = useState(false)
 
   return (
-    <div className="flex min-h-screen bg-ink-800">
+    <div className="ambient flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-[268px] shrink-0 flex-col border-r border-line bg-ink-700 px-4 pb-6 pt-7 lg:flex">
         <Link href="/" className="mb-10 px-3">
           <Logo />
@@ -473,11 +473,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       {mobileNav && (
-        <div className="fixed inset-0 z-50 bg-black/70 lg:hidden" onClick={() => setMobileNav(false)}>
+        <div className="fixed inset-0 z-50 bg-fg/35 lg:hidden" onClick={() => setMobileNav(false)}>
           <div className="flex h-full w-[284px] flex-col border-r border-line bg-ink-700 px-4 pb-6 pt-6" onClick={(e) => e.stopPropagation()}>
             <div className="mb-8 flex items-center justify-between px-3">
               <Logo />
-              <button className="rounded-md border border-ink-500 p-1.5" onClick={() => setMobileNav(false)} aria-label="Close menu">
+              <button className="rounded-full border border-line p-1.5" onClick={() => setMobileNav(false)} aria-label="Close menu">
                 <X className="h-4 w-4" />
               </button>
             </div>
@@ -492,7 +492,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="min-w-0 flex-1">
-        <header className="sticky top-0 z-30 border-b border-line bg-ink-800">
+        <header className="sticky top-0 z-30 border-b border-line bg-ink-800/80 backdrop-blur-xl">
           <div className="flex h-[72px] items-center gap-2 px-3 sm:gap-3 sm:px-8">
             <button className={cx(iconBtn, 'lg:hidden')} onClick={() => setMobileNav(true)} aria-label="Open menu">
               <Menu className="h-5 w-5" />
@@ -509,7 +509,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <Lock className="h-[19px] w-[19px]" />
                 </button>
               )}
-              <span className="mx-1 hidden h-8 w-px bg-line sm:block" />
+              
               <AccountMenu />
             </div>
           </div>

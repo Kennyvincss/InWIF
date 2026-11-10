@@ -15,10 +15,10 @@ export default function DocsPage() {
         <div className="grid gap-10 lg:grid-cols-[200px,1fr]">
           <nav className="hidden space-y-2 text-sm text-mute lg:block">
             {['architecture', 'network', 'hardware', 'developers', 'faq', 'privacy', 'terms'].map((s) => (
-              <a key={s} href={`#${s}`} className="block capitalize hover:text-white">{s}</a>
+              <a key={s} href={`#${s}`} className="block capitalize hover:text-fg">{s}</a>
             ))}
           </nav>
-          <div className="prose-invert min-w-0 max-w-3xl space-y-4 break-words text-[15px] leading-relaxed text-mute [&_b]:text-white [&_code]:break-all [&_code]:text-accent-soft">
+          <div className="prose-invert min-w-0 max-w-3xl space-y-4 break-words text-[15px] leading-relaxed text-mute [&_b]:text-fg [&_code]:break-all [&_code]:text-accent-soft">
             <H id="architecture">Architecture</H>
             <p>InWIF is a monorepo. <b>packages/core</b> is the wallet engine shared by every client: network config, keystore, BIP-39 wallets, validation, transaction review and simulation, approvals, activity, market data, swaps, security quests and the hardware protocol. <b>apps/web</b> is this site and the web wallet (Next.js). <b>apps/api</b> is an optional backend for public, non-sensitive data (PostgreSQL). <b>apps/mobile</b> (Expo) and <b>apps/desktop</b> (Tauri) reuse the core. <b>firmware</b> holds the Rust signing core for the device.</p>
             <p>Signing is always local: in the browser for software wallets, on the device for hardware wallets. The backend never signs and never receives keys.</p>
@@ -32,7 +32,7 @@ export default function DocsPage() {
             <p>Frames: <code>&apos;I&apos; &apos;W&apos; | version | cmd/status | len (u16 BE) | payload</code>. Commands: GET_INFO, GET_ADDRESS, SIGN_TX (BIP-32 path + unsigned EIP-1559 serialization), SIGN_MESSAGE, ATTEST (32-byte challenge), FIRMWARE_UPDATE. Responses carry a status byte (OK, USER_REJECTED, LOCKED, BAD_REQUEST, UNSUPPORTED, CHAIN_NOT_ALLOWED, BUSY, BAD_SIGNATURE, NOT_INITIALIZED). SIGN_TX returns <code>yParity ‖ r ‖ s</code>; the companion verifies the signature recovers to the expected account before broadcasting. Full spec: <code>docs/hardware/protocol.md</code>.</p>
 
             <H id="developers">Developers</H>
-            <pre className="overflow-x-auto rounded-xl bg-ink-900 p-4 text-xs text-white">{`pnpm install
+            <pre className="overflow-x-auto rounded-xl bg-ink-900 p-4 text-xs text-fg">{`pnpm install
 pnpm dev                      # web wallet on http://localhost:3000
 pnpm test                     # core + web + api tests
 cd firmware && cargo test     # firmware signing core`}</pre>

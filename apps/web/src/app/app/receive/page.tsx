@@ -30,7 +30,7 @@ export default function ReceivePage() {
     <div className="mx-auto max-w-2xl space-y-6">
       <PageHeader title="Receive" subtitle="Share this address to receive $WIF, ETH or any token on the selected network." />
       <div className="card grid gap-6 p-6 sm:grid-cols-[220px,1fr]">
-        <div className="rounded-2xl bg-white p-3">
+        <div className="rounded-2xl bg-paper p-3 ring-1 ring-line">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           {qr && <img src={qr} alt={`QR code for ${address}`} className="h-auto w-full" />}
         </div>
@@ -47,7 +47,7 @@ export default function ReceivePage() {
           </div>
           <div>
             <p className="label">Your address</p>
-            <p className="break-all rounded-xl border border-white/[0.08] bg-ink-900 p-3 font-mono text-sm">{address}</p>
+            <p className="break-all rounded-xl border border-fg/[0.08] bg-ink-900 p-3 font-mono text-sm">{address}</p>
           </div>
           <div className="flex gap-2">
             <CopyButton value={address} label="Copy address" />

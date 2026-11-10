@@ -81,7 +81,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
     }
   }
 
-  const card = 'card w-full max-w-xl bg-ink-800 p-6 sm:p-9'
+  const card = 'card w-full max-w-xl bg-paper p-6 sm:p-9'
 
   return (
     <div className={cx('flex items-center justify-center gap-16', !embedded && 'min-h-[80vh]')}>
@@ -124,21 +124,21 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                     <p className="text-xs text-mute">Ready in seconds. Your recovery phrase is created on this device.</p>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center gap-2">
-                  <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <div className="flex shrink-0 rounded-full border border-line bg-paper p-0.5 text-[12.5px]">
                     {([128, 256] as const).map((s) => (
-                      <button key={s} className={cx('rounded-full px-3 py-1 transition', strength === s ? 'bg-white text-black' : 'text-mute hover:text-white')} onClick={() => setStrength(s)}>
+                      <button key={s} className={cx('whitespace-nowrap rounded-full px-3 py-1 transition', strength === s ? 'bg-fg text-paper' : 'text-mute hover:text-fg')} onClick={() => setStrength(s)}>
                         {s === 128 ? '12 words' : '24 words'}
                       </button>
                     ))}
                   </div>
-                  <button className="btn-primary ml-auto" onClick={startCreate}>
+                  <button className="btn-primary ml-auto whitespace-nowrap" onClick={startCreate}>
                     Create wallet
                   </button>
                 </div>
               </div>
-              <button className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.015] p-4 text-left transition hover:border-white/[0.16] hover:bg-white/[0.035]" onClick={() => setStep('import')}>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
+              <button className="group flex w-full items-center gap-4 rounded-2xl border border-line bg-paper p-4 text-left transition hover:border-fg/[0.16] hover:bg-fg/[0.035]" onClick={() => setStep('import')}>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
                   <KeyRound className="h-5 w-5" />
                 </span>
                 <div>
@@ -147,8 +147,8 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                 </div>
               </button>
               {HARDWARE_ENABLED ? (
-                <Link href="/app/hardware" className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.015] p-4 text-left transition hover:border-white/[0.16] hover:bg-white/[0.035]" onClick={onFinished}>
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
+                <Link href="/app/hardware" className="group flex w-full items-center gap-4 rounded-2xl border border-line bg-paper p-4 text-left transition hover:border-fg/[0.16] hover:bg-fg/[0.035]" onClick={onFinished}>
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
                     <Cpu className="h-5 w-5" />
                   </span>
                   <div>
@@ -157,8 +157,8 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                   </div>
                 </Link>
               ) : (
-                <div className="flex items-center gap-4 rounded-2xl border border-white/[0.06] p-4 opacity-60" aria-disabled="true">
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-mute">
+                <div className="flex items-center gap-4 rounded-2xl border border-fg/[0.06] p-4 opacity-60" aria-disabled="true">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent text-mute">
                     <Cpu className="h-5 w-5" />
                   </span>
                   <div className="flex-1">
@@ -168,8 +168,8 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                   <span className="chip">Coming soon</span>
                 </div>
               )}
-              <button className="group flex w-full items-center gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.015] p-4 text-left transition hover:border-white/[0.16] hover:bg-white/[0.035]" onClick={() => setStep('watch')}>
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
+              <button className="group flex w-full items-center gap-4 rounded-2xl border border-line bg-paper p-4 text-left transition hover:border-fg/[0.16] hover:bg-fg/[0.035]" onClick={() => setStep('watch')}>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent text-accent transition group-hover:border-accent/40 group-hover:shadow-glow-soft">
                   <ScanEye className="h-5 w-5" />
                 </span>
                 <div>
@@ -184,9 +184,9 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
         {step === 'import' && (
           <div>
             <h2 className="font-display text-2xl font-bold">Import wallet</h2>
-            <div className="mt-4 flex rounded-xl border border-white/10 p-1 text-sm">
+            <div className="mt-4 flex rounded-xl border border-fg/10 p-1 text-sm">
               {(['phrase', 'key'] as const).map((m) => (
-                <button key={m} className={cx('flex-1 rounded-lg py-1.5', importMode === m ? 'bg-white/10' : 'text-mute')} onClick={() => setImportMode(m)}>
+                <button key={m} className={cx('flex-1 rounded-lg py-1.5', importMode === m ? 'bg-fg/10' : 'text-mute')} onClick={() => setImportMode(m)}>
                   {m === 'phrase' ? 'Recovery phrase' : 'Private key'}
                 </button>
               ))}
@@ -308,7 +308,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
               <>
                 <h2 className="mt-5 font-display text-2xl font-bold">Pick your username</h2>
                 <p className="mt-1 text-sm text-mute">
-                  Friends can send you $WIF at <span className="text-white">@username</span> instead of a long 0x address. It&apos;s free: you sign a message, no transaction.
+                  Friends can send you $WIF at <span className="text-fg">@username</span> instead of a long 0x address. It&apos;s free: you sign a message, no transaction.
                 </p>
                 <div className="mt-5">
                   {existingName.isLoading ? (
@@ -326,7 +326,7 @@ export function Onboarding({ embedded = false, onFinished }: { embedded?: boolea
                   )}
                 </div>
                 <p className="mt-3 text-xs text-dim">Your username is public and shows your wallet address to anyone who looks it up.</p>
-                <button className="mt-4 w-full text-center text-xs text-mute transition hover:text-white" onClick={() => setStep('done')}>
+                <button className="mt-4 w-full text-center text-xs text-mute transition hover:text-fg" onClick={() => setStep('done')}>
                   Skip for now, add one later in Settings
                 </button>
               </>

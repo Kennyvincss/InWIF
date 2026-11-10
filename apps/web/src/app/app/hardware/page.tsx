@@ -209,7 +209,7 @@ function HardwareConsole() {
               <h2 className="mb-2 font-display font-bold">Accounts</h2>
               {existing ? (
                 <p className="text-sm text-mute">
-                  This device is linked to wallet <b className="text-white">{existing.name}</b>. Select it in the top bar to sign with the device.
+                  This device is linked to wallet <b className="text-fg">{existing.name}</b>. Select it in the top bar to sign with the device.
                 </p>
               ) : (
                 <p className="text-sm text-mute">Read the first three public addresses from the device and add them as a hardware wallet. Keys stay on the device.</p>

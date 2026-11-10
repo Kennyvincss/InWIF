@@ -59,7 +59,7 @@ export default function DefiPage() {
         ) : (
           <ul className="space-y-2">
             {positions.data.map((p) => (
-              <li key={p.tokenId.toString()} className="rounded-xl border border-white/[0.06] p-4 text-sm">
+              <li key={p.tokenId.toString()} className="rounded-xl border border-fg/[0.06] p-4 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-semibold">
                     {p.token0.symbol} / {p.token1.symbol}

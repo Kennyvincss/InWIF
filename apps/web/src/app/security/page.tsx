@@ -29,7 +29,7 @@ export default function SecurityPage() {
         <div className="grid gap-4 md:grid-cols-3">
           {LAYERS.map(([t, b, Icon]) => (
             <div key={t} className="card card-hover group p-6">
-              <span className="inline-grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03] transition group-hover:border-accent/40 group-hover:text-accent">
+              <span className="inline-grid h-10 w-10 place-items-center rounded-2xl bg-accent-soft text-accent transition group-hover:border-accent/40 group-hover:text-accent">
                 <Icon className="h-5 w-5" />
               </span>
               <p className="mt-5 font-medium">{t}</p>

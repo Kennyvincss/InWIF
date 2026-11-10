@@ -37,11 +37,11 @@ function PayRequest() {
       <h1 className="relative mt-6 font-display text-[44px] font-semibold leading-none sm:text-[56px]">
         {r.amount ? Number(r.amount).toLocaleString('en-US', { maximumFractionDigits: 18 }) : 'Any amount'} <span className="text-gradient">{r.symbol}</span>
       </h1>
-      {r.note && <p className="relative mx-auto mt-4 max-w-sm text-lg text-white/90">&ldquo;{r.note}&rdquo;</p>}
-      <div className="relative mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl border border-white/[0.08] bg-ink-900 p-3 text-left">
+      {r.note && <p className="relative mx-auto mt-4 max-w-sm text-lg text-fg/90">&ldquo;{r.note}&rdquo;</p>}
+      <div className="relative mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl border border-fg/[0.08] bg-ink-900 p-3 text-left">
         <AddressAvatar address={r.to} size={36} />
         <div className="min-w-0 flex-1">
-          <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Pay to</p>
+          <p className="text-[11.5px]  text-dim font-medium">Pay to</p>
           <p className="break-all font-mono text-xs text-mute">{r.to}</p>
         </div>
         <CopyButton value={r.to} />

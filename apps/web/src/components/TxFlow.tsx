@@ -246,7 +246,7 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
             )}
           </div>
 
-          <div className="rounded-xl border border-white/[0.06] p-3">
+          <div className="rounded-xl border border-fg/[0.06] p-3">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-mute">Simulation</p>
             {!sim && !loadErr && (
               <p className="flex items-center gap-2 text-sm text-mute">
@@ -285,8 +285,8 @@ export function TxFlow({ request, onClose, onDone }: { request: TxRequest | null
             </div>
           )}
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 p-3 text-sm">
-            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#B1FB59]" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-fg/10 p-3 text-sm">
+            <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#E8622C]" checked={confirmed} onChange={(e) => setConfirmed(e.target.checked)} />
             <span>
               I have checked the recipient, amounts and network fee. I understand blockchain transactions are irreversible.
               {isHardware && ' I will verify the same details on my device screen.'}

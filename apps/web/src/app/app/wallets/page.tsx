@@ -120,7 +120,7 @@ function WalletCard({ wallet }: { wallet: WalletRec }) {
         </div>
       </div>
 
-      <ul className="mt-3 divide-y divide-white/[0.05]">
+      <ul className="mt-3 divide-y divide-fg/[0.05]">
         {wallet.accounts.map((a) => {
           const active = w.activeWallet?.id === wallet.id && w.activeAccount?.index === a.index
           return (

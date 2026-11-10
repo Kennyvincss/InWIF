@@ -15,7 +15,7 @@ import { AddressAvatar, Badge, Callout, CopyButton, ErrorBox, Notice, Skeleton, 
 const RANGES = Object.keys(RANGE_QUERY) as ChartRange[]
 
 function Label({ children }: { children: React.ReactNode }) {
-  return <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">{children}</p>
+  return <p className="text-[11.5px]  text-dim font-medium">{children}</p>
 }
 
 export default function Dashboard() {
@@ -82,17 +82,17 @@ export default function Dashboard() {
               {activeWallet?.kind === 'watch' && <Badge>Watch-only</Badge>}
               <button
                 aria-label={hide ? 'Show balances' : 'Hide balances'}
-                className="rounded-full p-1 text-dim transition hover:bg-white/[0.06] hover:text-white"
+                className="rounded-full p-1 text-dim transition hover:bg-fg/[0.06] hover:text-fg"
                 onClick={() => update((s) => ({ ...s, settings: { ...s.settings, hideBalances: !s.settings.hideBalances } }))}
               >
                 {hide ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
-              <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[10.5px]" role="group" aria-label="Show balance in">
+              <div className="flex rounded-full border border-fg/[0.08] bg-ink-900 p-0.5 font-mono text-[10.5px]" role="group" aria-label="Show balance in">
                 {(['WIF', 'USD'] as const).map((c) => (
                   <button
                     key={c}
                     aria-pressed={currency === c}
-                    className={cx('rounded-full px-2.5 py-0.5 transition', currency === c ? 'bg-white text-black' : 'text-mute hover:text-white')}
+                    className={cx('rounded-full px-2.5 py-0.5 transition', currency === c ? 'bg-fg text-paper' : 'text-mute hover:text-fg')}
                     onClick={() => update((s) => ({ ...s, settings: { ...s.settings, displayCurrency: c } }))}
                   >
                     {c === 'WIF' ? '$WIF' : 'USD'}
@@ -100,7 +100,7 @@ export default function Dashboard() {
                 ))}
               </div>
             </div>
-            <div className="flex w-full min-w-0 items-center gap-2 rounded-full border border-white/[0.08] bg-ink-900 py-1 pl-1 pr-1 sm:w-auto sm:max-w-[22rem]">
+            <div className="flex w-full min-w-0 items-center gap-2 rounded-full border border-fg/[0.08] bg-ink-900 py-1 pl-1 pr-1 sm:w-auto sm:max-w-[22rem]">
               <AddressAvatar address={address} size={26} />
               <span className="min-w-0 flex-1 truncate font-mono text-xs text-mute">{address}</span>
               {address && <CopyButton value={address} />}
@@ -123,7 +123,7 @@ export default function Dashboard() {
             <div className="mt-4 flex flex-wrap items-center gap-2 text-sm">
               {inWif && totals.total !== null && <span className="text-mute">≈ {mask(fmtUsd(totals.total))}</span>}
               {totals.change24hPct !== null && (
-                <span className={cx('rounded-full border px-2.5 py-0.5 font-mono text-xs', up ? 'border-accent/30 bg-accent/10 text-accent' : 'border-bad/30 bg-bad/10 text-bad')}>
+                <span className={cx('rounded-full border px-2.5 py-0.5 font-mono text-xs', up ? 'border-transparent bg-[#E3F3EA] text-ok' : 'border-bad/30 bg-bad/10 text-bad')}>
                   {fmtPct(totals.change24hPct)}
                 </span>
               )}
@@ -139,7 +139,7 @@ export default function Dashboard() {
 
           <div className="relative mt-8 flex flex-wrap gap-2">
             {actions.map(({ href, label, icon: Icon }, i) => (
-              <Link key={href} href={href} className={cx(i === 0 ? 'btn-primary' : 'btn-ghost', 'min-w-[7.5rem] flex-1 sm:flex-none')}>
+              <Link key={href} href={href} className={cx(i === 0 ? 'btn-primary' : 'btn-ghost', 'min-w-[7.5rem] flex-1 whitespace-nowrap sm:flex-none')}>
                 <Icon className="h-4 w-4" />
                 {label}
               </Link>
@@ -156,12 +156,12 @@ export default function Dashboard() {
                 <Label>World is Flat</Label>
                 <p className="font-medium">$WIF</p>
               </div>
-              <ArrowRight className="ml-auto h-4 w-4 text-dim transition group-hover:translate-x-0.5 group-hover:text-white" />
+              <ArrowRight className="ml-auto h-4 w-4 text-dim transition group-hover:translate-x-0.5 group-hover:text-fg" />
             </div>
             <div className="relative mt-5 flex items-end justify-between gap-3">
               <p className="font-display text-3xl font-semibold">{wif?.priceUsd ? fmtUsd(wif.priceUsd) : '—'}</p>
               {wif?.change24hPct !== null && wif?.change24hPct !== undefined && (
-                <span className={cx('font-mono text-xs', wif.change24hPct >= 0 ? 'text-accent' : 'text-bad')}>{fmtPct(wif.change24hPct)} 24h</span>
+                <span className={cx('font-mono text-xs', wif.change24hPct >= 0 ? 'text-ok' : 'text-bad')}>{fmtPct(wif.change24hPct)} 24h</span>
               )}
             </div>
             <p className="relative mt-1 text-xs text-dim">You hold {wif ? mask(fmtToken(wif.raw, wif.decimals, 2)) : '0'} WIF</p>
@@ -169,7 +169,7 @@ export default function Dashboard() {
 
           <Link href="/app/security" className="card group p-6">
             <div className="flex items-center gap-3">
-              <span className="grid h-10 w-10 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.03]">
+              <span className="grid h-10 w-10 place-items-center rounded-2xl bg-accent-soft text-accent">
                 <ShieldCheck className="h-5 w-5 text-accent" />
               </span>
               <div>
@@ -178,7 +178,7 @@ export default function Dashboard() {
                   {checks.filter((c) => c.ok).length}/{checks.length} checks passed
                 </p>
               </div>
-              <ArrowRight className="ml-auto h-4 w-4 text-dim transition group-hover:translate-x-0.5 group-hover:text-white" />
+              <ArrowRight className="ml-auto h-4 w-4 text-dim transition group-hover:translate-x-0.5 group-hover:text-fg" />
             </div>
             <ul className="mt-4 space-y-1.5 text-sm">
               {checks.map((c) => (
@@ -197,11 +197,11 @@ export default function Dashboard() {
               <Label>Portfolio value</Label>
               <p className="mt-1 text-sm text-mute">Your current holdings at past prices{chartInWif ? ", in $WIF" : ""}.</p>
             </div>
-            <div className="flex rounded-full border border-white/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
+            <div className="flex rounded-full border border-fg/[0.08] bg-ink-900 p-0.5 font-mono text-[11px]">
               {RANGES.map((r) => (
                 <button
                   key={r}
-                  className={cx('rounded-full px-3 py-1 transition', range === r ? 'bg-white text-black' : 'text-mute hover:text-white')}
+                  className={cx('rounded-full px-3 py-1 transition', range === r ? 'bg-fg text-paper' : 'text-mute hover:text-fg')}
                   onClick={() => setRange(r)}
                 >
                   {r.toUpperCase()}
@@ -255,15 +255,15 @@ export default function Dashboard() {
               <Skeleton className="h-40" />
             </div>
           )}
-          <div className="hidden grid-cols-[1.6fr,1fr,0.7fr,1.2fr] gap-4 border-y border-white/[0.06] bg-white/[0.015] px-6 py-2 text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] md:grid font-medium">
+          <div className="hidden grid-cols-[1.6fr,1fr,0.7fr,1.2fr] gap-4 border-y border-line bg-ink-900 px-6 py-2 text-[11.5px]  text-dim md:grid font-medium">
             <span>Asset</span>
             <span className="text-right">Price</span>
             <span className="text-right">24h</span>
             <span className="text-right">Holdings</span>
           </div>
-          <ul className="divide-y divide-white/[0.05]">
+          <ul className="divide-y divide-fg/[0.05]">
             {rows.map((r) => (
-              <li key={r.key} className="grid grid-cols-[1fr,auto] items-center gap-4 px-6 py-3.5 transition hover:bg-white/[0.02] md:grid-cols-[1.6fr,1fr,0.7fr,1.2fr]">
+              <li key={r.key} className="grid grid-cols-[1fr,auto] items-center gap-4 px-6 py-3.5 transition hover:bg-fg/[0.02] md:grid-cols-[1.6fr,1fr,0.7fr,1.2fr]">
                 <div className="flex min-w-0 items-center gap-3">
                   <TokenIcon symbol={r.symbol} size={34} />
                   <div className="min-w-0">
@@ -276,13 +276,13 @@ export default function Dashboard() {
                       <span className="md:hidden">
                         {' '}
                         · {r.priceUsd !== null ? fmtUsd(r.priceUsd) : 'no market price'}{' '}
-                        {r.change24hPct !== null && <span className={r.change24hPct >= 0 ? 'text-accent' : 'text-bad'}>{fmtPct(r.change24hPct)}</span>}
+                        {r.change24hPct !== null && <span className={r.change24hPct >= 0 ? 'text-ok' : 'text-bad'}>{fmtPct(r.change24hPct)}</span>}
                       </span>
                     </p>
                   </div>
                 </div>
                 <p className="hidden text-right text-sm text-mute md:block">{r.priceUsd !== null ? fmtUsd(r.priceUsd) : '—'}</p>
-                <p className={cx('hidden text-right font-mono text-xs md:block', r.change24hPct === null ? 'text-dim' : r.change24hPct >= 0 ? 'text-accent' : 'text-bad')}>
+                <p className={cx('hidden text-right font-mono text-xs md:block', r.change24hPct === null ? 'text-dim' : r.change24hPct >= 0 ? 'text-ok' : 'text-bad')}>
                   {r.change24hPct !== null ? fmtPct(r.change24hPct) : '—'}
                 </p>
                 <div className="text-right">
@@ -305,7 +305,7 @@ export default function Dashboard() {
             <Label>Recent activity</Label>
             <div className="flex gap-3">
               {address && explorerAddressUrl(network, address) && (
-                <a className="text-xs text-dim transition hover:text-white" href={explorerAddressUrl(network, address)} target="_blank" rel="noreferrer">
+                <a className="text-xs text-dim transition hover:text-fg" href={explorerAddressUrl(network, address)} target="_blank" rel="noreferrer">
                   Explorer ↗
                 </a>
               )}

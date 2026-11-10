@@ -142,10 +142,10 @@ function PayPageLink({ username }: { username: string }) {
   if (!origin) return null
   const link = `${origin}/@${username}`
   return (
-    <div className="w-full rounded-xl border border-white/[0.08] bg-ink-900 p-3">
-      <p className="text-[11.5px] uppercase tracking-[0.04em] text-[#9095A4] font-medium">Your pay page</p>
+    <div className="w-full rounded-xl border border-fg/[0.08] bg-ink-900 p-3">
+      <p className="text-[11.5px]  text-dim font-medium">Your pay page</p>
       <div className="mt-1.5 flex flex-wrap items-center gap-2">
-        <a href={`/@${username}`} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-mono text-sm text-white hover:text-accent" data-testid="pay-page-link">
+        <a href={`/@${username}`} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate font-mono text-sm text-fg hover:text-accent" data-testid="pay-page-link">
           {link.replace(/^https?:\/\//, '')}
         </a>
         <CopyButton value={link} label="Copy link" />
